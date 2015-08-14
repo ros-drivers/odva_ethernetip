@@ -88,6 +88,25 @@ public:
   }
 
   /**
+   * Get the sender context value from this packet
+   * @returns sender context value as a 64-bit unsigned integer (8 bytes)
+   */
+  uint64_t getSenderContext()
+  {
+    return ((uint64_t)header_.context[1] << 32) | header_.context[0];
+  }
+
+  /**
+   * Set the sender context for this packet
+   * @param context Context value as a 64-bit unsigned integer (8 bytes)
+   */
+  void setSenderContext(uint64_t context)
+  {
+    header_.context[0] = context & 0x00000000FFFFFFFF;
+    header_.context[1] = (context >> 32) & 0x00000000FFFFFFFF;
+  }
+
+  /**
    * Get the options from this packet
    * @returns options value
    */
