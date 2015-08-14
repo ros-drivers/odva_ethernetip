@@ -11,6 +11,9 @@ express permission of Clearpath Robotics.
 
 #include <ros/ros.h>
 
+#include "os32c/eip_encap_pkt.h"
+
+
 int main(int argc, char const *argv[])
 {
   ROS_ERROR("HELLO WORLD!");
