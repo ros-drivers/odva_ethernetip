@@ -125,12 +125,21 @@ public:
   }
 
   /**
-   * Get the size of this packet
-   * @returns size of packet in bytes
+   * Get the length of the payload
+   * @returns length value
    */
-  size_t getSize() const
+  EIP_UINT getLength() const
   {
-    return sizeof(header_);
+    return header_.length;
+  }
+
+  /**
+   * Set the length value for this packet
+   * @param length Length value to use
+   */
+  void setLength(EIP_UINT length)
+  {
+    header_.length = length;
   }
 
   boost::asio::const_buffer serialize() const
