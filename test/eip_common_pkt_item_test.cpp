@@ -1,7 +1,7 @@
 /**
 Software License Agreement (proprietary)
 
-\file      eip_common_pkt_test.cpp
+\file      eip_common_pkt_item_test.cpp
 \authors   Kareem Shehata <kshehata@clearpathrobotics.com>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
@@ -64,6 +64,18 @@ TEST_F(EIPCommonPktItemTest, test_serialize_int)
 }
 
 TEST_F(EIPCommonPktItemTest, test_deserialize_int)
+{
+  uint8_t dbuf[] = {0x55, 0xAA, 0x08, 0x00, 0x89, 0x67, 0x45, 0x23, 0x01, 0xEF, 
+    0xCD, 0xAB};
+  mutable_buffer b1 = buffer(dbuf);
+  EIPCommonPktItem item;
+  ASSERT_EQ(12, item.deserialize(b1));
+  EXPECT_EQ(0xAA55, item.getItemType());
+  EXPECT_EQ(8, buffer_size(item.getItemData()));
+  EXPECT_EQ(0xABCDEF0123456789, *buffer_cast<uint64_t*>(item.getItemData()));
+}
+
+TEST_F(EIPCommonPktItemTest, test_deserialize_int_extra_data)
 {
   uint8_t dbuf[] = {0x55, 0xAA, 0x08, 0x00, 0x89, 0x67, 0x45, 0x23, 0x01, 0xEF, 
     0xCD, 0xAB, 0xFF, 0xFF};

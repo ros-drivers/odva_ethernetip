@@ -18,6 +18,7 @@ using boost::asio::buffer_cast;
 
 size_t EIPCommonPktItem::serialize(mutable_buffer buf)
 {
+  // TODO(kshehata): Add checking of buffer bounds to this!
   EIP_UINT length = buffer_size(item_data_);
   buffer_copy(buf, buffer(&item_type_, sizeof(item_type_)));
   buffer_copy(buf + sizeof(item_type_), buffer(&length, sizeof(length)));

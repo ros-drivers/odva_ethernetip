@@ -38,6 +38,7 @@ include_directories(
 ## Declare a cpp library
 add_library(os32c
   src/eip_common_pkt_item.cpp
+  src/eip_common_pkt.cpp
 )
 
 ## Declare a cpp executable
@@ -96,6 +97,7 @@ target_link_libraries(os32c_node
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test test/eip_encap_pkt_test.cpp 
     test/eip_common_pkt_item_test.cpp
+    test/eip_common_pkt_test.cpp
     test/eip_test_main.cpp )
 
 if(TARGET ${PROJECT_NAME}-test)
