@@ -96,11 +96,3 @@ TEST_F(EIPEncapPktTest, test_setters)
   EXPECT_EQ(0xAD, p[22]);
   EXPECT_EQ(0xDE, p[23]);
 }
-
-
-// Run all the tests that were declared with TEST_F()
-int main(int argc, char **argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

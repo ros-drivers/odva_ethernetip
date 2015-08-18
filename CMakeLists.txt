@@ -36,9 +36,9 @@ include_directories(
 )
 
 ## Declare a cpp library
-# add_library(os32c
-#   src/${PROJECT_NAME}/os32c.cpp
-# )
+add_library(os32c
+  src/eip_common_pkt_item.cpp
+)
 
 ## Declare a cpp executable
 add_executable(os32c_node src/os32c_node.cpp)
@@ -94,10 +94,12 @@ target_link_libraries(os32c_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-catkin_add_gtest(${PROJECT_NAME}-test test/eip_encap_pkt_test.cpp)
+catkin_add_gtest(${PROJECT_NAME}-test test/eip_encap_pkt_test.cpp 
+    test/eip_common_pkt_item_test.cpp
+    test/eip_test_main.cpp )
 
 if(TARGET ${PROJECT_NAME}-test)
-  target_link_libraries(${PROJECT_NAME}-test ${Boost_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME}-test ${Boost_LIBRARIES} os32c)
 endif()
 
 ## Add folders to be run by python nosetests
