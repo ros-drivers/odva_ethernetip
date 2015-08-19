@@ -28,26 +28,17 @@ size_t EIPEncapPkt::serialize(mutable_buffer buf)
   return sizeof(header_) + header_.length;
 }
 
-/*
 size_t EIPEncapPkt::deserialize(mutable_buffer buf)
 {
-  EIP_UINT length;
-  if (buffer_size(buf) < sizeof(item_type_) + sizeof(length))
+  if (buffer_size(buf) < sizeof(header_))
   {
-    throw std::length_error("Buffer too short for item header");
+    throw std::length_error("Buffer is too small to contain encap packet header");
   }
-
-  item_type_ = *buffer_cast<EIP_UINT*>(buf);
-  buf = buf + sizeof(item_type_);
-  length = *buffer_cast<EIP_UINT*>(buf);
-  buf = buf + sizeof(length);
-
-  if (buffer_size(buf) < length)
+  buffer_copy(buffer(&header_, sizeof(header_)), buf);
+  data_ = buffer(buf + sizeof(header_), header_.length);
+  if (buffer_size(data_) != header_.length)
   {
-    throw std::length_error("Buffer too short for item data");
+    throw std::length_error("Ran out of buffer before end of payload data");
   }
-
-  item_data_ = buffer(buf, length);
-  return sizeof(item_type_) + sizeof(length) + length;
+  return sizeof(header_) + header_.length;
 }
-*/

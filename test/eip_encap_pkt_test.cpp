@@ -161,3 +161,56 @@ TEST_F(EIPEncapPktTest, test_serialization_complex_short_buffer)
   EIP_USINT d[30];
   ASSERT_THROW(pkt.serialize(buffer(d)), std::length_error);
 }
+
+TEST_F(EIPEncapPktTest, test_deserialization_simple)
+{
+  EIPEncapPkt pkt;
+  EIP_USINT d[] = {0xAA, 0x55, 0, 0x00, 0x21, 0x43, 0x65, 0x87,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  ASSERT_EQ(24, pkt.deserialize(buffer(d)));
+  
+  EXPECT_EQ(0x55AA, pkt.getCommand());
+  EXPECT_EQ(0x87654321, pkt.getSessionHandle());
+  EXPECT_EQ(0, pkt.getStatus());
+  EXPECT_EQ(0, pkt.getSenderContext());
+  EXPECT_EQ(0, pkt.getOptions());
+  EXPECT_EQ(0, pkt.getLength());
+}
+
+TEST_F(EIPEncapPktTest, test_deserialization_simple_short_buffer)
+{
+  EIPEncapPkt pkt;
+  EIP_USINT d[] = {0xAA, 0x55, 0, 0x00, 0x21, 0x43, 0x65, 0x87,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  
+  ASSERT_THROW(pkt.deserialize(buffer(d)), std::length_error);
+}
+
+TEST_F(EIPEncapPktTest, test_deserialization_complex)
+{
+  EIPEncapPkt pkt;
+  EIP_USINT d[] = {0xAA, 0x55, 0x08, 0x00, 0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 
+    0xDC, 0xFE, 0x89, 0x67, 0x45, 0x23, 0x01, 0xEF, 0xCD, 0xAB, 0xEF, 0xBE, 
+    0xAD, 0xDE, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 0, };
+
+  ASSERT_EQ(32, pkt.deserialize(buffer(d)));
+  
+  EXPECT_EQ(0x55AA, pkt.getCommand());
+  EXPECT_EQ(0x87654321, pkt.getSessionHandle());
+  EXPECT_EQ(0xFEDCBA98, pkt.getStatus());
+  EXPECT_EQ(0xABCDEF0123456789, pkt.getSenderContext());
+  EXPECT_EQ(0xDEADBEEF, pkt.getOptions());
+  EXPECT_EQ(8, pkt.getLength());
+  EXPECT_STREQ("abcdefg", buffer_cast<char*>(pkt.getData()));
+}
+
+TEST_F(EIPEncapPktTest, test_deserialization_complex_short_buffer)
+{
+  EIPEncapPkt pkt;
+  EIP_USINT d[] = {0xAA, 0x55, 0x08, 0x00, 0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 
+    0xDC, 0xFE, 0x89, 0x67, 0x45, 0x23, 0x01, 0xEF, 0xCD, 0xAB, 0xEF, 0xBE, 
+    0xAD, 0xDE, 'a', 'b', 'c', 'd', 'e', 'f', 'g', };
+
+  ASSERT_THROW(pkt.deserialize(buffer(d)), std::length_error);
+}

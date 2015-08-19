@@ -171,11 +171,6 @@ public:
    * @throw std::length_error if the buffer is too small for the header data
    */
   size_t serialize(mutable_buffer buf);
-  /*
-  {
-    return boost::asio::const_buffer(&header_, sizeof(header_));
-  }
-  */
 
   /**
    * Deserialize header data to the given buffer
