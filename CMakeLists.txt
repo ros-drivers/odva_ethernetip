@@ -39,6 +39,7 @@ include_directories(
 add_library(os32c
   src/eip_common_pkt_item.cpp
   src/eip_common_pkt.cpp
+  src/eip_encap_pkt.cpp
 )
 
 ## Declare a cpp executable

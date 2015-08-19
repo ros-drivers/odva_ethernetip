@@ -14,6 +14,8 @@ express permission of Clearpath Robotics.
 
 #include "os32c/eip_encap_pkt.h"
 
+using namespace boost::asio;
+
 class EIPEncapPktTest : public :: testing :: Test
 {
 
@@ -22,13 +24,12 @@ class EIPEncapPktTest : public :: testing :: Test
 TEST_F(EIPEncapPktTest, test_default_values)
 {
   EIPEncapPkt pkt;
-  boost::asio::const_buffer b = pkt.serialize();
-  EXPECT_EQ(24, boost::asio::buffer_size(b));
-  const EIP_USINT* p = boost::asio::buffer_cast<const EIP_USINT*>(b);
-  for (size_t i = 0; i < boost::asio::buffer_size(b); ++i)
-  {
-    EXPECT_EQ(0, p[i]);
-  }
+  EXPECT_EQ(0, pkt.getCommand());
+  EXPECT_EQ(0, pkt.getSessionHandle());
+  EXPECT_EQ(0, pkt.getStatus());
+  EXPECT_EQ(0, pkt.getSenderContext());
+  EXPECT_EQ(0, pkt.getOptions());
+  EXPECT_EQ(0, pkt.getLength());
 }
 
 TEST_F(EIPEncapPktTest, test_constructor)
@@ -36,21 +37,49 @@ TEST_F(EIPEncapPktTest, test_constructor)
   EIPEncapPkt pkt(0x55AA, 0x87654321);
   EXPECT_EQ(0x55AA, pkt.getCommand());
   EXPECT_EQ(0x87654321, pkt.getSessionHandle());
-  boost::asio::const_buffer b = pkt.serialize();
-  EXPECT_EQ(24, boost::asio::buffer_size(b));
-  const EIP_USINT* p = boost::asio::buffer_cast<const EIP_USINT*>(b);
-  EXPECT_EQ(0xAA, p[0]);
-  EXPECT_EQ(0x55, p[1]);
-  EXPECT_EQ(0,   p[2]);
-  EXPECT_EQ(0x00, p[3]);
-  EXPECT_EQ(0x21, p[4]);
-  EXPECT_EQ(0x43, p[5]);
-  EXPECT_EQ(0x65, p[6]);
-  EXPECT_EQ(0x87, p[7]);
-  for (size_t i = 8; i < boost::asio::buffer_size(b); ++i)
+  EXPECT_EQ(0, pkt.getStatus());
+  EXPECT_EQ(0, pkt.getSenderContext());
+  EXPECT_EQ(0, pkt.getOptions());
+  EXPECT_EQ(0, pkt.getLength());
+}
+
+TEST_F(EIPEncapPktTest, test_constructor_with_data)
+{
+  char data[] = "abcdefg";
+  EIPEncapPkt pkt(0x55AA, 0x87654321, buffer(data));
+  EXPECT_EQ(0x55AA, pkt.getCommand());
+  EXPECT_EQ(0x87654321, pkt.getSessionHandle());
+  EXPECT_EQ(0, pkt.getStatus());
+  EXPECT_EQ(0, pkt.getSenderContext());
+  EXPECT_EQ(0, pkt.getOptions());
+  EXPECT_EQ(8, pkt.getLength());
+  EXPECT_EQ(data, buffer_cast<char*>(pkt.getData()));
+}
+
+TEST_F(EIPEncapPktTest, test_serialization_simple)
+{
+  EIPEncapPkt pkt(0x55AA, 0x87654321);
+  EIP_USINT d[24];
+  ASSERT_EQ(24, pkt.serialize(buffer(d)));
+  EXPECT_EQ(0xAA, d[0]);
+  EXPECT_EQ(0x55, d[1]);
+  EXPECT_EQ(0,   d[2]);
+  EXPECT_EQ(0x00, d[3]);
+  EXPECT_EQ(0x21, d[4]);
+  EXPECT_EQ(0x43, d[5]);
+  EXPECT_EQ(0x65, d[6]);
+  EXPECT_EQ(0x87, d[7]);
+  for (size_t i = 8; i < sizeof(d); ++i)
   {
-    EXPECT_EQ(0, p[i]);
+    EXPECT_EQ(0, d[i]);
   }
+}
+
+TEST_F(EIPEncapPktTest, test_serialization_simple_short_buffer)
+{
+  EIPEncapPkt pkt(0x55AA, 0x87654321);
+  char d[20];
+  ASSERT_THROW(pkt.serialize(buffer(d)), std::length_error);
 }
 
 TEST_F(EIPEncapPktTest, test_setters)
@@ -61,38 +90,74 @@ TEST_F(EIPEncapPktTest, test_setters)
   pkt.setStatus(0xFEDCBA98);
   pkt.setSenderContext(0xABCDEF0123456789);
   pkt.setOptions(0xDEADBEEF);
-  pkt.setLength(1599);
+
+  char data[] = "abcdefg";
+  pkt.setData(buffer(data));
+
   EXPECT_EQ(0x55AA, pkt.getCommand());
   EXPECT_EQ(0x87654321, pkt.getSessionHandle());
   EXPECT_EQ(0xFEDCBA98, pkt.getStatus());
   EXPECT_EQ(0xABCDEF0123456789, pkt.getSenderContext());
   EXPECT_EQ(0xDEADBEEF, pkt.getOptions());
-  EXPECT_EQ(1599, pkt.getLength());
-  boost::asio::const_buffer b = pkt.serialize();
-  EXPECT_EQ(24, boost::asio::buffer_size(b));
-  const EIP_USINT* p = boost::asio::buffer_cast<const EIP_USINT*>(b);
-  EXPECT_EQ(0xAA, p[0]);
-  EXPECT_EQ(0x55, p[1]);
-  EXPECT_EQ(0x3F, p[2]);
-  EXPECT_EQ(0x06, p[3]);
-  EXPECT_EQ(0x21, p[4]);
-  EXPECT_EQ(0x43, p[5]);
-  EXPECT_EQ(0x65, p[6]);
-  EXPECT_EQ(0x87, p[7]);
-  EXPECT_EQ(0x98, p[8]);
-  EXPECT_EQ(0xBA, p[9]);
-  EXPECT_EQ(0xDC, p[10]);
-  EXPECT_EQ(0xFE, p[11]);
-  EXPECT_EQ(0x89, p[12]);
-  EXPECT_EQ(0x67, p[13]);
-  EXPECT_EQ(0x45, p[14]);
-  EXPECT_EQ(0x23, p[15]);
-  EXPECT_EQ(0x01, p[16]);
-  EXPECT_EQ(0xEF, p[17]);
-  EXPECT_EQ(0xCD, p[18]);
-  EXPECT_EQ(0xAB, p[19]);
-  EXPECT_EQ(0xEF, p[20]);
-  EXPECT_EQ(0xBE, p[21]);
-  EXPECT_EQ(0xAD, p[22]);
-  EXPECT_EQ(0xDE, p[23]);
+  EXPECT_EQ(8, pkt.getLength());
+  EXPECT_EQ(data, buffer_cast<char*>(pkt.getData()));
+}
+
+TEST_F(EIPEncapPktTest, test_serialization_complex)
+{
+  EIPEncapPkt pkt;
+  pkt.setCommand(0x55AA);
+  pkt.setSessionHandle(0x87654321);
+  pkt.setStatus(0xFEDCBA98);
+  pkt.setSenderContext(0xABCDEF0123456789);
+  pkt.setOptions(0xDEADBEEF);
+
+  char data[] = "abcdefg";
+  pkt.setData(buffer(data));
+
+  EIP_USINT d[32];
+  ASSERT_EQ(32, pkt.serialize(buffer(d)));
+
+  EXPECT_EQ(0xAA, d[0]);
+  EXPECT_EQ(0x55, d[1]);
+  EXPECT_EQ(0x08, d[2]);
+  EXPECT_EQ(0x00, d[3]);
+  EXPECT_EQ(0x21, d[4]);
+  EXPECT_EQ(0x43, d[5]);
+  EXPECT_EQ(0x65, d[6]);
+  EXPECT_EQ(0x87, d[7]);
+  EXPECT_EQ(0x98, d[8]);
+  EXPECT_EQ(0xBA, d[9]);
+  EXPECT_EQ(0xDC, d[10]);
+  EXPECT_EQ(0xFE, d[11]);
+  EXPECT_EQ(0x89, d[12]);
+  EXPECT_EQ(0x67, d[13]);
+  EXPECT_EQ(0x45, d[14]);
+  EXPECT_EQ(0x23, d[15]);
+  EXPECT_EQ(0x01, d[16]);
+  EXPECT_EQ(0xEF, d[17]);
+  EXPECT_EQ(0xCD, d[18]);
+  EXPECT_EQ(0xAB, d[19]);
+  EXPECT_EQ(0xEF, d[20]);
+  EXPECT_EQ(0xBE, d[21]);
+  EXPECT_EQ(0xAD, d[22]);
+  EXPECT_EQ(0xDE, d[23]);
+  EXPECT_EQ('a', d[24]);
+  EXPECT_EQ('b', d[25]);
+  EXPECT_EQ('c', d[26]);
+  EXPECT_EQ('d', d[27]);
+  EXPECT_EQ('e', d[28]);
+  EXPECT_EQ('f', d[29]);
+  EXPECT_EQ('g', d[30]);
+  EXPECT_EQ(0, d[31]);
+}
+
+TEST_F(EIPEncapPktTest, test_serialization_complex_short_buffer)
+{
+  EIPEncapPkt pkt;
+  char data[] = "abcdefg";
+  pkt.setData(buffer(data));
+
+  EIP_USINT d[30];
+  ASSERT_THROW(pkt.serialize(buffer(d)), std::length_error);
 }

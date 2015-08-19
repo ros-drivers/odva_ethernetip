@@ -16,6 +16,8 @@ express permission of Clearpath Robotics.
 
 #include "os32c/eip_types.h"
 
+using boost::asio::mutable_buffer;
+
 /**
  * Representation of an EtherNet/IP Encapsulation Packet
  */
@@ -27,10 +29,21 @@ public:
    * Construct an encapsulation packet
    */
   EIPEncapPkt(EIP_UINT command = 0, EIP_UDINT session_handle = 0)
+    : data_(NULL, 0)
   {
-    memset(&header_, 0, sizeof(header_));
-    header_.command = command;
-    header_.session_handle = session_handle;
+    init_header(command, session_handle);
+  }
+
+  /**
+   * Construct an encapsulation packet with a data payload
+   * @param command Command ID for the header
+   * @param session_handle Session handle to use in the header
+   * @param buf Data for the payload
+   */
+  EIPEncapPkt(EIP_UINT command, EIP_UDINT session_handle, mutable_buffer buf)
+    : data_(buf)
+  {
+    init_header(command, session_handle);
   }
 
   /**
@@ -130,25 +143,58 @@ public:
    */
   EIP_UINT getLength() const
   {
-    return header_.length;
+    return buffer_size(data_);
   }
 
   /**
-   * Set the length value for this packet
-   * @param length Length value to use
+   * Get the data payload for this packet
+   * @returns data payload buffer
    */
-  void setLength(EIP_UINT length)
+  const mutable_buffer& getData() const
   {
-    header_.length = length;
+    return data_;
   }
 
-  boost::asio::const_buffer serialize() const
+  /**
+   * Set the data payload for this packet
+   * @param buf Buffer with data payload to use
+   */
+  void setData(mutable_buffer buf)
+  {
+    data_ = buf;
+  }
+
+  /**
+   * Serialize the header to the given buffer
+   * @param buf Buffer into which to serialize the header
+   * @return number of bytes written to the buffer
+   * @throw std::length_error if the buffer is too small for the header data
+   */
+  size_t serialize(mutable_buffer buf);
+  /*
   {
     return boost::asio::const_buffer(&header_, sizeof(header_));
   }
+  */
+
+  /**
+   * Deserialize header data to the given buffer
+   * @param buf Buffer from which to read data
+   * @return number of bytes read from the buffer
+   * @throw std::length_error if the buffer is overrun while deserializing
+   */
+  size_t deserialize(mutable_buffer buf);
   
 private:
   EIP_ENCAP_HEADER header_;
+  mutable_buffer data_;
+
+  void init_header(EIP_UINT command, EIP_UDINT session_handle)
+  {
+    memset(&header_, 0, sizeof(header_));
+    header_.command = command;
+    header_.session_handle = session_handle;
+  }
 };
 
 #endif  // OS32C_EIP_ENCAP_PKT_H
