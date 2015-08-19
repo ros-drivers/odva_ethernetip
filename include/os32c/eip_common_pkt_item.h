@@ -76,6 +76,7 @@ public:
    * Serialize this item into the given buffer
    * @param buf buffer into which to serialize this item
    * @return number of bytes written to buffer
+   * @throw std::length_error if the buffer is too small to contain the item
    */
   size_t serialize(mutable_buffer buf);
 
@@ -83,6 +84,7 @@ public:
    * Deserialize item data from what is given in the buffer
    * @param buf buffer from which to pull data for this item
    * @return number of bytes read from buffer
+   * @throw std::length_error if run out of buffer while deserializing the item
    */
   size_t deserialize(mutable_buffer buf);
 

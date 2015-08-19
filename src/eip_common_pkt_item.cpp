@@ -20,10 +20,14 @@ size_t EIPCommonPktItem::serialize(mutable_buffer buf)
 {
   // TODO(kshehata): Add checking of buffer bounds to this!
   EIP_UINT length = buffer_size(item_data_);
+  if (buffer_size(buf) < sizeof(item_type_) + sizeof(length) + length)
+  {
+    throw std::length_error("Buffer too short for item data");
+  }
   buffer_copy(buf, buffer(&item_type_, sizeof(item_type_)));
   buffer_copy(buf + sizeof(item_type_), buffer(&length, sizeof(length)));
   buffer_copy(buf + sizeof(item_type_) + sizeof(length), item_data_);
-  return sizeof(item_type_) + sizeof(length)+ buffer_size(item_data_);
+  return sizeof(item_type_) + sizeof(length) + length;
 }
 
 size_t EIPCommonPktItem::deserialize(mutable_buffer buf)

@@ -75,6 +75,32 @@ TEST_F(EIPCommonPktTest, test_serialize)
   EXPECT_EQ(0,    dbuf[23]);
 }
 
+TEST_F(EIPCommonPktTest, test_serialize_short_buffer)
+{
+  uint64_t data1 = 0xABCDEF0123456789;
+  EIPCommonPktItem item1(0xAA55, buffer(&data1, sizeof(data1)));
+  char data2[] = "abcde";
+  EIPCommonPktItem item2(0x55AA, buffer(data2));
+
+  EIPCommonPkt pkt;
+  pkt.getItems().push_back(item1);
+  pkt.getItems().push_back(item2);
+
+  ASSERT_EQ(2, pkt.getItemCount());
+
+  uint8_t dbuf[14];
+  mutable_buffer b1 = buffer(dbuf);
+  ASSERT_THROW(pkt.serialize(b1), std::length_error);
+}
+
+TEST_F(EIPCommonPktTest, test_serialize_very_short_buffer)
+{
+  EIPCommonPkt pkt;
+  uint8_t dbuf[1];
+  mutable_buffer b1 = buffer(dbuf);
+  ASSERT_THROW(pkt.serialize(b1), std::length_error);
+}
+
 TEST_F(EIPCommonPktTest, test_deserialize)
 {
   uint8_t dbuf[] = {0x02, 0x00, 0x55, 0xAA, 0x08, 0x00, 0x89, 0x67, 0x45, 0x23, 

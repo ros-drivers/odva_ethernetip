@@ -18,9 +18,12 @@ using boost::asio::buffer_cast;
 
 size_t EIPCommonPkt::serialize(mutable_buffer buf)
 {
-  // TODO(kshehata): Add checking of buffer bounds
   EIP_UINT num_items = getItemCount();
   size_t total_bytes = sizeof(num_items);
+  if (buffer_size(buf) < total_bytes)
+  {
+    throw std::length_error("Buffer too short for common packet header");
+  }
   buffer_copy(buf, buffer(&num_items, sizeof(num_items)));
   for (vector<EIPCommonPktItem>::iterator it = items_.begin(); 
     it != items_.end(); ++it)

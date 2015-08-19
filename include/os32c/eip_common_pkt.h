@@ -48,6 +48,7 @@ public:
    * Serialize this packet with all of the items to the given buffer
    * @param buf buffer into which to serialize the packet
    * @return number of bytes written to buffer
+   * @throw std::length_error if the buffer is too small to contain the packet
    */
   size_t serialize(mutable_buffer buf);
 
@@ -55,6 +56,7 @@ public:
    * Deserialize packet data from the given buffer, including all items
    * @param buf buffer from which to pull packet data
    * @return number of bytes read from buffer
+   * @throw std::length_error if run out of buffer while deserializing
    */
   size_t deserialize(mutable_buffer buf);
 
