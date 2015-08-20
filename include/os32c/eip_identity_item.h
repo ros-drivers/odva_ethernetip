@@ -18,116 +18,43 @@ express permission of Clearpath Robotics.
 #include "os32c/eip_types.h"
 
 using std::string;
-using boost::asio::mutable_buffer;
 
 /**
- * Handler for CIP Identity Item data
+ * Handler for CIP Identity Item data.
+ * 
+ * Note that I'm intentionally making this like a struct. It's basically a
+ * a struct with serialization and deserialization capabilities.
+ * Not sure if I prefer this layout, or hiding data behind accessors.
  */
 class EIPIdentityItem
 {
 public:
+  EIP_UINT encap_protocol_version;
+  sockaddr_in sockaddr;
+  EIP_UINT vendor_id;
+  EIP_UINT device_type;
+  EIP_UINT product_code;
+  EIP_USINT revision[2];
+  EIP_WORD status;
+  EIP_UDINT serial_number;
+  string product_name;
+  EIP_USINT state;
 
   /**
-   * Get the encapsulation protocol version
+   * Serialize identity item data to the given buffer
+   * @param buf Buffer to which to write data
+   * @return number of bytes written to the buffer
+   * @throw std::length_error if the buffer is overrun while serializing
    */
-  EIP_UINT getEncapProtocolVersion()
-  {
-    return encap_protocol_version_;
-  }
+  size_t serialize(boost::asio::mutable_buffer buf);
 
   /**
-   * Get the socket address
-   */
-  sockaddr_in& getSockAddr()
-  {
-    return sockaddr_;
-  }
-
-  /**
-   * Get the vendor ID
-   */
-  EIP_UINT getVendorID()
-  {
-    return vendor_id_;
-  }
-
-  /**
-   * Get the device type
-   */
-  EIP_UINT getDeviceType()
-  {
-    return device_type_;
-  }
-
-  /**
-   * Get the product code
-   */
-  EIP_UINT getProductCode()
-  {
-    return product_code_;
-  }
-
-  /**
-   * Get the product revision code
-   * @param segment which rev segment to return, 0 for major, 1 for minor
-   */
-  EIP_USINT getRevision(size_t segment)
-  {
-    return revision_[segment];
-  }
-
-  /**
-   * Get the device status value
-   */
-  EIP_WORD getStatus()
-  {
-    return status_;
-  }
-
-  /**
-   * Get the device serial number
-   */
-  EIP_UDINT getSerialNumber()
-  {
-    return serial_number_;
-  }
-
-  /**
-   * Get the product name
-   */
-  string& getProductName()
-  {
-    return product_name_;
-  }
-
-  /**
-   * Get the device state value
-   */
-  EIP_USINT getState()
-  {
-    return state_;
-  }
-
-
-  /**
-   * Deserialize identity item data to the given buffer
+   * Deserialize identity item data from the given buffer
    * @param buf Buffer from which to read data
    * @return number of bytes read from the buffer
    * @throw std::length_error if the buffer is overrun while deserializing
    */
-  size_t deserialize(mutable_buffer buf);
-  
-private:
-  EIP_UINT encap_protocol_version_;
-  sockaddr_in sockaddr_;
-  EIP_UINT vendor_id_;
-  EIP_UINT device_type_;
-  EIP_UINT product_code_;
-  EIP_USINT revision_[2];
-  EIP_WORD status_;
-  EIP_UDINT serial_number_;
-  string product_name_;
-  EIP_USINT state_;
+  size_t deserialize(boost::asio::const_buffer buf);  
 };
 
 #endif  // OS32C_EIP_IDENTITY_ITEM_H

@@ -17,9 +17,7 @@ express permission of Clearpath Robotics.
 
 #include "os32c/eip_types.h"
 
-using boost::asio::buffer;
 using boost::asio::const_buffer;
-using boost::asio::buffer_cast;
 
 /**
  * Helper class to read values out of a buffer to assist in deserializing.
@@ -43,11 +41,11 @@ public:
   template <typename T>
   void read(T& v)
   {
-    if (buffer_size(buf_) < sizeof(T))
+    if (boost::asio::buffer_size(buf_) < sizeof(T))
     {
       throw std::length_error("Buffer too small to deserialize value");
     }
-    buffer_copy(buffer(&v, sizeof(v)), buf_);
+    boost::asio::buffer_copy(boost::asio::buffer(&v, sizeof(v)), buf_);
     byte_count_ += sizeof(T);
     buf_ = buf_ + sizeof(T);
   }
@@ -61,11 +59,11 @@ public:
    */
   const char* readBytes(size_t n)
   {
-    if (buffer_size(buf_) < n)
+    if (boost::asio::buffer_size(buf_) < n)
     {
       throw std::length_error("Buffer too small to deserialize value");
     }
-    const char* p = buffer_cast<const char*>(buf_);
+    const char* p = boost::asio::buffer_cast<const char*>(buf_);
     byte_count_ += n;
     buf_ = buf_ + n;
     return p;
