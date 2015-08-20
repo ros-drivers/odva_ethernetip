@@ -59,14 +59,26 @@ public:
    */
   const char* readBytes(size_t n)
   {
+    return boost::asio::buffer_cast<const char*>(readBuffer(n));
+  }
+
+  /**
+   * Read a set of bytes from the buffer. Automatically increases the number of 
+   * bytes read and advances the pointer in the buffer
+   * @param n number of bytes to read
+   * @return buffer of resulting data
+   * @throw std::length_error if the buffer is too small to contain that many bytes
+   */
+  const_buffer readBuffer(size_t n)
+  {
     if (boost::asio::buffer_size(buf_) < n)
     {
       throw std::length_error("Buffer too small to deserialize value");
     }
-    const char* p = boost::asio::buffer_cast<const char*>(buf_);
+    const_buffer b = buffer(buf_, n);
     byte_count_ += n;
     buf_ = buf_ + n;
-    return p;
+    return b;
   }
 
   /**

@@ -10,6 +10,8 @@ express permission of Clearpath Robotics.
 */
 
 #include "os32c/eip_common_pkt_item.h"
+#include "os32c/eip_buffer_writer.h"
+#include "os32c/eip_buffer_reader.h"
 
 using boost::asio::buffer;
 using boost::asio::buffer_size;
@@ -19,34 +21,20 @@ using boost::asio::buffer_cast;
 size_t EIPCommonPktItem::serialize(mutable_buffer buf)
 {
   EIP_UINT length = buffer_size(item_data_);
-  if (buffer_size(buf) < sizeof(item_type_) + sizeof(length) + length)
-  {
-    throw std::length_error("Buffer too short for item data");
-  }
-  buffer_copy(buf, buffer(&item_type_, sizeof(item_type_)));
-  buffer_copy(buf + sizeof(item_type_), buffer(&length, sizeof(length)));
-  buffer_copy(buf + sizeof(item_type_) + sizeof(length), item_data_);
-  return sizeof(item_type_) + sizeof(length) + length;
+  EIPBufferWriter writer(buf);
+  writer.write(item_type_);
+  writer.write(length);
+  writer.writeBuffer(item_data_);
+  return writer.getByteCount();
 }
 
 size_t EIPCommonPktItem::deserialize(mutable_buffer buf)
 {
   EIP_UINT length;
-  if (buffer_size(buf) < sizeof(item_type_) + sizeof(length))
-  {
-    throw std::length_error("Buffer too short for item header");
-  }
-
-  item_type_ = *buffer_cast<EIP_UINT*>(buf);
-  buf = buf + sizeof(item_type_);
-  length = *buffer_cast<EIP_UINT*>(buf);
-  buf = buf + sizeof(length);
-
-  if (buffer_size(buf) < length)
-  {
-    throw std::length_error("Buffer too short for item data");
-  }
-
-  item_data_ = buffer(buf, length);
-  return sizeof(item_type_) + sizeof(length) + length;
+  EIPBufferReader reader(buf);
+  reader.read(item_type_);
+  reader.read(length);
+  // intentionally casting back to mutable buffer so that item data is mutable
+  item_data_ = buffer((void*)reader.readBytes(length), length);
+  return reader.getByteCount();
 }

@@ -17,6 +17,7 @@ express permission of Clearpath Robotics.
 
 #include "os32c/eip_types.h"
 
+using boost::asio::const_buffer;
 using boost::asio::mutable_buffer;
 
 /**
@@ -59,13 +60,27 @@ public:
    */
   void writeBytes(const void* p, size_t n)
   {
-    if (boost::asio::buffer_size(buf_) < n)
+    writeBuffer(boost::asio::buffer(p, n));
+  }
+
+  /**
+   * Write out the contents of a buffer into the current buffer.
+   * Automatically increases the bytes written and advances the pointer
+   * into the current output buffer.
+   * @param b buffer of data to add to the current buffer at the current location
+   * @throw std::length_error if the output buffer is too small to contain the 
+   * contents of b
+   */
+  void writeBuffer(const_buffer b)
+  {
+    using boost::asio::buffer_size;
+    if (buffer_size(buf_) < buffer_size(b))
     {
-      throw std::length_error("Buffer too small to deserialize value");
+      throw std::length_error("Buffer to small to serialize value");
     }
-    boost::asio::buffer_copy(buf_, boost::asio::buffer(p, n));
-    byte_count_ += n;
-    buf_ = buf_ + n;
+    boost::asio::buffer_copy(buf_, b);
+    byte_count_ += buffer_size(b);
+    buf_ = buf_ + buffer_size(b);
   }
 
   /**
