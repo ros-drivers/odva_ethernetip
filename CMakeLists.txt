@@ -40,6 +40,7 @@ add_library(os32c
   src/eip_common_pkt_item.cpp
   src/eip_common_pkt.cpp
   src/eip_encap_pkt.cpp
+  src/eip_identity_item.cpp
 )
 
 ## Declare a cpp executable
@@ -99,6 +100,7 @@ target_link_libraries(os32c_node
 catkin_add_gtest(${PROJECT_NAME}-test test/eip_encap_pkt_test.cpp 
     test/eip_common_pkt_item_test.cpp
     test/eip_common_pkt_test.cpp
+    test/eip_identity_item_test.cpp
     test/eip_test_main.cpp )
 
 if(TARGET ${PROJECT_NAME}-test)
