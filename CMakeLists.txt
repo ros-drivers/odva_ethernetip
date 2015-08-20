@@ -41,6 +41,7 @@ add_library(os32c
   src/eip_common_pkt.cpp
   src/eip_encap_pkt.cpp
   src/eip_identity_item.cpp
+  src/eip_io_scanner.cpp
 )
 
 ## Declare a cpp executable
@@ -52,6 +53,7 @@ add_executable(os32c_node src/os32c_node.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(os32c_node
+  os32c
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
   ${boost_LIBRARIES}

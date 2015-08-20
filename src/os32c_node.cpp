@@ -11,11 +11,20 @@ express permission of Clearpath Robotics.
 
 #include <ros/ros.h>
 
-#include "os32c/eip_encap_pkt.h"
+#include "os32c/eip_io_scanner.h"
 
+using std::cout;
+using std::endl;
 
 int main(int argc, char const *argv[])
 {
-  ROS_ERROR("HELLO WORLD!");
+  if (argc != 2)
+  {
+    cout << "Usage: os32c_node [hostname]" << endl;
+    return 1;
+  }
+  boost::asio::io_service io_service;
+  EIPIOScanner scanner(io_service, argv[1]);
+  scanner.run();
   return 0;
 }
