@@ -33,6 +33,21 @@ public:
    */
   EIPSession(boost::asio::io_service& io_service);
 
+  ~EIPSession()
+  {
+    try
+    {
+      if (session_id_ != 0)
+      {
+        close();
+      }
+    }
+    catch (...)
+    {
+      // can't throw exceptions, but can't do anything either
+    }
+  }
+
   /**
    * Open the session by opening the port and requesting a session.
    * @param hostname hostname of the target
