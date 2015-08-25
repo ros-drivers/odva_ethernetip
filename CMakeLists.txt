@@ -42,6 +42,7 @@ add_library(os32c
   src/eip_encap_pkt.cpp
   src/eip_identity_item.cpp
   src/eip_io_scanner.cpp
+  src/eip_session.cpp
 )
 
 ## Declare a cpp executable

@@ -14,6 +14,8 @@ express permission of Clearpath Robotics.
 
 #include <stdint.h>
 
+#define EIP_PROTOCOL_VERSION 1
+
 // EtherNet/IP type defs
 typedef bool      EIP_BOOL;   //< 1-bit value
 typedef uint8_t   EIP_BYTE;   //< 8-bit string
