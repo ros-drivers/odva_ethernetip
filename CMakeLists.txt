@@ -44,6 +44,7 @@ add_library(os32c
   src/eip_io_scanner.cpp
   src/eip_session.cpp
   src/eip_path.cpp
+  src/eip_rr_data_cmd.cpp
 )
 
 ## Declare a cpp executable
@@ -106,6 +107,7 @@ catkin_add_gtest(${PROJECT_NAME}-test test/eip_encap_pkt_test.cpp
     test/eip_common_pkt_test.cpp
     test/eip_identity_item_test.cpp
     test/eip_path_test.cpp
+    test/eip_rr_data_cmd_test.cpp
     test/eip_test_main.cpp )
 
 if(TARGET ${PROJECT_NAME}-test)
