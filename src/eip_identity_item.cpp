@@ -55,3 +55,43 @@ size_t EIPIdentityItem::deserialize(boost::asio::const_buffer buf)
   reader.read(state);
   return reader.getByteCount();
 }
+
+#define WRITE_BIN(ost, v) ost.write((char*)&v, sizeof(v))
+#define READ_BIN(ist, v) ist.read((char*)&v, sizeof(v))
+
+ostream& operator<<(ostream& ost, const EIPIdentityItem& id)
+{
+  WRITE_BIN(ost, id.encap_protocol_version);
+  WRITE_BIN(ost, id.sockaddr);
+  WRITE_BIN(ost, id.vendor_id);
+  WRITE_BIN(ost, id.device_type);
+  WRITE_BIN(ost, id.product_code);
+  WRITE_BIN(ost, id.revision);
+  WRITE_BIN(ost, id.status);
+  WRITE_BIN(ost, id.serial_number);
+
+  EIP_USINT name_length = id.product_name.size();
+  WRITE_BIN(ost, name_length);
+  ost << id.product_name;
+  WRITE_BIN(ost, id.state);
+  return ost;
+}
+
+istream& operator>>(istream& ist, EIPIdentityItem& id)
+{
+  READ_BIN(ist, id.encap_protocol_version);
+  READ_BIN(ist, id.sockaddr);
+  READ_BIN(ist, id.vendor_id);
+  READ_BIN(ist, id.device_type);
+  READ_BIN(ist, id.product_code);
+  READ_BIN(ist, id.revision);
+  READ_BIN(ist, id.status);
+  READ_BIN(ist, id.serial_number);
+
+  EIP_USINT name_length;
+  READ_BIN(ist, name_length);
+  id.product_name.resize(name_length);
+  ist.read(&id.product_name[0], name_length);
+  READ_BIN(ist, id.state);
+  return ist;
+}

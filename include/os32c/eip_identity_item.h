@@ -13,18 +13,17 @@ express permission of Clearpath Robotics.
 #define OS32C_EIP_IDENTITY_ITEM_H
 
 #include <string>
+#include <iostream>
 #include <boost/asio.hpp>
 
 #include "os32c/eip_types.h"
 
 using std::string;
+using std::ostream;
+using std::istream;
 
 /**
- * Handler for CIP Identity Item data.
- * 
- * Note that I'm intentionally making this like a struct. It's basically a
- * a struct with serialization and deserialization capabilities.
- * Not sure if I prefer this layout, or hiding data behind accessors.
+ * Data structure and operators for CIP Identity Item data.
  */
 class EIPIdentityItem
 {
@@ -56,5 +55,8 @@ public:
    */
   size_t deserialize(boost::asio::const_buffer buf);  
 };
+
+ostream& operator<<(ostream& ost, const EIPIdentityItem& id);
+istream& operator>>(istream& ist, EIPIdentityItem& id);
 
 #endif  // OS32C_EIP_IDENTITY_ITEM_H

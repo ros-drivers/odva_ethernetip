@@ -11,6 +11,8 @@ express permission of Clearpath Robotics.
 
 #include <gtest/gtest.h>
 #include <boost/asio.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/device/array.hpp>
 
 #include "os32c/eip_identity_item.h"
 
@@ -27,8 +29,11 @@ TEST_F(EIPIdentityItemTest, test_deserialize)
     0, 0, 0, 0, 0, 0, 0, 0, 0xEE, 0xDD, 0x98, 0x76, 0xA5, 0x5A, 0x6B, 0xC7, 
     0xE7, 0x81, 0x78, 0x56, 0x34, 0x12, 0x06, 'a', 'b', 'c', 'd', 'e', 'f', 0x7E};
 
+  boost::iostreams::basic_array_source<char> sr((const char*)d, sizeof(d));  
+  boost::iostreams::stream< boost::iostreams::basic_array_source<char> > is(sr);
+
   EIPIdentityItem id;
-  EXPECT_EQ(sizeof(d), id.deserialize(buffer(d)));
+  is >> id;
   EXPECT_EQ(0xAA55, id.encap_protocol_version);
   EXPECT_EQ(0x0200, id.sockaddr.sin_family);
   EXPECT_EQ(0x3412, id.sockaddr.sin_port);
@@ -62,7 +67,9 @@ TEST_F(EIPIdentityItemTest, test_serialize)
   id.state = 0x7E;
 
   EIP_BYTE d[40];
-  mutable_buffer b = buffer(d);
+  boost::iostreams::basic_array_sink<char> sr((char*)d, sizeof(d));  
+  boost::iostreams::stream< boost::iostreams::basic_array_sink<char> > os(sr);
+  os << id;
   EXPECT_EQ(sizeof(d), id.serialize(buffer(d)));
   EXPECT_EQ(d[0], 0x55);
   EXPECT_EQ(d[1], 0xAA);
