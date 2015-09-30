@@ -10,10 +10,7 @@ express permission of Clearpath Robotics.
 */
 
 #include "os32c/eip_encap_header.h"
-
-#define WRITE_BIN(ost, v) ost.write((char*)&v, sizeof(v))
-#define READ_BIN(ist, v) ist.read((char*)&v, sizeof(v))
-
+#include "os32c/eip_serialization_helpers.h"
 
 std::ostream& operator<<(std::ostream& ost, const EIPEncapHeader& header)
 {

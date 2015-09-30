@@ -12,6 +12,7 @@ express permission of Clearpath Robotics.
 #include "os32c/eip_identity_item.h"
 #include "os32c/eip_buffer_writer.h"
 #include "os32c/eip_buffer_reader.h"
+#include "os32c/eip_serialization_helpers.h"
 
 using boost::asio::buffer;
 using boost::asio::buffer_size;
@@ -55,9 +56,6 @@ size_t EIPIdentityItem::deserialize(boost::asio::const_buffer buf)
   reader.read(state);
   return reader.getByteCount();
 }
-
-#define WRITE_BIN(ost, v) ost.write((char*)&v, sizeof(v))
-#define READ_BIN(ist, v) ist.read((char*)&v, sizeof(v))
 
 ostream& operator<<(ostream& ost, const EIPIdentityItem& id)
 {
