@@ -37,6 +37,7 @@ include_directories(
 
 ## Declare a cpp library
 add_library(os32c
+  src/eip_cpf_packet.cpp
   src/eip_cpf_item.cpp
   src/eip_common_pkt_item.cpp
   src/eip_common_pkt.cpp
@@ -108,6 +109,7 @@ catkin_add_gtest(${PROJECT_NAME}-test test/eip_encap_pkt_test.cpp
     test/eip_encap_header_test.cpp
     test/eip_cpf_null_item_test.cpp
     test/eip_cpf_item_primitive_test.cpp
+    test/eip_cpf_packet_test.cpp
     test/eip_common_pkt_item_test.cpp
     test/eip_common_pkt_test.cpp
     test/eip_identity_item_test.cpp
