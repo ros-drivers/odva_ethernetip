@@ -37,6 +37,7 @@ include_directories(
 
 ## Declare a cpp library
 add_library(os32c
+  src/serialization/serializable.cpp
   src/eip_cpf_packet.cpp
   src/eip_cpf_item.cpp
   src/eip_common_pkt_item.cpp
@@ -110,6 +111,7 @@ catkin_add_gtest(${PROJECT_NAME}-test test/eip_encap_pkt_test.cpp
     test/serialization/buffer_reader_test.cpp
     test/serialization/stream_writer_test.cpp
     test/serialization/stream_reader_test.cpp
+    test/serialization/serializable_buffer_test.cpp
     test/eip_encap_header_test.cpp
     test/eip_cpf_null_item_test.cpp
     test/eip_cpf_item_primitive_test.cpp

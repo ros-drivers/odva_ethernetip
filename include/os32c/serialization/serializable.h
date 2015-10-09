@@ -12,8 +12,8 @@ express permission of Clearpath Robotics.
 #ifndef EIP_SERIALIZABLE_H
 #define EIP_SERIALIZABLE_H
 
-#include "os32c/eip_buffer_writer.h"
-#include "os32c/eip_buffer_reader.h"
+#include "os32c/serialization/writer.h"
+#include "os32c/serialization/reader.h"
 
 namespace eip {
 namespace serialization {
@@ -32,7 +32,7 @@ public:
 
   /**
    * Serialize data into the given buffer
-   * @param buf Writer to use for serialization
+   * @param writer Writer to use for serialization
    * @return the writer again
    * @throw std::length_error if the buffer is too small for the header data
    */
@@ -45,7 +45,7 @@ public:
    * @return the reader again
    * @throw std::length_error if the buffer is overrun while deserializing
    */
-  virtual Reader& deserialize(const Reader& reader, size_t length) = 0;
+  virtual Reader& deserialize(Reader& reader, size_t length) = 0;
 
   /**
    * Deserialize data from the given reader without length information
@@ -53,7 +53,7 @@ public:
    * @return the reader again
    * @throw std::length_error if the buffer is overrun while deserializing
    */
-  virtual Reader& deserialize(const Reader& reader) = 0;
+  virtual Reader& deserialize(Reader& reader) = 0;
 };
 
 Writer& operator<<(Writer& writer, const Serializable& s);
