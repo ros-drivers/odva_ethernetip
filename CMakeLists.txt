@@ -106,6 +106,10 @@ target_link_libraries(os32c_node
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test test/eip_encap_pkt_test.cpp 
+    test/serialization/buffer_writer_test.cpp
+    test/serialization/buffer_reader_test.cpp
+    test/serialization/stream_writer_test.cpp
+    test/serialization/stream_reader_test.cpp
     test/eip_encap_header_test.cpp
     test/eip_cpf_null_item_test.cpp
     test/eip_cpf_item_primitive_test.cpp
