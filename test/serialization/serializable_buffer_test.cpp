@@ -48,26 +48,6 @@ TEST_F(SerializableBufferTest, test_serialize)
   EXPECT_EQ(0x34, d[7]);
 }
 
-TEST_F(SerializableBufferTest, test_serialize_operator)
-{
-  unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
-  SerializableBuffer sb(buffer(input));
-
-  unsigned char d[8]; 
-  BufferWriter writer(buffer(d));
-
-  writer << (Serializable&)sb;
-  EXPECT_EQ(8, writer.getByteCount());
-  EXPECT_EQ(0xFF, d[0]);
-  EXPECT_EQ(0xFE, d[1]);
-  EXPECT_EQ(0xFD, d[2]);
-  EXPECT_EQ(0xFC, d[3]);
-  EXPECT_EQ(0xFB, d[4]);
-  EXPECT_EQ(0xFA, d[5]);
-  EXPECT_EQ(0x12, d[6]);
-  EXPECT_EQ(0x34, d[7]);
-}
-
 TEST_F(SerializableBufferTest, test_write_bytes_short_buffer)
 {
   unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
@@ -88,27 +68,6 @@ TEST_F(SerializableBufferTest, test_deserialize)
   shared_ptr<Serializable> sb = make_shared<SerializableBuffer> (buffer(d));
 
   sb->deserialize(reader);
-
-  EXPECT_EQ(8, reader.getByteCount());
-  EXPECT_EQ(0xFF, d[0]);
-  EXPECT_EQ(0xFE, d[1]);
-  EXPECT_EQ(0xFD, d[2]);
-  EXPECT_EQ(0xFC, d[3]);
-  EXPECT_EQ(0xFB, d[4]);
-  EXPECT_EQ(0xFA, d[5]);
-  EXPECT_EQ(0x12, d[6]);
-  EXPECT_EQ(0x34, d[7]);
-}
-
-TEST_F(SerializableBufferTest, test_deserialize_operator)
-{
-  unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
-  BufferReader reader(buffer(input));
-
-  unsigned char d[8];  
-  shared_ptr<Serializable> sb = make_shared<SerializableBuffer> (buffer(d));
-
-  reader >> *sb;
 
   EXPECT_EQ(8, reader.getByteCount());
   EXPECT_EQ(0xFF, d[0]);

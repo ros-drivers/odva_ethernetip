@@ -56,9 +56,6 @@ public:
   virtual Reader& deserialize(Reader& reader) = 0;
 };
 
-Writer& operator<<(Writer& writer, const Serializable& s);
-Reader& operator>>(Reader& reader, Serializable& s);
-
 } // namespace serialization
 } // namespace eip
 #endif  // EIP_SERIALIZABLE_H

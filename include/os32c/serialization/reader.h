@@ -59,15 +59,6 @@ public:
    * @return number of bytes read from the buffer
    */
   virtual size_t getByteCount() = 0;
-
-  /**
-   * Read using the >> operator
-   * @param v Value holder to read in to
-   */
-  template <typename T> Reader& operator>>(T& v)
-  {
-    read(v);
-  }
 };
 
 } // namespace serialization

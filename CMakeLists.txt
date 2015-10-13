@@ -37,7 +37,6 @@ include_directories(
 
 ## Declare a cpp library
 add_library(os32c
-  src/serialization/serializable.cpp
   src/eip_cpf_packet.cpp
   src/eip_cpf_item.cpp
   src/eip_common_pkt_item.cpp

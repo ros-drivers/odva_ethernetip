@@ -42,7 +42,7 @@ TEST_F(StreamReaderTest, test_read_int)
   reader->read(value);
   EXPECT_EQ(0x123455AA, value);
   EXPECT_EQ(4, reader->getByteCount());
-  *reader >> value;
+  reader->read(value);
   EXPECT_EQ(0xDEADBEEF, value);
   EXPECT_EQ(8, reader->getByteCount());
 }
@@ -55,7 +55,7 @@ TEST_F(StreamReaderTest, test_read_int_short_buffer)
   EIP_UDINT value;
   reader->read(value);
   EXPECT_EQ(0x123455AA, value);
-  ASSERT_THROW(*reader >> value, std::length_error);
+  ASSERT_THROW(reader->read(value), std::length_error);
 }
 */
 

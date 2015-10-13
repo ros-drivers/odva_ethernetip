@@ -38,7 +38,7 @@ TEST_F(StreamWriterTest, test_write_int)
   EIP_UDINT value = 0x123455AA;
   writer->write(value);
   value = 0xDEADBEEF;
-  *writer << value;
+  writer->write(value);
 
   EXPECT_EQ(8, writer->getByteCount());
   EXPECT_EQ(0xAA, d[0]);
@@ -62,7 +62,7 @@ TEST_F(StreamWriterTest, test_write_int_short_buffer)
   EIP_UDINT value = 0x123455AA;
   writer->write(value);
   value = 0xDEADBEEF;
-  ASSERT_THROW(*writer << value, std::length_error);
+  ASSERT_THROW(writer->write(value), std::length_error);
 }
 */
 

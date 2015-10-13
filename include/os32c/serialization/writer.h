@@ -59,15 +59,6 @@ public:
    * @return number of bytes writen to the buffer
    */
   virtual size_t getByteCount() = 0;
-
-  /**
-   * Write using the << operator
-   * @param v Value to write
-   */
-  template <typename T> Writer& operator<<(const T& v)
-  {
-    write(v);
-  }
 };
 
 } // namespace serialization
