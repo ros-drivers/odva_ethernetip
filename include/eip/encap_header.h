@@ -9,21 +9,23 @@ Redistribution and use in source and binary forms, with or without modification,
 express permission of Clearpath Robotics.
 */
 
-#ifndef OS32C_EIP_ENCAP_HEADER_H
-#define OS32C_EIP_ENCAP_HEADER_H
+#ifndef EIP_ENCAP_HEADER_H
+#define EIP_ENCAP_HEADER_H
 
 #include <iostream>
-#include "os32c/eip_types.h"
-#include "os32c/serialization/serializable.h"
+#include "eip/eip_types.h"
+#include "eip/serialization/serializable.h"
 
-using eip::serialization::Serializable;
-using eip::serialization::Reader;
-using eip::serialization::Writer;
+namespace eip {
+
+using serialization::Serializable;
+using serialization::Reader;
+using serialization::Writer;
 
 /**
  * Representation of an EtherNet/IP Encapsulation Packet Header
  */
-class EIPEncapHeader : public Serializable
+class EncapHeader : public Serializable
 {
 public:
   EIP_UINT  command;
@@ -36,7 +38,7 @@ public:
   /**
    * Construct an encapsulation packet for a given command and session handle
    */
-  EIPEncapHeader(EIP_UINT cmd = 0, EIP_UDINT handle = 0)
+  EncapHeader(EIP_UINT cmd = 0, EIP_UDINT handle = 0)
     : command(cmd), length(0), session_handle(handle), status(0), options(0)
   {
     context[0] = 0;
@@ -86,4 +88,6 @@ public:
   virtual Reader& deserialize(Reader& reader);
 };
 
-#endif  // OS32C_EIP_ENCAP_HEADER_H
+} // namespace eip
+
+#endif  // EIP_ENCAP_HEADER_H

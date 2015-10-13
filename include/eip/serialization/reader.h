@@ -15,7 +15,7 @@ express permission of Clearpath Robotics.
 #include <stdexcept>
 #include <boost/asio.hpp>
 
-#include "os32c/eip_types.h"
+#include "eip/eip_types.h"
 
 using boost::asio::mutable_buffer;
 

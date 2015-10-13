@@ -12,8 +12,8 @@ express permission of Clearpath Robotics.
 #ifndef EIP_SERIALIZABLE_H
 #define EIP_SERIALIZABLE_H
 
-#include "os32c/serialization/writer.h"
-#include "os32c/serialization/reader.h"
+#include "eip/serialization/writer.h"
+#include "eip/serialization/reader.h"
 
 namespace eip {
 namespace serialization {

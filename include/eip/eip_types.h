@@ -9,8 +9,8 @@ Redistribution and use in source and binary forms, with or without modification,
 express permission of Clearpath Robotics.
 */
 
-#ifndef OS32C_EIP_TYPES_H
-#define OS32C_EIP_TYPES_H
+#ifndef EIP_EIP_TYPES_H
+#define EIP_EIP_TYPES_H
 
 #include <stdint.h>
 
@@ -90,4 +90,4 @@ typedef struct
   EIP_DWORD options;
 } EIP_ENCAP_HEADER;
 
-#endif  // OS32C_EIP_TYPES_H
+#endif  // EIP_EIP_TYPES_H
