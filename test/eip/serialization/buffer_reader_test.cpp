@@ -14,7 +14,7 @@ express permission of Clearpath Robotics.
 #include <boost/make_shared.hpp>
 #include <boost/asio.hpp>
 
-#include "os32c/serialization/buffer_reader.h"
+#include "eip/serialization/buffer_reader.h"
 
 using boost::shared_ptr;
 using boost::make_shared;

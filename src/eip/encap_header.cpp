@@ -1,7 +1,7 @@
 /**
 Software License Agreement (proprietary)
 
-\file      eip_encap_header.cpp
+\file      encap_header.cpp
 \authors   Kareem Shehata <kshehata@clearpathrobotics.com>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
@@ -9,9 +9,16 @@ Redistribution and use in source and binary forms, with or without modification,
 express permission of Clearpath Robotics.
 */
 
-#include "os32c/eip_encap_header.h"
+#include "eip/encap_header.h"
 
-Writer& EIPEncapHeader::serialize(Writer& writer) const
+
+namespace eip {
+
+using serialization::Reader;
+using serialization::Writer;
+
+
+Writer& EncapHeader::serialize(Writer& writer) const
 {
   writer.write(command);
   writer.write(length);
@@ -22,7 +29,7 @@ Writer& EIPEncapHeader::serialize(Writer& writer) const
   return writer;
 }
 
-Reader& EIPEncapHeader::deserialize(Reader& reader)
+Reader& EncapHeader::deserialize(Reader& reader)
 {
   reader.read(command);
   reader.read(length);
@@ -32,3 +39,5 @@ Reader& EIPEncapHeader::deserialize(Reader& reader)
   reader.read(options);
   return reader;
 }
+
+} // namespace eip

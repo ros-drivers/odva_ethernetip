@@ -1,7 +1,7 @@
 /**
 Software License Agreement (proprietary)
 
-\file      eip_encap_header_test.cpp
+\file      encap_header_test.cpp
 \authors   Kareem Shehata <kshehata@clearpathrobotics.com>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
@@ -11,20 +11,21 @@ express permission of Clearpath Robotics.
 
 #include <gtest/gtest.h>
 
-#include "os32c/serialization/buffer_writer.h"
-#include "os32c/serialization/buffer_reader.h"
-#include "os32c/eip_encap_header.h"
+#include "eip/serialization/buffer_writer.h"
+#include "eip/serialization/buffer_reader.h"
+#include "eip/encap_header.h"
 
+using namespace eip;
 using namespace eip::serialization;
 
-class EIPEncapHeaderTest : public :: testing :: Test
+class EncapHeaderTest : public :: testing :: Test
 {
 
 };
 
-TEST_F(EIPEncapHeaderTest, test_default_values)
+TEST_F(EncapHeaderTest, test_default_values)
 {
-  EIPEncapHeader pkt;
+  EncapHeader pkt;
   EXPECT_EQ(0, pkt.command);
   EXPECT_EQ(0, pkt.session_handle);
   EXPECT_EQ(0, pkt.status);
@@ -34,9 +35,9 @@ TEST_F(EIPEncapHeaderTest, test_default_values)
   EXPECT_EQ(0, pkt.length);
 }
 
-TEST_F(EIPEncapHeaderTest, test_constructor)
+TEST_F(EncapHeaderTest, test_constructor)
 {
-  EIPEncapHeader pkt(0x55AA, 0x87654321);
+  EncapHeader pkt(0x55AA, 0x87654321);
   EXPECT_EQ(0x55AA, pkt.command);
   EXPECT_EQ(0x87654321, pkt.session_handle);
   EXPECT_EQ(0, pkt.status);
@@ -46,12 +47,12 @@ TEST_F(EIPEncapHeaderTest, test_constructor)
   EXPECT_EQ(0, pkt.length);
 }
 
-TEST_F(EIPEncapHeaderTest, test_serialization_simple)
+TEST_F(EncapHeaderTest, test_serialization_simple)
 {
   unsigned char d[24];
   BufferWriter writer(buffer(d));
 
-  EIPEncapHeader pkt(0x55AA, 0x87654321);
+  EncapHeader pkt(0x55AA, 0x87654321);
   pkt.serialize(writer);
   EXPECT_EQ(0xAA, d[0]);
   EXPECT_EQ(0x55, d[1]);
@@ -67,9 +68,9 @@ TEST_F(EIPEncapHeaderTest, test_serialization_simple)
   }
 }
 
-TEST_F(EIPEncapHeaderTest, test_serialization_complex)
+TEST_F(EncapHeaderTest, test_serialization_complex)
 {
-  EIPEncapHeader pkt;
+  EncapHeader pkt;
   pkt.command = 0x55AA;
   pkt.session_handle = 0x87654321;
   pkt.status = 0xFEDCBA98;
@@ -108,9 +109,9 @@ TEST_F(EIPEncapHeaderTest, test_serialization_complex)
   EXPECT_EQ(0xDE, d[23]);
 }
 
-TEST_F(EIPEncapHeaderTest, test_deserialization_simple)
+TEST_F(EncapHeaderTest, test_deserialization_simple)
 {
-  EIPEncapHeader pkt;
+  EncapHeader pkt;
   EIP_USINT d[] = {0xAA, 0x55, 0, 0x00, 0x21, 0x43, 0x65, 0x87,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -126,9 +127,9 @@ TEST_F(EIPEncapHeaderTest, test_deserialization_simple)
   EXPECT_EQ(0, pkt.length);
 }
 
-TEST_F(EIPEncapHeaderTest, test_deserialization_complex)
+TEST_F(EncapHeaderTest, test_deserialization_complex)
 {
-  EIPEncapHeader pkt;
+  EncapHeader pkt;
   EIP_USINT d[] = {0xAA, 0x55, 0x08, 0x00, 0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 
     0xDC, 0xFE, 0x89, 0x67, 0x45, 0x23, 0x01, 0xEF, 0xCD, 0xAB, 0xEF, 0xBE, 
     0xAD, 0xDE, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 0, };

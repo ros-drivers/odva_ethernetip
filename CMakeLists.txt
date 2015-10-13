@@ -35,35 +35,39 @@ include_directories(
   ${boost_INCLUDE_DIRS}
 )
 
-## Declare a cpp library
-add_library(os32c
-  src/eip_cpf_packet.cpp
-  src/eip_cpf_item.cpp
-  src/eip_common_pkt_item.cpp
-  src/eip_common_pkt.cpp
-  src/eip_encap_pkt.cpp
-  src/eip_encap_header.cpp
-  src/eip_identity_item.cpp
-  src/eip_io_scanner.cpp
-  src/eip_session.cpp
-  src/eip_path.cpp
-  src/eip_rr_data_cmd.cpp
+## Declare a cpp library for just Ethernet/IP generic stuff
+add_library(eip
+  src/eip/encap_header.cpp
 )
 
+#add_library(os32c
+#  src/eip_cpf_packet.cpp
+#  src/eip_cpf_item.cpp
+#  src/eip_common_pkt_item.cpp
+#  src/eip_common_pkt.cpp
+#  src/eip_encap_pkt.cpp
+#  src/eip_encap_header.cpp
+#  src/eip_identity_item.cpp
+#  src/eip_io_scanner.cpp
+#  src/eip_session.cpp
+#  src/eip_path.cpp
+#  src/eip_rr_data_cmd.cpp
+#)
+
 ## Declare a cpp executable
-add_executable(os32c_node src/os32c_node.cpp)
+#add_executable(os32c_node src/os32c_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(os32c_node os32c_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(os32c_node
-  os32c
-  ${catkin_LIBRARIES}
-  ${Boost_LIBRARIES}
-  ${boost_LIBRARIES}
-)
+#target_link_libraries(os32c_node
+#  os32c
+#  ${catkin_LIBRARIES}
+#  ${Boost_LIBRARIES}
+#  ${boost_LIBRARIES}
+#)
 
 #############
 ## Install ##
@@ -105,25 +109,18 @@ target_link_libraries(os32c_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-catkin_add_gtest(${PROJECT_NAME}-test test/eip_encap_pkt_test.cpp 
-    test/serialization/buffer_writer_test.cpp
-    test/serialization/buffer_reader_test.cpp
-    test/serialization/stream_writer_test.cpp
-    test/serialization/stream_reader_test.cpp
-    test/serialization/serializable_buffer_test.cpp
-    test/eip_encap_header_test.cpp
-    test/eip_cpf_null_item_test.cpp
-    test/eip_cpf_item_primitive_test.cpp
-    test/eip_cpf_packet_test.cpp
-    test/eip_common_pkt_item_test.cpp
-    test/eip_common_pkt_test.cpp
-    test/eip_identity_item_test.cpp
-    test/eip_path_test.cpp
-    test/eip_rr_data_cmd_test.cpp
-    test/eip_test_main.cpp )
+catkin_add_gtest(eip-test
+  test/eip/serialization/buffer_writer_test.cpp
+  test/eip/serialization/buffer_reader_test.cpp
+  test/eip/serialization/stream_writer_test.cpp
+  test/eip/serialization/stream_reader_test.cpp
+  test/eip/serialization/serializable_buffer_test.cpp
+  test/eip/encap_header_test.cpp
+  test/eip/test_main.cpp
+)
 
-if(TARGET ${PROJECT_NAME}-test)
-  target_link_libraries(${PROJECT_NAME}-test ${Boost_LIBRARIES} os32c)
+if(TARGET eip-test)
+  target_link_libraries(eip-test ${Boost_LIBRARIES} eip)
 endif()
 
 ## Add folders to be run by python nosetests

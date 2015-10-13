@@ -16,7 +16,7 @@ express permission of Clearpath Robotics.
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/device/array.hpp>
 
-#include "os32c/serialization/stream_writer.h"
+#include "eip/serialization/stream_writer.h"
 
 using boost::make_shared;
 using namespace boost::asio;

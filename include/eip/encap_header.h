@@ -1,7 +1,7 @@
 /**
 Software License Agreement (proprietary)
 
-\file      eip_encap_header.h
+\file      encap_header.h
 \authors   Kareem Shehata <kshehata@clearpathrobotics.com>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
