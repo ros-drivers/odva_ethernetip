@@ -14,12 +14,18 @@ express permission of Clearpath Robotics.
 
 #include <iostream>
 #include "os32c/eip_types.h"
+#include "os32c/serialization/serializable.h"
+
+using eip::serialization::Serializable;
+using eip::serialization::Reader;
+using eip::serialization::Writer;
 
 /**
  * Representation of an EtherNet/IP Encapsulation Packet Header
  */
-struct EIPEncapHeader
+class EIPEncapHeader : public Serializable
 {
+public:
   EIP_UINT  command;
   EIP_UINT  length;
   EIP_UDINT session_handle;
@@ -37,16 +43,47 @@ struct EIPEncapHeader
     context[1] = 0;
   }
 
+  /**
+   * Always returns 24, the size of the encapsulation packer header
+   * @return Total length in bytes to be serialized, always 24 bytes
+   */
+  virtual size_t getLength() const
+  {
+    return 24;
+  }
+
+  /**
+   * Serialize data into the given buffer
+   * @param writer Writer to use for serialization
+   * @return the writer again
+   * @throw std::length_error if the buffer is too small for the header data
+   */
+  virtual Writer& serialize(Writer& writer) const;
+
+  /**
+   * Deserialize data from the given reader with the length given.
+   * Length must be 24 or a length_error is thrown
+   * @param reader Reader to use for deserialization
+   * @param length Length expected for data, must be 24
+   * @return the reader again
+   * @throw std::length_error if the buffer is overrun while deserializing
+   */
+  virtual Reader& deserialize(Reader& reader, size_t length)
+  {
+    if (getLength() != length)
+    {
+      throw std::length_error("Invalid length given for encapsulation packet header");
+    }
+    deserialize(reader);
+  }
+
+  /**
+   * Deserialize data from the given reader without length information
+   * @param reader Reader to use for deserialization
+   * @return the reader again
+   * @throw std::length_error if the buffer is overrun while deserializing
+   */
+  virtual Reader& deserialize(Reader& reader);
 };
-
-/**
- * Override to serialize Encapsulation Packet Header into a binary stream
- */
-std::ostream& operator<<(std::ostream& ost, const EIPEncapHeader& header);
-
-/**
- * Override to deserialize an Encapsulation Packet Header from a stream
- */
-std::istream& operator>>(std::istream& ist, EIPEncapHeader& header);
 
 #endif  // OS32C_EIP_ENCAP_HEADER_H

@@ -51,13 +51,12 @@ TEST_F(SerializableBufferTest, test_serialize)
 TEST_F(SerializableBufferTest, test_serialize_operator)
 {
   unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
-  shared_ptr<Serializable> sb = make_shared<SerializableBuffer> (buffer(input));
+  SerializableBuffer sb(buffer(input));
 
   unsigned char d[8]; 
   BufferWriter writer(buffer(d));
 
-  writer << *sb;
-
+  writer << (Serializable&)sb;
   EXPECT_EQ(8, writer.getByteCount());
   EXPECT_EQ(0xFF, d[0]);
   EXPECT_EQ(0xFE, d[1]);

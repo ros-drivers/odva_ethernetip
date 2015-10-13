@@ -48,7 +48,7 @@ public:
    * Get the length of the current data buffer
    * @return Total length in bytes to be serialized
    */
-  virtual size_t getLength()
+  virtual size_t getLength() const
   {
     return buffer_size(data_);
   }

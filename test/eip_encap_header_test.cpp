@@ -10,10 +10,12 @@ express permission of Clearpath Robotics.
 */
 
 #include <gtest/gtest.h>
-#include <boost/iostreams/stream.hpp>
-#include <boost/iostreams/device/array.hpp>
 
+#include "os32c/serialization/buffer_writer.h"
+#include "os32c/serialization/buffer_reader.h"
 #include "os32c/eip_encap_header.h"
+
+using namespace eip::serialization;
 
 class EIPEncapHeaderTest : public :: testing :: Test
 {
@@ -47,11 +49,10 @@ TEST_F(EIPEncapHeaderTest, test_constructor)
 TEST_F(EIPEncapHeaderTest, test_serialization_simple)
 {
   unsigned char d[24];
-  boost::iostreams::basic_array_sink<char> sr((char*)d, sizeof(d));  
-  boost::iostreams::stream< boost::iostreams::basic_array_sink<char> > os(sr);
+  BufferWriter writer(buffer(d));
 
   EIPEncapHeader pkt(0x55AA, 0x87654321);
-  os << pkt;
+  pkt.serialize(writer);
   EXPECT_EQ(0xAA, d[0]);
   EXPECT_EQ(0x55, d[1]);
   EXPECT_EQ(   0, d[2]);
@@ -78,10 +79,8 @@ TEST_F(EIPEncapHeaderTest, test_serialization_complex)
   pkt.length = 8;
 
   EIP_USINT d[24];
-  boost::iostreams::basic_array_sink<char> sr((char*)d, sizeof(d));  
-  boost::iostreams::stream< boost::iostreams::basic_array_sink<char> > os(sr);
-
-  os << pkt;
+  BufferWriter writer(buffer(d));
+  pkt.serialize(writer);
 
   EXPECT_EQ(0xAA, d[0]);
   EXPECT_EQ(0x55, d[1]);
@@ -115,10 +114,8 @@ TEST_F(EIPEncapHeaderTest, test_deserialization_simple)
   EIP_USINT d[] = {0xAA, 0x55, 0, 0x00, 0x21, 0x43, 0x65, 0x87,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-  boost::iostreams::basic_array_source<char> sr((const char*)d, sizeof(d));  
-  boost::iostreams::stream< boost::iostreams::basic_array_source<char> > is(sr);
-
-  is >> pkt;
+  BufferReader reader(buffer(d));
+  pkt.deserialize(reader);
 
   EXPECT_EQ(0x55AA, pkt.command);
   EXPECT_EQ(0x87654321, pkt.session_handle);
@@ -136,10 +133,8 @@ TEST_F(EIPEncapHeaderTest, test_deserialization_complex)
     0xDC, 0xFE, 0x89, 0x67, 0x45, 0x23, 0x01, 0xEF, 0xCD, 0xAB, 0xEF, 0xBE, 
     0xAD, 0xDE, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 0, };
 
-  boost::iostreams::basic_array_source<char> sr((const char*)d, sizeof(d));  
-  boost::iostreams::stream< boost::iostreams::basic_array_source<char> > is(sr);
-
-  is >> pkt;
+  BufferReader reader(buffer(d));
+  pkt.deserialize(reader);
 
   EXPECT_EQ(0x55AA, pkt.command);
   EXPECT_EQ(0x87654321, pkt.session_handle);

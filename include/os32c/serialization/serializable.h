@@ -28,7 +28,7 @@ public:
    * Get the length of serialized data that would be produced if serialized
    * @return Total length in bytes to be serialized
    */
-  virtual size_t getLength() = 0;
+  virtual size_t getLength() const = 0;
 
   /**
    * Serialize data into the given buffer

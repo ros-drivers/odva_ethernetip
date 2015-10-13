@@ -10,26 +10,25 @@ express permission of Clearpath Robotics.
 */
 
 #include "os32c/eip_encap_header.h"
-#include "os32c/eip_serialization_helpers.h"
 
-std::ostream& operator<<(std::ostream& ost, const EIPEncapHeader& header)
+Writer& EIPEncapHeader::serialize(Writer& writer) const
 {
-  WRITE_BIN(ost, header.command);
-  WRITE_BIN(ost, header.length);
-  WRITE_BIN(ost, header.session_handle);
-  WRITE_BIN(ost, header.status);
-  WRITE_BIN(ost, header.context);
-  WRITE_BIN(ost, header.options);
-  return ost;
+  writer.write(command);
+  writer.write(length);
+  writer.write(session_handle);
+  writer.write(status);
+  writer.write(context);
+  writer.write(options);
+  return writer;
 }
 
-std::istream& operator>>(std::istream& ist, EIPEncapHeader& header)
+Reader& EIPEncapHeader::deserialize(Reader& reader)
 {
-  READ_BIN(ist, header.command);
-  READ_BIN(ist, header.length);
-  READ_BIN(ist, header.session_handle);
-  READ_BIN(ist, header.status);
-  READ_BIN(ist, header.context);
-  READ_BIN(ist, header.options);
-  return ist;
+  reader.read(command);
+  reader.read(length);
+  reader.read(session_handle);
+  reader.read(status);
+  reader.read(context);
+  reader.read(options);
+  return reader;
 }
