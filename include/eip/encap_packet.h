@@ -1,0 +1,131 @@
+/**
+Software License Agreement (proprietary)
+
+\file      encap_packet.h
+\authors   Kareem Shehata <kshehata@clearpathrobotics.com>
+\copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, is not permitted without the
+express permission of Clearpath Robotics.
+*/
+
+#ifndef EIP_ENCAP_PACKET_H
+#define EIP_ENCAP_PACKET_H
+
+#include <boost/shared_ptr.hpp>
+
+#include "eip/eip_types.h"
+#include "eip/encap_header.h"
+#include "eip/serialization/serializable.h"
+
+
+using boost::shared_ptr;
+
+namespace eip {
+
+using serialization::Serializable;
+
+/**
+ * Representation of an EtherNet/IP Encapsulation Packet
+ */
+class EncapPacket : public Serializable
+{
+public:
+
+  /**
+   * Construct an encapsulation packet
+   */
+  EncapPacket(EIP_UINT command = 0, EIP_UDINT session_handle = 0)
+    : header_(command, session_handle) { }
+
+  /**
+   * Construct an encapsulation packet with a data payload
+   * @param command Command ID for the header
+   * @param session_handle Session handle to use in the header
+   * @param buf Data for the payload
+   */
+  EncapPacket(EIP_UINT command, EIP_UDINT session_handle,
+    shared_ptr<Serializable> payload)
+    : header_(command, session_handle), payload_(payload)
+    {
+      if (payload_)
+      {
+        header_.length = payload->getLength();
+      }
+    }
+
+
+  /**
+   * Get the header portion of this packet
+   * @return Header data
+   */
+  EncapHeader& getHeader()
+  {
+    return header_;
+  }
+
+  /**
+   * Get the data payload from this packet
+   * @return the data payload of the packet
+   */
+  shared_ptr<Serializable> getPayload() const
+  {
+    return payload_;
+  }
+
+  /**
+   * Set the payload for this packet
+   * @param payload Payload to use
+   */
+  void setPayload(shared_ptr<Serializable> payload)
+  {
+    payload_ = payload;
+    header_.length = payload_ ? payload_->getLength() : 0;
+  }
+
+  /**
+   * Get the length of the entire packet, not just the payload
+   * @return total length of the header and the payload combined
+   */
+  size_t getLength() const
+  {
+    size_t l = header_.getLength();
+    if (NULL != payload_)
+    {
+      l += payload_->getLength();
+    }
+    return l;
+  }
+
+  /**
+   * Serialize the packet to the given writer
+   * @param writer The Writer into which to serialize
+   * @return the writer again
+   */
+  Writer& serialize(Writer& writer) const;
+
+  /**
+   * Deserialize packet from the given reader with the max length given
+   * @param reader Reader to use for deserialization
+   * @param length Length expected for the packet
+   * @return the reader again
+   * @throw std::length_error if the buffer is overrun while deserializing
+   */
+  Reader& deserialize(Reader& reader, size_t length);
+
+  /**
+   * Deserialize data from the given reader without length information
+   * @param reader Reader to use for deserialization
+   * @return the reader again
+   * @throw std::length_error if the buffer is overrun while deserializing
+   */
+  Reader& deserialize(Reader& reader);
+
+private:
+  EncapHeader header_;
+  shared_ptr<Serializable> payload_;
+};
+
+} // namespace eip
+
+#endif  // EIP_ENCAP_PACKET_H
