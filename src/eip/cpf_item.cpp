@@ -12,7 +12,6 @@ express permission of Clearpath Robotics.
 #include <boost/make_shared.hpp>
 
 #include "eip/cpf_item.h"
-#include "eip/encap_packet.h"
 #include "eip/serialization/serializable_buffer.h"
 
 using boost::make_shared;
