@@ -14,6 +14,8 @@ express permission of Clearpath Robotics.
 
 #include <iostream>
 #include "eip/eip_types.h"
+#include "eip/serialization/reader.h"
+#include "eip/serialization/writer.h"
 #include "eip/serialization/serializable.h"
 
 namespace eip {

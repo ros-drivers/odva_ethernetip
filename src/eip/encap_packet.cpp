@@ -13,14 +13,12 @@ express permission of Clearpath Robotics.
 
 #include "eip/encap_packet.h"
 #include "eip/serialization/serializable_buffer.h"
-#include "eip/serialization/buffer_reader.h"
 
 using boost::make_shared;
 
 namespace eip {
 
 using serialization::SerializableBuffer;
-using serialization::BufferReader;
 
 Writer& EncapPacket::serialize(Writer& writer) const
 {

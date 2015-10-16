@@ -15,7 +15,10 @@ express permission of Clearpath Robotics.
 #include <boost/shared_ptr.hpp>
 
 #include "eip/eip_types.h"
+
 #include "eip/encap_header.h"
+#include "eip/serialization/reader.h"
+#include "eip/serialization/writer.h"
 #include "eip/serialization/serializable.h"
 
 
@@ -24,6 +27,8 @@ using boost::shared_ptr;
 namespace eip {
 
 using serialization::Serializable;
+using serialization::Reader;
+using serialization::Writer;
 
 /**
  * Representation of an EtherNet/IP Encapsulation Packet
