@@ -40,14 +40,7 @@ Reader& EncapPacket::deserialize(Reader& reader)
   if (header_.length > 0)
   {
     shared_ptr<SerializableBuffer> sb = make_shared<SerializableBuffer>();
-    // problem. Unless this is a BufferReader, need a buffer to copy into
-    // who owns that buffer?
-    BufferReader* br = dynamic_cast<BufferReader*>(&reader);
-    if (br)
-    {
-      sb->deserialize(*br, header_.length);
-    }
-    // TODO: hande the non-copy case
+    sb->deserialize(reader, header_.length);
     payload_ = sb;
   }
   else

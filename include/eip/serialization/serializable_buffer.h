@@ -36,13 +36,19 @@ public:
    * Construct an empty serializable buffer
    * @param data Data to hold in the buffer
    */
-  SerializableBuffer() : data_(NULL, 0) { }
+  SerializableBuffer() : data_(NULL, 0), allocated_buffer_(NULL) { }
 
   /**
    * Construct a serializable buffer for the given data buffer
    * @param data Data to hold in the buffer
    */
-  SerializableBuffer(mutable_buffer data) : data_(data) { }
+  SerializableBuffer(mutable_buffer data) : data_(data), allocated_buffer_(NULL) { }
+
+  virtual ~SerializableBuffer()
+  {
+    deleteAllocatedBuffer();
+    data_ = mutable_buffer(NULL, 0);
+  }
 
   /**
    * Get the length of the current data buffer
@@ -68,6 +74,9 @@ public:
    */
   virtual void setData(mutable_buffer data)
   {
+    // TODO: It's possible that the user could pass in the same buffer again,
+    // or a subset of it. That would be absurd, but possible.
+    deleteAllocatedBuffer();
     data_ = data;
   }
 
@@ -93,11 +102,24 @@ public:
    */
   virtual Reader& deserialize(Reader& reader, size_t length)
   {
-    if (length > buffer_size(data_))
+    // with a BufferReader, we can read without copying
+    BufferReader* br = dynamic_cast<BufferReader*>(&reader);
+    if (br)
     {
-      throw std::length_error("Given data length longer than data buffer");
+      deleteAllocatedBuffer();
+      data_ = br->readBuffer(length);
     }
-    reader.readBuffer(buffer(data_, length));
+    else
+    {
+      if (length != buffer_size(data_))
+      {
+        // must allocate a new buffer
+        deleteAllocatedBuffer();
+        allocated_buffer_ = new char[length];
+        data_ = buffer(allocated_buffer_, length);
+      }
+      reader.readBuffer(data_);
+    }
   }
 
   /**
@@ -112,20 +134,6 @@ public:
     reader.readBuffer(data_);
   }
 
-  /**
-   * Deserialize from a BufferReader without copying. Asks the BufferReader
-   * for length bytes out of the existing buffer.
-   * @param reader BufferReader to use for reading
-   * @param length the number of bytes to request
-   * @return the BufferReader again
-   * @throw std::length_error if the length requested is greater than the
-   *   remaining bytes in the reader's buffer.
-   */
-  virtual BufferReader& deserialize(BufferReader& reader, size_t length)
-  {
-    data_ = reader.readBuffer(length);
-  }
-
   void operator=(mutable_buffer b)
   {
     data_ = b;
@@ -133,6 +141,19 @@ public:
 
 private:
   mutable_buffer data_;
+  char* allocated_buffer_;
+
+  /**
+   * Helper to delete an allocated buffer if needed
+   */
+  void deleteAllocatedBuffer()
+  {
+    if (allocated_buffer_)
+    {
+      delete[] allocated_buffer_;
+      allocated_buffer_ = NULL;
+    }
+  }
 };
 
 } // namespace serialization
