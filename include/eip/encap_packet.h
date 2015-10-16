@@ -48,10 +48,7 @@ public:
     shared_ptr<Serializable> payload)
     : header_(command, session_handle), payload_(payload)
     {
-      if (payload_)
-      {
-        header_.length = payload->getLength();
-      }
+      updateLength();
     }
 
 
@@ -80,7 +77,7 @@ public:
   void setPayload(shared_ptr<Serializable> payload)
   {
     payload_ = payload;
-    header_.length = payload_ ? payload_->getLength() : 0;
+    updateLength();
   }
 
   /**
@@ -95,6 +92,15 @@ public:
       l += payload_->getLength();
     }
     return l;
+  }
+
+  /**
+   * Update the length field of the header. Note that this must be called if
+   * the payload size is modified after setting the payload reference.
+   */
+  void updateLength()
+  {
+    header_.length = payload_ ? payload_->getLength() : 0;
   }
 
   /**
