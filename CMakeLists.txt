@@ -39,6 +39,7 @@ include_directories(
 add_library(eip
   src/eip/encap_header.cpp
   src/eip/encap_packet.cpp
+  src/eip/cpf_item.cpp
 )
 
 #add_library(os32c
@@ -118,6 +119,7 @@ catkin_add_gtest(eip-test
   test/eip/serialization/serializable_buffer_test.cpp
   test/eip/encap_header_test.cpp
   test/eip/encap_packet_test.cpp
+  test/eip/cpf_item_test.cpp
   test/eip/test_main.cpp
 )
 
