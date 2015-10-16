@@ -86,6 +86,12 @@ public:
   }
 
   /**
+   * Get the payload as a particular serializable instance
+   * @param result Serializable class to get data into
+   */
+  void getPayloadAs(Serializable& result);
+
+  /**
    * Get the length of the entire packet, not just the payload
    * @return total length of the header and the payload combined
    */

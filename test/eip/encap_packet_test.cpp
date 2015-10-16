@@ -28,6 +28,42 @@ class EncapPacketTest : public :: testing :: Test
 
 };
 
+class SerializableDummy : public Serializable
+{
+public:
+  mutable_buffer buf;
+
+  SerializableDummy(mutable_buffer b) : buf(b) { }
+
+  size_t getLength() const
+  {
+    return buffer_size(buf);
+  }
+
+  Writer& serialize(Writer& writer) const
+  {
+    // printf("Serializing %lu bytes, %s\n", buffer_size(buf), buffer_cast<char*>(buf));
+    writer.writeBuffer(buf);
+    return writer;
+  }
+
+  Reader& deserialize(Reader& reader, size_t length)
+  {
+    if (length != buffer_size(buf))
+    {
+      throw std::length_error("Wrong size given to deserialize");
+    }
+    reader.readBuffer(buf);
+    return reader;
+  }
+
+  Reader& deserialize(Reader& reader)
+  {
+    reader.readBuffer(buf);
+    return reader;
+  }
+};
+
 TEST_F(EncapPacketTest, test_default_values)
 {
   EncapPacket pkt;
@@ -225,4 +261,49 @@ TEST_F(EncapPacketTest, test_deserialization_complex_short_buffer)
 
   BufferReader reader(buffer(d));
   ASSERT_THROW(pkt.deserialize(reader), std::length_error);
+}
+
+TEST_F(EncapPacketTest, test_get_payload_as_sb)
+{
+  char data[] = "abcdefg";
+  shared_ptr<SerializableBuffer> payload = make_shared<SerializableBuffer>(buffer(data));
+  EncapPacket pkt(0x55AA, 0x87654321, payload);
+
+  SerializableBuffer sb;
+  pkt.getPayloadAs(sb);
+  EXPECT_EQ(data, buffer_cast<char*>(sb.getData()));
+}
+
+TEST_F(EncapPacketTest, test_get_payload_as_dummy)
+{
+  char data[] = "abcdefg";
+  shared_ptr<SerializableBuffer> payload = make_shared<SerializableBuffer>(buffer(data));
+  EncapPacket pkt(0x55AA, 0x87654321, payload);
+
+  char result[8];
+  SerializableDummy sd(buffer(result));
+  pkt.getPayloadAs(sd);
+  EXPECT_STREQ("abcdefg", buffer_cast<char*>(sd.buf));
+}
+
+TEST_F(EncapPacketTest, test_get_payload_from_dummy)
+{
+  char data[] = "abcdefg";
+  shared_ptr<SerializableDummy> payload = make_shared<SerializableDummy>(buffer(data));
+  EncapPacket pkt(0x55AA, 0x87654321, payload);
+
+  char result[8];
+  SerializableDummy sd(buffer(result));
+  pkt.getPayloadAs(sd);
+  EXPECT_STREQ("abcdefg", buffer_cast<char*>(sd.buf));
+}
+
+TEST_F(EncapPacketTest, test_get_payload_from_dummy_to_sb_throws_logic_error)
+{
+  char data[] = "abcdefg";
+  shared_ptr<SerializableDummy> payload = make_shared<SerializableDummy>(buffer(data));
+  EncapPacket pkt(0x55AA, 0x87654321, payload);
+
+  SerializableBuffer sb;
+  ASSERT_THROW(pkt.getPayloadAs(sb), std::logic_error);
 }
