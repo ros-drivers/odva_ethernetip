@@ -1,7 +1,7 @@
 /**
 Software License Agreement (proprietary)
 
-\file      eip_identity_item_test.cpp
+\file      identity_item_data_test.cpp
 \authors   Kareem Shehata <kshehata@clearpathrobotics.com>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
@@ -11,29 +11,31 @@ express permission of Clearpath Robotics.
 
 #include <gtest/gtest.h>
 #include <boost/asio.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <boost/iostreams/device/array.hpp>
 
-#include "os32c/eip_identity_item.h"
+#include "eip/identity_item_data.h"
+#include "eip/serialization/serializable_buffer.h"
+#include "eip/serialization/buffer_writer.h"
+#include "eip/serialization/buffer_reader.h"
 
 using namespace boost::asio;
+using namespace eip;
+using namespace eip::serialization;
+using namespace boost::asio;
 
-class EIPIdentityItemTest : public :: testing :: Test
+class IdentityItemDataTest : public :: testing :: Test
 {
 
 };
 
-TEST_F(EIPIdentityItemTest, test_deserialize)
+TEST_F(IdentityItemDataTest, test_deserialize)
 {
   EIP_BYTE d[] = {0x55, 0xAA, 0x00, 0x02, 0x12, 0x34, 0xAB, 0xCD, 0xEF, 0x99, 
     0, 0, 0, 0, 0, 0, 0, 0, 0xEE, 0xDD, 0x98, 0x76, 0xA5, 0x5A, 0x6B, 0xC7, 
     0xE7, 0x81, 0x78, 0x56, 0x34, 0x12, 0x06, 'a', 'b', 'c', 'd', 'e', 'f', 0x7E};
 
-  boost::iostreams::basic_array_source<char> sr((const char*)d, sizeof(d));  
-  boost::iostreams::stream< boost::iostreams::basic_array_source<char> > is(sr);
-
-  EIPIdentityItem id;
-  is >> id;
+  BufferReader reader(buffer(d));
+  IdentityItemData id;
+  id.deserialize(reader);
   EXPECT_EQ(0xAA55, id.encap_protocol_version);
   EXPECT_EQ(0x0200, id.sockaddr.sin_family);
   EXPECT_EQ(0x3412, id.sockaddr.sin_port);
@@ -47,12 +49,14 @@ TEST_F(EIPIdentityItemTest, test_deserialize)
   EXPECT_EQ(0x12345678, id.serial_number);
   EXPECT_STREQ("abcdef", id.product_name.c_str());
   EXPECT_EQ(0x7E, id.state);
+  EXPECT_EQ(sizeof(d), id.getLength());
 }
 
-TEST_F(EIPIdentityItemTest, test_serialize)
+TEST_F(IdentityItemDataTest, test_serialize)
 {
-  EIPIdentityItem id;
+  IdentityItemData id;
   id.encap_protocol_version = 0xAA55;
+  memset(&id.sockaddr, 0, sizeof(sockaddr));
   id.sockaddr.sin_family = 0x0200;
   id.sockaddr.sin_port = 0x3412;
   id.sockaddr.sin_addr.s_addr = 0x99EFCDAB;
@@ -67,10 +71,9 @@ TEST_F(EIPIdentityItemTest, test_serialize)
   id.state = 0x7E;
 
   EIP_BYTE d[40];
-  boost::iostreams::basic_array_sink<char> sr((char*)d, sizeof(d));  
-  boost::iostreams::stream< boost::iostreams::basic_array_sink<char> > os(sr);
-  os << id;
-  EXPECT_EQ(sizeof(d), id.serialize(buffer(d)));
+  BufferWriter writer(buffer(d));
+  id.serialize(writer);
+  EXPECT_EQ(sizeof(d), writer.getByteCount());
   EXPECT_EQ(d[0], 0x55);
   EXPECT_EQ(d[1], 0xAA);
   EXPECT_EQ(d[2], 0x00);
