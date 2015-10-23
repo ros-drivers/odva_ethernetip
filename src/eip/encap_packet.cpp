@@ -16,6 +16,7 @@ express permission of Clearpath Robotics.
 #include "eip/serialization/serializable_buffer.h"
 #include "eip/serialization/buffer_reader.h"
 #include "eip/serialization/buffer_writer.h"
+#include "eip/serialization/copy_serializable.h"
 
 using std::vector;
 using boost::make_shared;
@@ -28,41 +29,7 @@ using serialization::BufferWriter;
 
 void EncapPacket::getPayloadAs(Serializable& result)
 {
-  // check if this is SerializableBuffer to avoid unnecessary copy
-  shared_ptr<SerializableBuffer> sb =
-    boost::dynamic_pointer_cast<SerializableBuffer>(payload_);
-  SerializableBuffer* result_sb = dynamic_cast<SerializableBuffer*>(&result);
-  if (sb)
-  {
-    if (result_sb)
-    {
-      (*result_sb) = (*sb);
-    }
-    else
-    {
-      BufferReader reader(sb->getData());
-      result.deserialize(reader, sb->getLength());
-    }
-    return;
-  }
-  else if (result_sb)
-  {
-    // cannot serialize to a SerializableBuffer, since it will attempt not to
-    // copy the buffer but just return to it.
-    // This should never be required in practice. Not implementing yet
-    // TODO: fix if actually ever needed
-    throw std::logic_error("Cannot get payload from Serializable to SerializableBuffer");
-  }
-  else
-  {
-    // must serialize and then deserialize again
-    size_t length = payload_->getLength();
-    vector<char> buf(length);
-    BufferWriter writer(buffer(buf));
-    payload_->serialize(writer);
-    BufferReader reader(buffer(buf));
-    result.deserialize(reader, length);
-  }
+  serialization::copy_serializable(result, *payload_);
 }
 
 Writer& EncapPacket::serialize(Writer& writer) const

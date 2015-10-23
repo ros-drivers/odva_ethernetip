@@ -37,6 +37,7 @@ include_directories(
 
 ## Declare a cpp library for just Ethernet/IP generic stuff
 add_library(eip
+  src/eip/copy_serializable.cpp
   src/eip/encap_header.cpp
   src/eip/encap_packet.cpp
   src/eip/cpf_item.cpp

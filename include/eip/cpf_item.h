@@ -85,6 +85,12 @@ public:
   }
 
   /**
+   * Get the item data as a particular serializable instance
+   * @param result Serializable class to get data into
+   */
+  void getDataAs(Serializable& result);
+
+  /**
    * Get the length of the data in this item.
    * @return length in bytes of the data for this item
    */

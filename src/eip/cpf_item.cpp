@@ -13,6 +13,7 @@ express permission of Clearpath Robotics.
 
 #include "eip/cpf_item.h"
 #include "eip/serialization/serializable_buffer.h"
+#include "eip/serialization/copy_serializable.h"
 
 using boost::make_shared;
 
@@ -67,6 +68,11 @@ void CPFItem::deserializeData(Reader& reader, EIP_UINT item_length)
   {
     item_data_ = shared_ptr<Serializable>();
   }
+}
+
+void CPFItem::getDataAs(Serializable& result)
+{
+  serialization::copy_serializable(result, *item_data_);
 }
 
 } // namespace eip
