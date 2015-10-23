@@ -1,7 +1,7 @@
 /**
 Software License Agreement (proprietary)
 
-\file      eip_io_scanner.cpp
+\file      io_scanner.cpp
 \authors   Kareem Shehata <kshehata@clearpathrobotics.com>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
@@ -9,13 +9,17 @@ Redistribution and use in source and binary forms, with or without modification,
 express permission of Clearpath Robotics.
 */
 
+#include <iostream>
 #include <boost/bind.hpp>
 
-#include "os32c/eip_io_scanner.h"
-#include "os32c/eip_types.h"
-#include "os32c/eip_encap_pkt.h"
-#include "os32c/eip_common_pkt.h"
-#include "os32c/eip_identity_item.h"
+#include "eip/io_scanner.h"
+#include "eip/eip_types.h"
+#include "eip/serialization/buffer_reader.h"
+#include "eip/serialization/buffer_writer.h"
+#include "eip/encap_packet.h"
+#include "eip/cpf_packet.h"
+#include "eip/cpf_item.h"
+#include "eip/identity_item_data.h"
 
 using namespace boost::asio;
 using boost::asio::ip::udp;
@@ -23,34 +27,39 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
-EIPIOScanner::EIPIOScanner(io_service& io_service, string hostname)
+namespace eip {
+
+using serialization::BufferReader;
+using serialization::BufferWriter;
+
+IOScanner::IOScanner(io_service& io_service, string hostname)
     : socket_(io_service), hostname_(hostname)
 {
   cout << "Opening UDP socket... ";
   socket_.open(udp::v4());
   socket_.async_receive_from(buffer(recv_buf_), device_endpoint_,
-    boost::bind(&EIPIOScanner::handleListIdentityResponse, this, 
+    boost::bind(&IOScanner::handleListIdentityResponse, this, 
       boost::asio::placeholders::error, 
       boost::asio::placeholders::bytes_transferred));
   cout << "done." << endl;
 }
 
-void EIPIOScanner::sendListIdentityRequest()
+void IOScanner::sendListIdentityRequest()
 {
   cout << "Sending List Identity Request... ";
   udp::resolver r(socket_.get_io_service());
   udp::resolver::query q(udp::v4(), hostname_, "44818");
   udp::endpoint receiver_endpoint = *r.resolve(q);
 
-  EIPEncapPkt pkt(EIP_CMD_LIST_IDENTITY);
-  boost::array<EIP_BYTE, 128> data;
-  mutable_buffer send_buf = buffer(data);
-  size_t length = pkt.serialize(send_buf);
-  socket_.send_to(buffer(send_buf, length), receiver_endpoint);
+  EncapPacket pkt(EIP_CMD_LIST_IDENTITY);
+  char d[128];
+  BufferWriter w(buffer(d));
+  pkt.serialize(w);
+  socket_.send_to(buffer(d, w.getByteCount()), receiver_endpoint);
   cout << "done." << endl;
 }
 
-void EIPIOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
+void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
   std::size_t num_bytes)
 {
   if (ec)
@@ -61,39 +70,41 @@ void EIPIOScanner::handleListIdentityResponse(const boost::system::error_code& e
 
   try
   {
-    EIPEncapPkt pkt;
-    std::size_t n = pkt.deserialize(buffer(recv_buf_, num_bytes));
-    if (n != num_bytes)
+    BufferReader r(buffer(recv_buf_, num_bytes));
+    EncapPacket pkt;
+    pkt.deserialize(r);
+    if (r.getByteCount() != num_bytes)
     {
       cerr << "Warning: packet received with " << num_bytes << 
-        " bytes, but only " << n << " bytes used" << endl;
+        " bytes, but only " << r.getByteCount() << " bytes used" << endl;
     }
 
-    if (pkt.getCommand() != EIP_CMD_LIST_IDENTITY)
+    if (pkt.getHeader().command != EIP_CMD_LIST_IDENTITY)
     {
       cerr << "Reply received with wrong command. Expected " 
-        << EIP_CMD_LIST_IDENTITY << ", received " << pkt.getCommand() << endl;
+        << EIP_CMD_LIST_IDENTITY << ", received " << pkt.getHeader().command << endl;
       return;
     }
-    if (pkt.getSessionHandle() != 0)
+    if (pkt.getHeader().session_handle != 0)
     {
-      cerr << "Warning: Non-zero session handle received: " << pkt.getSessionHandle() << endl;
+      cerr << "Warning: Non-zero session handle received: " << pkt.getHeader().session_handle << endl;
     }
-    if (pkt.getStatus() != 0)
+    if (pkt.getHeader().status != 0)
     {
-      cerr << "Warning: Non-zero status received: " << pkt.getStatus() << endl;
+      cerr << "Warning: Non-zero status received: " << pkt.getHeader().status << endl;
     }
-    if (pkt.getSenderContext() != 0)
+    if (pkt.getHeader().context[0] != 0 || pkt.getHeader().context[1] != 0)
     {
-      cerr << "Warning: Non-zero sender context received: " << pkt.getSenderContext() << endl;
+      cerr << "Warning: Non-zero sender context received: " 
+           << pkt.getHeader().context[0] << ", " << pkt.getHeader().context[1] << endl;
     }
-    if (pkt.getOptions() != 0)
+    if (pkt.getHeader().options != 0)
     {
-      cerr << "Warning: Non-zero options received: " << pkt.getOptions() << endl;
+      cerr << "Warning: Non-zero options received: " << pkt.getHeader().options << endl;
     }
 
-    EIPCommonPkt payload;
-    payload.deserialize(pkt.getData());
+    CPFPacket payload;
+    pkt.getPayloadAs(payload);
 
     if (payload.getItemCount() < 1)
     {
@@ -105,16 +116,16 @@ void EIPIOScanner::handleListIdentityResponse(const boost::system::error_code& e
       cerr << "Warning: more than one item in list identity payload " << payload.getItemCount() << endl;
     }
 
-    if (payload.getItems().at(0).getItemType() != EIP_ITEM_LIST_IDENTITY_RESPONSE)
+    if (payload.getItems().at(0)->getItemType() != EIP_ITEM_LIST_IDENTITY_RESPONSE)
     {
       cerr << "Error: Payload response received with the wrong item type. Expected: "
         << EIP_ITEM_LIST_IDENTITY_RESPONSE << ", received: " << 
-        payload.getItems().at(0).getItemType() << endl;
+        payload.getItems().at(0)->getItemType() << endl;
       return;
     }
 
-    EIPIdentityItem id;
-    id.deserialize(payload.getItems().at(0).getItemData());
+    IdentityItemData id;
+    payload.getItems().at(0)->getDataAs(id);
 
     cout << "=== Received ID Message ===" << endl;
     cout << "Encapsulation Protocol Version: " << (int)id.encap_protocol_version << endl;
@@ -134,9 +145,11 @@ void EIPIOScanner::handleListIdentityResponse(const boost::system::error_code& e
   }
 }
 
-void EIPIOScanner::run()
+void IOScanner::run()
 {
   sendListIdentityRequest();
   cout << "Waiting for responses." << endl;
   socket_.get_io_service().run();
 }
+
+} // namespace eip
