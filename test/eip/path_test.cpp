@@ -12,24 +12,29 @@ express permission of Clearpath Robotics.
 #include <gtest/gtest.h>
 #include <boost/asio.hpp>
 
-#include "os32c/eip_path.h"
+#include "eip/path.h"
+#include "eip/serialization/buffer_writer.h"
 
 using namespace boost::asio;
+using eip::Path;
+using eip::serialization::BufferWriter;
 
-class EIPPathTest : public :: testing :: Test
+class PathTest : public :: testing :: Test
 {
 
 };
 
-TEST_F(EIPPathTest, test_attribute)
+TEST_F(PathTest, test_attribute)
 {
   EIP_BYTE d[7];
 
-  EIPPath p;
+  Path p;
   p.addLogicalClass(0x73);
   p.addLogicalInstance(1);
   p.addLogicalAttribute(4);
-  EXPECT_EQ(sizeof(d), p.serialize(buffer(d)));
+  BufferWriter writer(buffer(d));
+  p.serialize(writer);
+  EXPECT_EQ(sizeof(d), writer.getByteCount());
   EXPECT_EQ(   3, d[0]);
   EXPECT_EQ(0x20, d[1]);
   EXPECT_EQ(0x73, d[2]);

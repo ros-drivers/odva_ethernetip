@@ -45,6 +45,7 @@ add_library(eip
   src/eip/identity_item_data.cpp
   src/eip/io_scanner.cpp
   src/eip/session.cpp
+  src/eip/path.cpp
 )
 
 #add_library(os32c
@@ -135,6 +136,7 @@ catkin_add_gtest(eip-test
   test/eip/cpf_item_test.cpp
   test/eip/cpf_packet_test.cpp
   test/eip/identity_item_data_test.cpp
+  test/eip/path_test.cpp
   test/eip/test_main.cpp
 )
 

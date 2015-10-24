@@ -9,40 +9,49 @@ Redistribution and use in source and binary forms, with or without modification,
 express permission of Clearpath Robotics.
 */
 
-#include "os32c/eip_path.h"
-#include "os32c/eip_buffer_writer.h"
+#include "eip/path.h"
 
-EIPPath::EIPPath()
+#include <boost/asio.hpp>
+
+namespace eip {
+
+Path::Path()
 {
   path_buf_.reserve(6);
 }
 
-void EIPPath::addSegment(EIP_USINT type, EIP_USINT data)
+void Path::addSegment(EIP_USINT type, EIP_USINT data)
 {
   path_buf_.push_back(type);
   path_buf_.push_back(data);
 }
 
-void EIPPath::addLogicalClass(EIP_USINT class_id)
+void Path::addLogicalClass(EIP_USINT class_id)
 {
   addSegment(0x20, class_id);
 }
 
-void EIPPath::addLogicalInstance(EIP_USINT instance_id)
+void Path::addLogicalInstance(EIP_USINT instance_id)
 {
   addSegment(0x24, instance_id);
 }
 
-void EIPPath::addLogicalAttribute(EIP_USINT attribute_id)
+void Path::addLogicalAttribute(EIP_USINT attribute_id)
 {
   addSegment(0x30, attribute_id);
 }
 
-size_t EIPPath::serialize(boost::asio::mutable_buffer buf)
+size_t Path::getLength() const
+{
+  return path_buf_.size() * sizeof(EIP_USINT);
+}
+
+Writer& Path::serialize(Writer& writer) const
 {
   EIP_USINT length = path_buf_.size() / 2;
-  EIPBufferWriter writer(buf);
   writer.write(length);
   writer.writeBuffer(boost::asio::buffer(path_buf_));
-  return writer.getByteCount();
+  return writer;
 }
+
+} // namespace eip
