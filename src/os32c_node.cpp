@@ -11,11 +11,11 @@ express permission of Clearpath Robotics.
 
 #include <ros/ros.h>
 
-#include "os32c/eip_session.h"
-#include "os32c/eip_io_scanner.h"
+#include "eip/session.h"
 
 using std::cout;
 using std::endl;
+using eip::Session;
 
 int main(int argc, char const *argv[])
 {
@@ -27,14 +27,12 @@ int main(int argc, char const *argv[])
   boost::asio::io_service io_service;
   try
   {
-    EIPSession session(io_service);
+    Session session(io_service);
     session.open(argv[1]);
   }
   catch (std::runtime_error ex)
   {
     cout << "Exception caught opening session: " << ex.what() << endl;
   }
-  EIPIOScanner scanner(io_service, argv[1]);
-  scanner.run();
   return 0;
 }

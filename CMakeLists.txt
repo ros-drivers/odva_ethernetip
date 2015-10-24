@@ -44,6 +44,7 @@ add_library(eip
   src/eip/cpf_packet.cpp
   src/eip/identity_item_data.cpp
   src/eip/io_scanner.cpp
+  src/eip/session.cpp
 )
 
 #add_library(os32c
@@ -62,6 +63,7 @@ add_library(eip
 
 ## Declare a cpp executable
 add_executable(scanner src/scanner_node.cpp)
+add_executable(os32c src/os32c_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -69,6 +71,13 @@ add_executable(scanner src/scanner_node.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(scanner
+  eip
+  ${catkin_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${boost_LIBRARIES}
+)
+
+target_link_libraries(os32c
   eip
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
