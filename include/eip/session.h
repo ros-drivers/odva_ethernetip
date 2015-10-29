@@ -23,7 +23,7 @@ using boost::asio::ip::tcp;
 
 namespace eip {
 
-using eip::serialization::Serializable;
+using serialization::Serializable;
 
 /**
  * Class to handle creating and managing Ethernet/IP Sessions
