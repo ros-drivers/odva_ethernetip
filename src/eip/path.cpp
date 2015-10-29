@@ -43,7 +43,7 @@ void Path::addLogicalAttribute(EIP_USINT attribute_id)
 
 size_t Path::getLength() const
 {
-  return path_buf_.size() * sizeof(EIP_USINT);
+  return sizeof(EIP_USINT) + path_buf_.size() * sizeof(EIP_USINT);
 }
 
 Writer& Path::serialize(Writer& writer) const

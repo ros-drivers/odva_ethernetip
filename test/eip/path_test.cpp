@@ -32,6 +32,7 @@ TEST_F(PathTest, test_attribute)
   p.addLogicalClass(0x73);
   p.addLogicalInstance(1);
   p.addLogicalAttribute(4);
+  EXPECT_EQ(sizeof(d), p.getLength());
   BufferWriter writer(buffer(d));
   p.serialize(writer);
   EXPECT_EQ(sizeof(d), writer.getByteCount());
