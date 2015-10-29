@@ -27,8 +27,7 @@ Writer& RRData::serialize(Writer& writer) const
   writer.write(timeout);
   CPFPacket pkt;
   shared_ptr<CPFItem> address = make_shared<CPFItem>();
-  shared_ptr<CPFItem> data = make_shared<CPFItem>();
-  data->setItemType(EIP_ITEM_UNCONNECTED_MESSAGE);
+  shared_ptr<CPFItem> data = make_shared<CPFItem>(EIP_ITEM_UNCONNECTED_MESSAGE, getData());
   pkt.getItems().push_back(address);
   pkt.getItems().push_back(data);
   pkt.serialize(writer);
@@ -61,7 +60,7 @@ Reader& RRData::deserialize(Reader& reader)
     throw std::logic_error("Unexpected data type in RR Data");
   }
 
-  // TODO: parse data here
+  setData(pkt.getItems().at(1));
   return reader;
 }
 

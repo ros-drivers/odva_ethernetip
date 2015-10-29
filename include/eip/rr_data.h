@@ -13,12 +13,16 @@ express permission of Clearpath Robotics.
 #define EIP_RR_DATA_H
 
 #include <string>
+#include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
 
 #include "eip/eip_types.h"
+#include "eip/cpf_item.h"
 #include "eip/serialization/serializable.h"
 #include "eip/serialization/reader.h"
 #include "eip/serialization/writer.h"
+
+using boost::shared_ptr;
 
 namespace eip {
 
@@ -36,7 +40,6 @@ public:
 
   EIP_UDINT interface_handle;
   EIP_UINT timeout;
-  // TODO: MR data
 
   /**
    * Construct an empty RR data holder
@@ -49,8 +52,12 @@ public:
    */
   virtual size_t getLength() const
   {
-    // TODO: doesn't yet take into account size of data, since we don't have it yet
-    return sizeof(interface_handle) + sizeof(timeout) + 5 * sizeof(EIP_UINT);
+    size_t result = sizeof(interface_handle) + sizeof(timeout) + 5 * sizeof(EIP_UINT);
+    if (getData())
+    {
+      result += getData()->getLength();
+    }
+    return result;
   }
 
   /**
@@ -76,6 +83,22 @@ public:
    * @throw std::length_error if the buffer is overrun while deserializing
    */
   virtual Reader& deserialize(Reader& reader);
+
+protected:
+  /**
+   * Serialize data for the specific implementation. Default is null
+   * @return Shared pointer to the serializable of the data to send
+   */
+  virtual shared_ptr<Serializable> getData() const
+  {
+    return shared_ptr<Serializable>();
+  }
+
+  /**
+   * Deserialize the data for this specific implementation
+   * @param item the CPF item that was deserialized, copy data from that
+   */
+  virtual void setData(shared_ptr<CPFItem> item) { }
 };
 
 } // namespace eip
