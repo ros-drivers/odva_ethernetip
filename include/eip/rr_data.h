@@ -17,11 +17,14 @@ express permission of Clearpath Robotics.
 
 #include "eip/eip_types.h"
 #include "eip/serialization/serializable.h"
-#include "eip/path.h"
+#include "eip/serialization/reader.h"
+#include "eip/serialization/writer.h"
 
 namespace eip {
 
 using serialization::Serializable;
+using serialization::Reader;
+using serialization::Writer;
 
 /**
  * Class to encapsulate an RR Data request or reply. Note that this is intended
