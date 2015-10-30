@@ -96,6 +96,14 @@ protected:
     return mr_data_;
   }
 
+  /**
+   * Cannot currently deserialize this class
+   */
+  virtual void setData(CPFItem& item)
+  {
+    throw std::logic_error("Not implemented");
+  }
+
 private:
   shared_ptr<MessageRouterRequest> mr_data_;
 };

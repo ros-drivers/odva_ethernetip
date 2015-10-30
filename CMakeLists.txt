@@ -143,6 +143,7 @@ catkin_add_gtest(eip-test
   test/eip/message_router_request_test.cpp
   test/eip/message_router_response_test.cpp
   test/eip/rr_data_request_test.cpp
+  test/eip/rr_data_response_test.cpp
   test/eip/test_main.cpp
 )
 
