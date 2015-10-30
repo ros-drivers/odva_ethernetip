@@ -17,6 +17,8 @@ express permission of Clearpath Robotics.
 
 #include "eip/eip_types.h"
 #include "eip/serialization/serializable.h"
+#include "eip/serialization/reader.h"
+#include "eip/serialization/writer.h"
 #include "eip/path.h"
 
 using boost::shared_ptr;
@@ -24,6 +26,8 @@ using boost::shared_ptr;
 namespace eip {
 
 using serialization::Serializable;
+using serialization::Reader;
+using serialization::Writer;
 
 /**
  * Class to encapsulate a MessageRouterRequest data.
