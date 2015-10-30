@@ -18,7 +18,6 @@ express permission of Clearpath Robotics.
 #include "eip/session.h"
 #include "eip/eip_types.h"
 #include "eip/encap_packet.h"
-#include "eip/cpf_packet.h"
 #include "eip/register_session_data.h"
 
 using namespace boost::asio;

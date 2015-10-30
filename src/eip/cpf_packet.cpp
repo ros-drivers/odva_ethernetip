@@ -22,9 +22,9 @@ size_t CPFPacket::getLength() const
 {
   // 2 bytes just for the number of items
   size_t l = 2;
-  BOOST_FOREACH(shared_ptr<CPFItem> i, items_)
+  BOOST_FOREACH(CPFItem i, items_)
   {
-    l += i->getLength();
+    l += i.getLength();
   }
   return l;
 }
@@ -32,9 +32,9 @@ size_t CPFPacket::getLength() const
 Writer& CPFPacket::serialize(Writer& writer) const
 {
   writer.write(getItemCount());
-  BOOST_FOREACH(shared_ptr<CPFItem> i, items_)
+  BOOST_FOREACH(CPFItem i, items_)
   {
-    i->serialize(writer);
+    i.serialize(writer);
   }
   return writer;
 }
@@ -46,8 +46,8 @@ Reader& CPFPacket::deserialize(Reader& reader)
   reader.read(num_items);
   for (int i = 0; i < num_items; ++i)
   {
-    shared_ptr<CPFItem> item = make_shared<CPFItem>();
-    item->deserialize(reader);
+    CPFItem item;
+    item.deserialize(reader);
     items_.push_back(item);
   }
 }

@@ -14,7 +14,6 @@ express permission of Clearpath Robotics.
 
 #include <vector>
 #include <iostream>
-#include <boost/shared_ptr.hpp>
 
 #include "eip/eip_types.h"
 #include "eip/cpf_item.h"
@@ -23,7 +22,6 @@ express permission of Clearpath Robotics.
 #include "eip/serialization/serializable.h"
 
 using std::vector;
-using boost::shared_ptr;
 
 namespace eip {
 
@@ -51,7 +49,7 @@ public:
    * Get the items in this packet
    * @return vector of the items in this packet
    */
-  vector< shared_ptr< CPFItem > >& getItems()
+  vector<CPFItem>& getItems()
   {
     return items_;
   }
@@ -88,7 +86,7 @@ public:
   virtual Reader& deserialize(Reader& reader);
 
 private:
-  vector< shared_ptr< CPFItem > > items_;
+  vector< CPFItem > items_;
 };
 
 } // namespace eip

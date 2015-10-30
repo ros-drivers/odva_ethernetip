@@ -26,10 +26,8 @@ Writer& RRData::serialize(Writer& writer) const
   writer.write(interface_handle);
   writer.write(timeout);
   CPFPacket pkt;
-  shared_ptr<CPFItem> address = make_shared<CPFItem>();
-  shared_ptr<CPFItem> data = make_shared<CPFItem>(EIP_ITEM_UNCONNECTED_MESSAGE, getData());
-  pkt.getItems().push_back(address);
-  pkt.getItems().push_back(data);
+  pkt.getItems().push_back(CPFItem());
+  pkt.getItems().push_back(CPFItem(EIP_ITEM_UNCONNECTED_MESSAGE, getData()));
   pkt.serialize(writer);
   return writer;
 }
@@ -46,16 +44,16 @@ Reader& RRData::deserialize(Reader& reader)
   {
     throw std::logic_error("Unexpected number of items in RR Data");
   }
-  if (pkt.getItems().at(0)->getItemType() != EIP_ITEM_NULL)
+  if (pkt.getItems().at(0).getItemType() != EIP_ITEM_NULL)
   {
     throw std::logic_error("Address other than null in RR Data");
   }
-  if (pkt.getItems().at(0)->getDataLength() != 0)
+  if (pkt.getItems().at(0).getDataLength() != 0)
   {
     throw std::logic_error("Data length greater than zero in null address type");
   }
 
-  if (pkt.getItems().at(1)->getItemType() != EIP_ITEM_UNCONNECTED_MESSAGE)
+  if (pkt.getItems().at(1).getItemType() != EIP_ITEM_UNCONNECTED_MESSAGE)
   {
     throw std::logic_error("Unexpected data type in RR Data");
   }

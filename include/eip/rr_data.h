@@ -98,7 +98,7 @@ protected:
    * Deserialize the data for this specific implementation
    * @param item the CPF item that was deserialized, copy data from that
    */
-  virtual void setData(shared_ptr<CPFItem> item) { }
+  virtual void setData(CPFItem& item) { }
 };
 
 } // namespace eip

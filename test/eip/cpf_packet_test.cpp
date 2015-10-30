@@ -10,6 +10,7 @@ express permission of Clearpath Robotics.
 */
 
 #include <gtest/gtest.h>
+#include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/asio.hpp>
 
@@ -45,7 +46,7 @@ TEST_F(CPFPacketTest, test_serialize_one_item)
 {
   EIP_UDINT data = 0xDEADBEEF;
   shared_ptr<SerializableBuffer> sb = make_shared<SerializableBuffer>(buffer((char*)&data, sizeof(data)));
-  shared_ptr<CPFItem> item = make_shared<CPFItem>(0x55AA, sb);
+  CPFItem item = CPFItem(0x55AA, sb);
 
   CPFPacket pkt;
   pkt.getItems().push_back(item);
@@ -73,11 +74,11 @@ TEST_F(CPFPacketTest, test_serialize_one_item)
 
 TEST_F(CPFPacketTest, test_serialize_two_items)
 {
-  shared_ptr<CPFItem> item1 = make_shared<CPFItem>();
+  CPFItem item1 = CPFItem();
 
   EIP_UDINT data = 0xDEADBEEF;
   shared_ptr<SerializableBuffer> sb = make_shared<SerializableBuffer>(buffer((char*)&data, sizeof(data)));
-  shared_ptr<CPFItem> item2 = make_shared<CPFItem>(0x55AA, sb);
+  CPFItem item2 = CPFItem(0x55AA, sb);
 
   CPFPacket pkt;
   pkt.getItems().push_back(item1);

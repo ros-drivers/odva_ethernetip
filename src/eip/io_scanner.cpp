@@ -116,16 +116,16 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
       cerr << "Warning: more than one item in list identity payload " << payload.getItemCount() << endl;
     }
 
-    if (payload.getItems().at(0)->getItemType() != EIP_ITEM_LIST_IDENTITY_RESPONSE)
+    if (payload.getItems().at(0).getItemType() != EIP_ITEM_LIST_IDENTITY_RESPONSE)
     {
       cerr << "Error: Payload response received with the wrong item type. Expected: "
         << EIP_ITEM_LIST_IDENTITY_RESPONSE << ", received: " << 
-        payload.getItems().at(0)->getItemType() << endl;
+        payload.getItems().at(0).getItemType() << endl;
       return;
     }
 
     IdentityItemData id;
-    payload.getItems().at(0)->getDataAs(id);
+    payload.getItems().at(0).getDataAs(id);
 
     cout << "=== Received ID Message ===" << endl;
     cout << "Encapsulation Protocol Version: " << (int)id.encap_protocol_version << endl;
