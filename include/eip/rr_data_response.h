@@ -22,6 +22,7 @@ express permission of Clearpath Robotics.
 #include "eip/serialization/serializable.h"
 #include "eip/serialization/reader.h"
 #include "eip/serialization/writer.h"
+#include "eip/serialization/copy_serializable.h"
 #include "eip/rr_data.h"
 #include "eip/message_router_response.h"
 
@@ -33,6 +34,7 @@ namespace eip {
 using serialization::Serializable;
 using serialization::Reader;
 using serialization::Writer;
+using serialization::copy_serializable;
 
 /**
  * Class to encapsulate an RR Data request specifically
@@ -41,24 +43,62 @@ class RRDataResponse : public RRData
 {
 public:
 
+  /**
+   * Get the response code given in the Message Router section of the RR Data Response
+   * @return service code value
+   */
   EIP_USINT getServiceCode() const
   {
     return response_data_.service;
   }
 
+  /**
+   * Get the general status code given in the message router section of the RR Data response
+   * @return general status code value
+   */
   EIP_USINT getGeneralStatus() const
   {
     return response_data_.general_status;
   }
 
+  /**
+   * Get a shared pointer to the additional status given in the RR Data response.
+   * If no additional status given (i.e. length 0) then the pointer will be null
+   * @return Shared pointer to additional status, or null if none given
+   */
   shared_ptr<Serializable> getAdditionalStatus()
   {
     return response_data_.getAdditionalStatus();
   }
 
+  /**
+   * Get a shared pointer to the data given in the RR Data response.
+   * If no data given (i.e. length 0), then the pointer will be null.
+   * @return Shared pointer to response data, or null if none given
+   */
   shared_ptr<Serializable> getResponseData()
   {
     return response_data_.getResponseData();
+  }
+
+  /**
+   * Copy the additional status into the serializable type given. Note that
+   * status must be available, make sure to check pointer exists first!
+   * @param result Structure into which to copy data
+   */
+  void getAdditionalStatusAs(Serializable& result)
+  {
+    copy_serializable(result, *response_data_.getAdditionalStatus());
+  }
+
+  /**
+   * Copy the response data into the given serializable type. Note that data 
+   * must be available, make sure to check pointer exists first!
+   * @param result Structure into which to copy data
+   */
+  void getResponseDataAs(Serializable& result)
+  {
+    copy_serializable(result, *response_data_.getResponseData());
   }
 
 protected:

@@ -74,26 +74,48 @@ public:
     mr_data_->getPath().addLogicalAttribute(attribute_id);
   }
 
+  /**
+   * Get the service code for this request
+   * @param service code value
+   */
   EIP_USINT getServiceCode() const
   {
     return mr_data_->service;
   }
 
+  /**
+   * Set the service code for this request.
+   * @param service_code service value to use
+   */
   void setServiceCode(EIP_USINT service_code)
   {
     mr_data_->service = service_code;
   }
 
+  /**
+   * Get the path for this request. Can be used to modify the path.
+   * @return path reference for this request
+   */
   Path& getPath()
   {
     return mr_data_->getPath();
   }
 
+  /**
+   * Get a shared pointer to the data used for this request. If no value is
+   * to be supplied, pointer is null.
+   * @return shared pointer to data to be sent with request
+   */
   shared_ptr<Serializable> getData()
   {
     return mr_data_->getData();
   }
 
+  /**
+   * Set the data to be used for this request. If no data is to be set
+   * set to null (i.e. the default value of a shared_ptr).
+   * @param data Data to be sent with the request
+   */
   void setData(shared_ptr<Serializable> data)
   {
     mr_data_->setData(data);
