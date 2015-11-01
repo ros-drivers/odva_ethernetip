@@ -153,6 +153,7 @@ endif()
 
 catkin_add_gtest(os32c-test
   test/os32c/measurement_report_header_test.cpp
+  test/os32c/measurement_report_test.cpp
   test/os32c/test_main.cpp
 )
 

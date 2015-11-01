@@ -180,3 +180,55 @@ TEST_F(MeasurementReportHeaderTest, test_serialize)
   EXPECT_EQ(d[55], 0x02);
 }
 
+
+TEST_F(MeasurementReportHeaderTest, test_serialize_and_deserialize)
+{
+  MeasurementReportHeader mrh;
+  mrh.scan_count = 0xDEADBEEF;
+  mrh.scan_rate = 40000;
+  mrh.scan_timestamp = 0x55AA55AA;
+  mrh.scan_beam_period = 43333;
+  mrh.machine_state = 3;
+  mrh.machine_stop_reasons = 7;
+  mrh.active_zone_set = 0x45;
+  mrh.zone_inputs = 0xAA;
+  mrh.detection_zone_status = 0x0F;
+  mrh.output_status = 7;
+  mrh.input_status = 3;
+  mrh.display_status = 0x0402;
+  mrh.non_safety_config_checksum = 0x55AA;
+  mrh.safety_config_checksum = 0x5AA5;
+  mrh.range_report_format = 1;
+  mrh.refletivity_report_format = 1;
+  mrh.num_beams = 677;
+
+  EIP_BYTE d[56];
+  EXPECT_EQ(sizeof(d), mrh.getLength());
+  BufferWriter writer(buffer(d));
+  mrh.serialize(writer);
+  EXPECT_EQ(sizeof(d), writer.getByteCount());
+
+  BufferReader reader(buffer(d));
+  MeasurementReportHeader mrh2;
+  mrh2.deserialize(reader);
+  EXPECT_EQ(sizeof(d), reader.getByteCount());
+  EXPECT_EQ(sizeof(d), mrh2.getLength());
+  EXPECT_EQ(0xDEADBEEF, mrh2.scan_count);
+  EXPECT_EQ(40000, mrh2.scan_rate);
+  EXPECT_EQ(0x55AA55AA, mrh2.scan_timestamp);
+  EXPECT_EQ(43333, mrh2.scan_beam_period);
+  EXPECT_EQ(3, mrh2.machine_state);
+  EXPECT_EQ(7, mrh2.machine_stop_reasons);
+  EXPECT_EQ(0x45, mrh2.active_zone_set);
+  EXPECT_EQ(0xAA, mrh2.zone_inputs);
+  EXPECT_EQ(0x0F, mrh2.detection_zone_status);
+  EXPECT_EQ(7, mrh2.output_status);
+  EXPECT_EQ(3, mrh2.input_status);
+  EXPECT_EQ(0x0402, mrh2.display_status);
+  EXPECT_EQ(0x55AA, mrh2.non_safety_config_checksum);
+  EXPECT_EQ(0x5AA5, mrh2.safety_config_checksum);
+  EXPECT_EQ(1, mrh2.range_report_format);
+  EXPECT_EQ(1, mrh2.refletivity_report_format);
+  EXPECT_EQ(677, mrh2.num_beams);
+}
+
