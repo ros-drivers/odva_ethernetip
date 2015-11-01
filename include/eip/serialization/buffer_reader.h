@@ -106,6 +106,20 @@ public:
     return byte_count_;
   }
 
+  /**
+   * Skip forward in input by n bytes
+   * @param n number of bytes to skip forward
+   * @throw std::length_error if end of output buffer reached
+   */
+  virtual void skip(size_t n)
+  {
+    if (buffer_size(buf_) < n)
+    {
+      throw std::length_error("End of buffer reached skipping forward");
+    }
+    byte_count_ += n;
+    buf_ = buf_ + n;
+  }
 private:
   mutable_buffer buf_;
   size_t byte_count_;

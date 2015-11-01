@@ -52,6 +52,7 @@ TEST_F(BufferReaderTest, test_read_int_short_buffer)
 TEST_F(BufferReaderTest, test_read_bytes)
 {
   unsigned char d[8];
+  memset(d, 0, sizeof(d));
   unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
   shared_ptr<Reader> reader = make_shared<BufferReader> (buffer(input));
   reader->readBytes(d, sizeof(d));
@@ -69,6 +70,7 @@ TEST_F(BufferReaderTest, test_read_bytes)
 TEST_F(BufferReaderTest, test_read_bytes_short_buffer)
 {
   unsigned char d[8];
+  memset(d, 0, sizeof(d));
   unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12 };
   shared_ptr<Reader> reader = make_shared<BufferReader> (buffer(input));
   ASSERT_THROW(reader->readBytes(d, sizeof(d)), std::length_error);
@@ -77,6 +79,7 @@ TEST_F(BufferReaderTest, test_read_bytes_short_buffer)
 TEST_F(BufferReaderTest, test_read_buffer)
 {
   unsigned char d[8];
+  memset(d, 0, sizeof(d));
   unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
   shared_ptr<Reader> reader = make_shared<BufferReader> (buffer(input));
   reader->readBuffer(buffer(d));
@@ -132,3 +135,20 @@ TEST_F(BufferReaderTest, test_read_buffer_no_copy)
   EXPECT_EQ(0x12, d[6]);
   EXPECT_EQ(0x34, d[7]);
 }
+
+TEST_F(BufferReaderTest, test_read_skip)
+{
+  unsigned char d[4];
+  memset(d, 0, sizeof(d));
+  unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
+  shared_ptr<Reader> reader = make_shared<BufferReader> (buffer(input));
+  reader->readBuffer(buffer(d,2));
+  reader->skip(4);
+  reader->readBuffer(buffer(d+2,2));
+  EXPECT_EQ(8, reader->getByteCount());
+  EXPECT_EQ(0xFF, d[0]);
+  EXPECT_EQ(0xFE, d[1]);
+  EXPECT_EQ(0x12, d[2]);
+  EXPECT_EQ(0x34, d[3]);
+}
+

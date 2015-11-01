@@ -71,6 +71,14 @@ public:
     return isp_->tellg();
   }
 
+  /**
+   * Skip forward in input by n bytes
+   * @param n number of bytes to skip forward
+   */
+  virtual void skip(size_t n)
+  {
+    isp_->seekg(n, std::ios_base::cur);
+  }
 private:
   shared_ptr<istream> isp_;
 };

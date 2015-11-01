@@ -59,6 +59,13 @@ public:
    * @return number of bytes read from the buffer
    */
   virtual size_t getByteCount() = 0;
+
+  /**
+   * Skip forward in input by n bytes
+   * @param n number of bytes to skip forward
+   * @throw std::length_error if end of output buffer reached
+   */
+  virtual void skip(size_t n) = 0;
 };
 
 } // namespace serialization
