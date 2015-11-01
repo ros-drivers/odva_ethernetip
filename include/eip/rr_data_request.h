@@ -62,6 +62,18 @@ public:
     mr_data_->setData(data);
   }
 
+  /**
+   * Construct an RR data request for the given path and without data
+   */
+  RRDataRequest(EIP_USINT service_code, EIP_USINT class_id, EIP_USINT instance_id, 
+    EIP_USINT attribute_id)
+  {
+    mr_data_ = make_shared<MessageRouterRequest>(service_code);
+    mr_data_->getPath().addLogicalClass(class_id);
+    mr_data_->getPath().addLogicalInstance(instance_id);
+    mr_data_->getPath().addLogicalAttribute(attribute_id);
+  }
+
   EIP_USINT getServiceCode() const
   {
     return mr_data_->service;

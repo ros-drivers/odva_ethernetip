@@ -19,6 +19,8 @@ express permission of Clearpath Robotics.
 #include "eip/eip_types.h"
 #include "eip/encap_packet.h"
 #include "eip/register_session_data.h"
+#include "eip/rr_data_request.h"
+#include "eip/rr_data_response.h"
 
 using namespace boost::asio;
 using boost::asio::ip::tcp;
@@ -81,55 +83,72 @@ void Session::open(string hostname, string port)
       " bytes, but only " << reader.getByteCount() << " bytes used" << endl;
   }
 
-  // verify that all fields are correct
-  if (reg_msg.getHeader().command != EIP_CMD_REGISTER_SESSION)
+  if (!check_packet(reg_msg, EIP_CMD_REGISTER_SESSION, 4))
   {
-    cerr << "Reply received with wrong command. Expected " 
-      << EIP_CMD_REGISTER_SESSION << ", received " << reg_msg.getHeader().command << endl;
-    // TODO(kshehata) should probably close the socket here or something similar
     return;
   }
-  if (reg_msg.getHeader().session_handle == 0)
+
+  reg_msg.getPayloadAs(*reg_data);
+  if (reg_data->protocol_version != EIP_PROTOCOL_VERSION)
   {
-    cerr << "Warning: Zero session handle received on registration: " << reg_msg.getHeader().session_handle << endl;
+    cerr << "Error: Wrong Ethernet Industrial Protocol Version. "
+      "Expected " << EIP_PROTOCOL_VERSION << " got "
+      << reg_data->protocol_version << endl;
+    // TODO(kshehata): Fail here
+    return;
   }
-  if (reg_msg.getHeader().status != 0)
+  if (reg_data->options != 0)
   {
-    cerr << "Warning: Non-zero status received: " << reg_msg.getHeader().status << endl;
-  }
-  if (reg_msg.getHeader().context[0] != 0 || reg_msg.getHeader().context[1] != 0)
-  {
-    cerr << "Warning: Non-zero sender context received: " 
-    << reg_msg.getHeader().context[0] << " / " << reg_msg.getHeader().context[1] << endl;
-  }
-  if (reg_msg.getHeader().options != 0)
-  {
-    cerr << "Warning: Non-zero options received: " << reg_msg.getHeader().options << endl;
-  }
-  if (reg_msg.getHeader().length != 4)
-  {
-    cerr << "Warning: Session registration message has wrong size data. "
-      "Expected 4 bytes, got " << reg_msg.getHeader().length << endl;
-  }
-  else
-  {
-    reg_msg.getPayloadAs(*reg_data);
-    if (reg_data->protocol_version != EIP_PROTOCOL_VERSION)
-    {
-      cerr << "Error: Wrong Ethernet Industrial Protocol Version. "
-        "Expected " << EIP_PROTOCOL_VERSION << " got "
-        << reg_data->protocol_version << endl;
-      // TODO(kshehata): Fail here
-    }
-    if (reg_data->options != 0)
-    {
-      cerr << "Warning: Registration message included non-zero options flags: "
-        << reg_data->options << endl;
-    }
+    cerr << "Warning: Registration message included non-zero options flags: "
+      << reg_data->options << endl;
   }
 
   session_id_ = reg_msg.getHeader().session_handle;
   cout << "Successfully opened session ID " << session_id_ << endl;
+}
+
+
+bool Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd, int exp_length)
+{
+  // verify that all fields are correct
+  if (pkt.getHeader().command != exp_cmd)
+  {
+    cerr << "Reply received with wrong command. Expected " 
+      << exp_cmd << ", received " << pkt.getHeader().command << endl;
+    return false;
+  }
+  if (session_id_ == 0 && pkt.getHeader().session_handle == 0)
+  {
+    cerr << "Warning: Zero session handle received on registration: " 
+      << pkt.getHeader().session_handle << endl;
+    return false;
+  }
+  if (session_id_ != 0 && pkt.getHeader().session_handle != session_id_)
+  {
+    cerr << "Warning: reply received with wrong session ID. Expected "
+      << session_id_ << ", recieved " << pkt.getHeader().session_handle << endl;
+    return false;
+  }
+  if (pkt.getHeader().status != 0)
+  {
+    cerr << "Warning: Non-zero status received: " << pkt.getHeader().status << endl;
+  }
+  if (pkt.getHeader().context[0] != 0 || pkt.getHeader().context[1] != 0)
+  {
+    cerr << "Warning: Non-zero sender context received: " 
+    << pkt.getHeader().context[0] << " / " << pkt.getHeader().context[1] << endl;
+  }
+  if (pkt.getHeader().options != 0)
+  {
+    cerr << "Warning: Non-zero options received: " << pkt.getHeader().options << endl;
+  }
+  if (exp_length >= 0 && pkt.getHeader().length != exp_length)
+  {
+    cerr << "Warning: Message received with wrong size. Expected " << exp_length
+      << " bytes, received " << pkt.getHeader().length << endl;
+    return false;
+  }
+  return true;
 }
 
 void Session::send(const Serializable& msg)
@@ -138,6 +157,39 @@ void Session::send(const Serializable& msg)
   BufferWriter writer(buffer(buf));
   msg.serialize(writer);
   socket_.send(buffer(buf));
+}
+
+RRDataResponse Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id)
+{
+  cout << "Creating RR Data Request for Get Single Attribute" << endl;
+  shared_ptr<RRDataRequest> req_data = 
+    make_shared<RRDataRequest> (0x0E, class_id, instance_id, attribute_id);
+  EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, 0, req_data);
+  cout << "Sending RR Data Request" << endl;
+  send(encap_pkt);
+
+  cout << "Waiting for response" << endl;
+  char buf[4*1024];
+  size_t n = socket_.receive(buffer(buf));  
+  cout << "Received response of " << n << " bytes" << endl;
+
+  BufferReader reader(buffer(buf, n));
+  encap_pkt.deserialize(reader);
+
+  if (reader.getByteCount() != n)
+  {
+    cerr << "Warning: packet received with " << n << 
+      " bytes, but only " << reader.getByteCount() << " bytes used" << endl;
+  }
+
+  if (!check_packet(encap_pkt, EIP_CMD_SEND_RR_DATA))
+  {
+    throw std::logic_error("Invalid response received");
+  }
+
+  RRDataResponse resp_data;
+  encap_pkt.getPayloadAs(resp_data);
+  return resp_data;
 }
 
 void Session::close()

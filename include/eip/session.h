@@ -17,6 +17,8 @@ express permission of Clearpath Robotics.
 
 #include "eip/eip_types.h"
 #include "eip/serialization/serializable.h"
+#include "eip/encap_packet.h"
+#include "eip/rr_data_response.h"
 
 using std::string;
 using boost::asio::ip::tcp;
@@ -47,7 +49,7 @@ public:
    */
   void open(string hostname, string port = "44818");
 
-  void send(const Serializable& msg);
+  RRDataResponse getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id);
 
   /**
    * Close the session by unregistering the session and then closing the port
@@ -65,6 +67,9 @@ public:
 private:
   tcp::socket socket_;
   EIP_UINT session_id_;
+  
+  void send(const Serializable& msg);
+  bool check_packet(EncapPacket& pkt, EIP_UINT exp_cmd, int exp_length = -1);
 };
 
 } // namespace eip
