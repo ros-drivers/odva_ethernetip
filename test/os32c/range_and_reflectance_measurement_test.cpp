@@ -1,7 +1,7 @@
 /**
 Software License Agreement (proprietary)
 
-\file      measurement_report_test.cpp
+\file      range_and_reflectance_measurement_test.cpp
 \authors   Kareem Shehata <kshehata@clearpathrobotics.com>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
@@ -12,7 +12,7 @@ express permission of Clearpath Robotics.
 #include <gtest/gtest.h>
 #include <boost/asio.hpp>
 
-#include "os32c/measurement_report.h"
+#include "os32c/range_and_reflectance_measurement.h"
 #include "eip/serialization/serializable_buffer.h"
 #include "eip/serialization/buffer_writer.h"
 #include "eip/serialization/buffer_reader.h"
@@ -23,14 +23,14 @@ using namespace eip;
 using namespace eip::serialization;
 using namespace boost::asio;
 
-class MeasurementReportTest : public :: testing :: Test
+class RangeAndReflectanceMeasurementTest : public :: testing :: Test
 {
 
 };
 
-TEST_F(MeasurementReportTest, test_deserialize)
+TEST_F(RangeAndReflectanceMeasurementTest, test_deserialize)
 {
-  EIP_BYTE d[56 + 2000];
+  EIP_BYTE d[56 + 4000];
 
   // use a measurement report header to serialize the header data
   MeasurementReportHeader mrh;
@@ -59,10 +59,14 @@ TEST_F(MeasurementReportTest, test_deserialize)
     writer.write(i);
   }
 
+  for (EIP_UINT i = 20000; i < 20000 + 1000; ++i) {
+    writer.write(i);
+  }
+
   ASSERT_EQ(sizeof(d), writer.getByteCount());
 
   BufferReader reader(buffer(d));
-  MeasurementReport mr;
+  RangeAndReflectanceMeasurement mr;
   mr.deserialize(reader);
   EXPECT_EQ(sizeof(d), reader.getByteCount());
 
@@ -84,16 +88,22 @@ TEST_F(MeasurementReportTest, test_deserialize)
   EXPECT_EQ(1, mr.header.refletivity_report_format);
   EXPECT_EQ(1000, mr.header.num_beams);
 
-  EXPECT_EQ(1000, mr.measurement_data.size());
-  for (int i = 0; i < mr.measurement_data.size(); ++i)
+  EXPECT_EQ(1000, mr.range_data.size());
+  for (int i = 0; i < mr.range_data.size(); ++i)
   {
-    EXPECT_EQ(i + 10000, mr.measurement_data[i]);
+    EXPECT_EQ(i + 10000, mr.range_data[i]);
+  }
+
+  EXPECT_EQ(1000, mr.reflectance_data.size());
+  for (int i = 0; i < mr.reflectance_data.size(); ++i)
+  {
+    EXPECT_EQ(i + 20000, mr.reflectance_data[i]);
   }
 }
 
-TEST_F(MeasurementReportTest, test_serialize)
+TEST_F(RangeAndReflectanceMeasurementTest, test_serialize)
 {
-  MeasurementReport mr;
+  RangeAndReflectanceMeasurement mr;
   mr.header.scan_count = 0xDEADBEEF;
   mr.header.scan_rate = 40000;
   mr.header.scan_timestamp = 0x55AA55AA;
@@ -112,12 +122,17 @@ TEST_F(MeasurementReportTest, test_serialize)
   mr.header.refletivity_report_format = 1;
   mr.header.num_beams = 1000;
 
-  mr.measurement_data.resize(1000);
+  mr.range_data.resize(1000);
   for (int i = 0; i <  1000; ++i) {
-    mr.measurement_data[i] = i + 30000;
+    mr.range_data[i] = i + 30000;
   }
 
-  EIP_BYTE d[56 + 2000];
+  mr.reflectance_data.resize(1000);
+  for (int i = 0; i <  1000; ++i) {
+    mr.reflectance_data[i] = i + 40000;
+  }
+
+  EIP_BYTE d[56 + 4000];
   EXPECT_EQ(sizeof(d), mr.getLength());
   BufferWriter writer(buffer(d));
   mr.serialize(writer);
@@ -185,5 +200,12 @@ TEST_F(MeasurementReportTest, test_serialize)
     EIP_UINT exp_value = i + 30000;
     EXPECT_EQ((exp_value) & 0x00FF, d[56 + i*2]);
     EXPECT_EQ((exp_value >> 8) & 0x00FF, d[56 + i*2 + 1]);
+  }
+
+  for (int i = 0; i < 1000; ++i)
+  {
+    EIP_UINT exp_value = i + 40000;
+    EXPECT_EQ((exp_value) & 0x00FF, d[56 + 2000 + i*2]);
+    EXPECT_EQ((exp_value >> 8) & 0x00FF, d[56 + 2000 + i*2 + 1]);
   }
 }
