@@ -151,5 +151,14 @@ if(TARGET eip-test)
   target_link_libraries(eip-test ${Boost_LIBRARIES} eip)
 endif()
 
+catkin_add_gtest(os32c-test
+  test/os32c/measurement_report_header_test.cpp
+  test/os32c/test_main.cpp
+)
+
+if(TARGET os32c-test)
+  target_link_libraries(os32c-test ${Boost_LIBRARIES} eip)
+endif()
+
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
