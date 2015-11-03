@@ -88,7 +88,7 @@ void Session::open(string hostname, string port)
       << reg_data->options << endl;
   }
 
-  session_id_ = reg_msg.getHeader().session_handle;
+  session_id_ = response.getHeader().session_handle;
   cout << "Successfully opened session ID " << session_id_ << endl;
 }
 
