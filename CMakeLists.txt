@@ -50,19 +50,9 @@ add_library(eip
   src/eip/message_router_response.cpp
 )
 
-#add_library(os32c
-#  src/eip_cpf_packet.cpp
-#  src/eip_cpf_item.cpp
-#  src/eip_common_pkt_item.cpp
-#  src/eip_common_pkt.cpp
-#  src/eip_encap_pkt.cpp
-#  src/eip_encap_header.cpp
-#  src/eip_identity_item.cpp
-#  src/eip_io_scanner.cpp
-#  src/eip_session.cpp
-#  src/eip_path.cpp
-#  src/eip_rr_data_cmd.cpp
-#)
+add_library(os32c_lib
+  src/os32c.cpp
+)
 
 ## Declare a cpp executable
 add_executable(scanner src/scanner_node.cpp)
@@ -82,6 +72,7 @@ target_link_libraries(scanner
 
 target_link_libraries(os32c
   eip
+  os32c_lib
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
   ${boost_LIBRARIES}
