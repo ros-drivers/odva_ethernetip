@@ -164,7 +164,7 @@ RRDataResponse Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instanc
   cout << "Creating RR Data Request for Get Single Attribute" << endl;
   shared_ptr<RRDataRequest> req_data = 
     make_shared<RRDataRequest> (0x0E, class_id, instance_id, attribute_id);
-  EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, 0, req_data);
+  EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
   cout << "Sending RR Data Request" << endl;
   send(encap_pkt);
 
