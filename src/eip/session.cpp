@@ -192,4 +192,20 @@ RRDataResponse Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instanc
   return resp_data;
 }
 
+RRDataResponse Session::setSingleAttribute(EIP_USINT class_id,
+  EIP_USINT instance_id, EIP_USINT attribute_id, shared_ptr<Serializable> data)
+{
+  cout << "Creating RR Data Request for Set Single Attribute" << endl;
+  shared_ptr<RRDataRequest> req_data =
+    make_shared<RRDataRequest> (0x10, class_id, instance_id, attribute_id, data);
+  EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
+
+  // send command and get response
+  EncapPacket response = sendCommand(encap_pkt);
+
+  RRDataResponse resp_data;
+  response.getPayloadAs(resp_data);
+  return resp_data;
+}
+
 } // namespace eip

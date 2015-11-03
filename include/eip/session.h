@@ -72,6 +72,17 @@ public:
    */
   RRDataResponse getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id);
 
+  /**
+   * Set a single attribute from the given class / instance / attribute path
+   * @param class_id Class ID for the path to get
+   * @param instance_id Instance ID number for the path to get
+   * @param attribute_id Attribute ID number for the path to get
+   * @param data Data to set the attribute to
+   * @param response data, including status and data
+   */
+  RRDataResponse setSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, 
+    EIP_USINT attribute_id, shared_ptr<Serializable> data);
+
 private:
   tcp::socket socket_;
   EIP_UINT session_id_;
