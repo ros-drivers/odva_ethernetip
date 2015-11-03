@@ -63,32 +63,17 @@ void Session::open(string hostname, string port)
   shared_ptr<RegisterSessionData> reg_data = make_shared<RegisterSessionData>();
   EncapPacket reg_msg(EIP_CMD_REGISTER_SESSION, 0, reg_data);
 
-  // send the register session message
-  send(reg_msg);
+  // send the register session message and get response
+  EncapPacket response = sendCommand(reg_msg);
 
-  cout << "Waiting for response" << endl;
-  // receive the response
-  char buf[1024];
-  size_t n = socket_.receive(buffer(buf));
-
-  cout << "Received response of " << n << " bytes" << endl;
-
-  // TODO(kshehata): Should probably catch exceptions here if the packet is malformed
-  BufferReader reader(buffer(buf, n));
-  reg_msg.deserialize(reader);
-
-  if (reader.getByteCount() != n)
+  if (response.getHeader().length != reg_data->getLength())
   {
-    cerr << "Warning: packet received with " << n << 
-      " bytes, but only " << reader.getByteCount() << " bytes used" << endl;
+    cerr << "Warning: Registration message received with wrong size. Expected "
+       << reg_data->getLength() << " bytes, received "
+       << response.getHeader().length << endl;
   }
 
-  if (!check_packet(reg_msg, EIP_CMD_REGISTER_SESSION, 4))
-  {
-    return;
-  }
-
-  reg_msg.getPayloadAs(*reg_data);
+  response.getPayloadAs(*reg_data);
   if (reg_data->protocol_version != EIP_PROTOCOL_VERSION)
   {
     cerr << "Error: Wrong Ethernet Industrial Protocol Version. "
@@ -107,8 +92,55 @@ void Session::open(string hostname, string port)
   cout << "Successfully opened session ID " << session_id_ << endl;
 }
 
+void Session::close()
+{
+  cout << "Closing session" << endl;
+  
+  // create the unregister session message
+  EncapPacket reg_msg(EIP_CMD_UNREGISTER_SESSION, session_id_);
+  send(reg_msg);
 
-bool Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd, int exp_length)
+  cout << "Session closed" << endl;
+
+  socket_.close();
+  session_id_ = 0;
+}
+
+void Session::send(const Serializable& msg)
+{
+  std::vector<char> buf(msg.getLength());
+  BufferWriter writer(buffer(buf));
+  msg.serialize(writer);
+  socket_.send(buffer(buf));
+}
+
+EncapPacket Session::sendCommand(EncapPacket& req)
+{
+  cout << "Sending Command" << endl;
+  send(req);
+
+  cout << "Waiting for response" << endl;
+  size_t n = socket_.receive(buffer(recv_buffer_));  
+  cout << "Received response of " << n << " bytes" << endl;
+
+  BufferReader reader(buffer(recv_buffer_, n));
+  EncapPacket result;
+  result.deserialize(reader);
+
+  if (reader.getByteCount() != n)
+  {
+    cerr << "Warning: packet received with " << n << 
+      " bytes, but only " << reader.getByteCount() << " bytes used" << endl;
+  }
+
+  if (!check_packet(result, req.getHeader().command))
+  {
+    throw std::logic_error("Invalid response received");
+  }
+  return result;
+}
+
+bool Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
 {
   // verify that all fields are correct
   if (pkt.getHeader().command != exp_cmd)
@@ -142,21 +174,7 @@ bool Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd, int exp_length)
   {
     cerr << "Warning: Non-zero options received: " << pkt.getHeader().options << endl;
   }
-  if (exp_length >= 0 && pkt.getHeader().length != exp_length)
-  {
-    cerr << "Warning: Message received with wrong size. Expected " << exp_length
-      << " bytes, received " << pkt.getHeader().length << endl;
-    return false;
-  }
   return true;
-}
-
-void Session::send(const Serializable& msg)
-{
-  std::vector<char> buf(msg.getLength());
-  BufferWriter writer(buffer(buf));
-  msg.serialize(writer);
-  socket_.send(buffer(buf));
 }
 
 RRDataResponse Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id)
@@ -165,45 +183,13 @@ RRDataResponse Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instanc
   shared_ptr<RRDataRequest> req_data = 
     make_shared<RRDataRequest> (0x0E, class_id, instance_id, attribute_id);
   EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
-  cout << "Sending RR Data Request" << endl;
-  send(encap_pkt);
 
-  cout << "Waiting for response" << endl;
-  char buf[4*1024];
-  size_t n = socket_.receive(buffer(buf));  
-  cout << "Received response of " << n << " bytes" << endl;
-
-  BufferReader reader(buffer(buf, n));
-  encap_pkt.deserialize(reader);
-
-  if (reader.getByteCount() != n)
-  {
-    cerr << "Warning: packet received with " << n << 
-      " bytes, but only " << reader.getByteCount() << " bytes used" << endl;
-  }
-
-  if (!check_packet(encap_pkt, EIP_CMD_SEND_RR_DATA))
-  {
-    throw std::logic_error("Invalid response received");
-  }
+  // send command and get response
+  EncapPacket response = sendCommand(encap_pkt);
 
   RRDataResponse resp_data;
-  encap_pkt.getPayloadAs(resp_data);
+  response.getPayloadAs(resp_data);
   return resp_data;
-}
-
-void Session::close()
-{
-  cout << "Closing session" << endl;
-  
-  // create the unregister session message
-  EncapPacket reg_msg(EIP_CMD_UNREGISTER_SESSION, session_id_);
-  send(reg_msg);
-
-  cout << "Session closed" << endl;
-
-  socket_.close();
-  session_id_ = 0;
 }
 
 } // namespace eip

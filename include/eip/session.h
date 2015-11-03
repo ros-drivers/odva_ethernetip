@@ -49,8 +49,6 @@ public:
    */
   void open(string hostname, string port = "44818");
 
-  RRDataResponse getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id);
-
   /**
    * Close the session by unregistering the session and then closing the port
    */
@@ -64,12 +62,40 @@ public:
   {
     return session_id_;
   }
+
+  /**
+   * Get a single attribute from the given class / instance / attribute path
+   * @param class_id Class ID for the path to get
+   * @param instance_id Instance ID number for the path to get
+   * @param attribute_id Attribute ID number for the path to get
+   * @param response data, including status and data
+   */
+  RRDataResponse getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id);
+
 private:
   tcp::socket socket_;
   EIP_UINT session_id_;
+  EIP_BYTE recv_buffer_[4*1024];
   
+  /**
+   * Helper to send the given serializable out the socket
+   */
   void send(const Serializable& msg);
-  bool check_packet(EncapPacket& pkt, EIP_UINT exp_cmd, int exp_length = -1);
+
+  /**
+   * Helper to check a returned encapsulation packet based on an expected command.
+   * Note that there are some warnings given that do not produce a false result.
+   * @return true if packet can be used, false if there's a serious error
+   */
+  bool check_packet(EncapPacket& pkt, EIP_UINT exp_cmd);
+
+  /**
+   * Helper to send a command to the target as encapsulation packet and get 
+   * the response, also as an encapsulation packet
+   * @param req Encapsulation packet to send
+   * @return Encapsulation packet received in response
+   */
+  EncapPacket sendCommand(EncapPacket& req);
 };
 
 } // namespace eip
