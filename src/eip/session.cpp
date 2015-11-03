@@ -165,7 +165,7 @@ RRDataResponse Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instanc
   shared_ptr<RRDataRequest> req_data = 
     make_shared<RRDataRequest> (0x0E, class_id, instance_id, attribute_id);
   EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
-  cout << "Sending RR Data Request" << endl;
+  cout << "Sending RR Data Request " << session_id_ << endl;
   send(encap_pkt);
 
   cout << "Waiting for response" << endl;
