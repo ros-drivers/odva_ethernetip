@@ -49,12 +49,12 @@ TEST_F(TestSocketTest, test_send)
   EXPECT_EQ(4, ts->tx_count);
   s->send(buffer(d));
   EXPECT_EQ(12, ts->tx_count);
-  EXPECT_EQ(0xAA, (unsigned char)ts->tx_buffer[0]);
-  EXPECT_EQ(0x55, (unsigned char)ts->tx_buffer[1]);
-  EXPECT_EQ(0x34, (unsigned char)ts->tx_buffer[2]);
-  EXPECT_EQ(0x12, (unsigned char)ts->tx_buffer[3]);
-  EXPECT_EQ(0xAA, (unsigned char)ts->tx_buffer[4]);
-  EXPECT_EQ(0x55, (unsigned char)ts->tx_buffer[5]);
+  EXPECT_EQ(0xAA, ts->tx_buffer[0]);
+  EXPECT_EQ(0x55, ts->tx_buffer[1]);
+  EXPECT_EQ(0x34, ts->tx_buffer[2]);
+  EXPECT_EQ(0x12, ts->tx_buffer[3]);
+  EXPECT_EQ(0xAA, ts->tx_buffer[4]);
+  EXPECT_EQ(0x55, ts->tx_buffer[5]);
 }
 
 TEST_F(TestSocketTest, test_receive)

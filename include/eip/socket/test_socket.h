@@ -41,7 +41,7 @@ public:
   string port;
 
   /// Characters passed in during send()
-  char tx_buffer[4096];
+  unsigned char tx_buffer[4096];
   /// Number of characters sent via send()
   size_t tx_count;
 
