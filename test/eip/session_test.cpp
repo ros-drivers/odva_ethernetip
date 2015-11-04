@@ -143,3 +143,169 @@ TEST_F(SessionTest, test_open)
   EXPECT_EQ(   0, ts->tx_buffer[22]);
   EXPECT_EQ(   0, ts->tx_buffer[23]);
 }
+
+TEST_F(SessionTest, test_open_wrong_command_id)
+{
+  char resp_packet[] = {
+    // command for register session
+    0x00, 0x00,
+    // length
+    0, 0,
+    // session handle
+    0, 0, 0, 0,
+    // status
+    0, 0, 0, 0,
+    // sender context. Should probably mirror, but this will always be 0
+    0, 0, 0, 0, 0, 0, 0, 0,
+    // options
+    0, 0, 0, 0,
+  };
+
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
+  Session session(ts);
+  EXPECT_THROW(session.open("example_host"), std::runtime_error);
+  EXPECT_FALSE(ts->is_open);
+  EXPECT_EQ("example_host", ts->hostname);
+  EXPECT_EQ("44818", ts->port);
+  EXPECT_EQ(0, session.getSessionID());
+}
+
+TEST_F(SessionTest, test_open_zero_session)
+{
+  char resp_packet[] = {
+    // command for register session
+    0x65, 0x00,
+    // length
+    0, 0,
+    // session handle
+    0, 0, 0, 0,
+    // status
+    0, 0, 0, 0,
+    // sender context. Should probably mirror, but this will always be 0
+    0, 0, 0, 0, 0, 0, 0, 0,
+    // options
+    0, 0, 0, 0,
+  };
+
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
+  Session session(ts);
+  EXPECT_THROW(session.open("example_host"), std::runtime_error);
+  EXPECT_FALSE(ts->is_open);
+  EXPECT_EQ("example_host", ts->hostname);
+  EXPECT_EQ("44818", ts->port);
+  EXPECT_EQ(0, session.getSessionID());
+}
+
+TEST_F(SessionTest, test_open_short_packet)
+{
+  char resp_packet[] = {
+    // command for register session
+    0x65, 0x00,
+    // length
+    1, 0,
+    // session handle
+    1, 0, 0, 0,
+    // status
+    0, 0, 0, 0,
+    // sender context. Should probably mirror, but this will always be 0
+    0, 0, 0, 0, 0, 0, 0, 0,
+    // options
+    0, 0, 0, 0,
+  };
+
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
+  Session session(ts);
+  EXPECT_THROW(session.open("example_host"), std::runtime_error);
+  EXPECT_FALSE(ts->is_open);
+  EXPECT_EQ("example_host", ts->hostname);
+  EXPECT_EQ("44818", ts->port);
+  EXPECT_EQ(0, session.getSessionID());
+}
+
+TEST_F(SessionTest, test_open_short_data)
+{
+  char resp_packet[] = {
+    // command for register session
+    0x65, 0x00,
+    // length
+    2, 0,
+    // session handle
+    1, 0, 0, 0,
+    // status
+    0, 0, 0, 0,
+    // sender context. Should probably mirror, but this will always be 0
+    0, 0, 0, 0, 0, 0, 0, 0,
+    // options
+    0, 0, 0, 0,
+    // version (short)
+    1, 0,
+  };
+
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
+  Session session(ts);
+  session.open("example_host");
+  EXPECT_TRUE(ts->is_open);
+  EXPECT_EQ("example_host", ts->hostname);
+  EXPECT_EQ("44818", ts->port);
+  EXPECT_EQ(1, session.getSessionID());
+}
+
+TEST_F(SessionTest, test_open_extra_data)
+{
+  char resp_packet[] = {
+    // command for register session
+    0x65, 0x00,
+    // length
+    8, 0,
+    // session handle
+    0xEF, 0xBE, 0xAD, 0xDE,
+    // status
+    0xFF, 0xFF, 0xFF, 0xFF,
+    // sender context
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    // options
+    0xFF, 0xFF, 0xFF, 0xFF,
+    // protocol version
+    1, 0,
+    // more options flags
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+  };
+
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
+  Session session(ts);
+  session.open("example_host");
+  EXPECT_TRUE(ts->is_open);
+  EXPECT_EQ("example_host", ts->hostname);
+  EXPECT_EQ("44818", ts->port);
+  EXPECT_EQ(0xDEADBEEF, session.getSessionID());
+}
+
+TEST_F(SessionTest, test_open_wrong_version)
+{
+  char resp_packet[] = {
+    // command for register session
+    0x65, 0x00,
+    // length
+    4, 0,
+    // session handle
+    0xEF, 0xBE, 0xAD, 0xDE,
+    // status
+    0, 0, 0, 0,
+    // sender context. Should probably mirror, but this will always be 0
+    0, 0, 0, 0, 0, 0, 0, 0,
+    // options
+    0, 0, 0, 0,
+    // protocol version
+    2, 1,
+    // more options flags
+    0, 0,
+  };
+
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
+  Session session(ts);
+  EXPECT_THROW(session.open("example_host"), std::runtime_error);
+  EXPECT_FALSE(ts->is_open);
+  EXPECT_EQ("example_host", ts->hostname);
+  EXPECT_EQ("44818", ts->port);
+  EXPECT_EQ(0, session.getSessionID());
+}

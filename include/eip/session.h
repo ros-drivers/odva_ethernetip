@@ -49,6 +49,7 @@ public:
    * Open the session by opening the port and requesting a session.
    * @param hostname hostname of the target
    * @param port port to use if other than the standard
+   * @throw std::runtime_error on problem opening the connection
    */
   void open(string hostname, string port = "44818");
 
@@ -93,10 +94,10 @@ private:
   
   /**
    * Helper to check a returned encapsulation packet based on an expected command.
-   * Note that there are some warnings given that do not produce a false result.
-   * @return true if packet can be used, false if there's a serious error
+   * Note that there are some warnings given that do not produce an exception
+   * @throws std::logic_error if problems are found with the response
    */
-  bool check_packet(EncapPacket& pkt, EIP_UINT exp_cmd);
+  void check_packet(EncapPacket& pkt, EIP_UINT exp_cmd);
 
   /**
    * Helper to send a command to the target as encapsulation packet and get 

@@ -59,7 +59,23 @@ void Session::open(string hostname, string port)
   EncapPacket reg_msg(EIP_CMD_REGISTER_SESSION, 0, reg_data);
 
   // send the register session message and get response
-  EncapPacket response = sendCommand(reg_msg);
+  EncapPacket response;
+  try
+  {
+    response = sendCommand(reg_msg);
+  }
+  catch (std::length_error ex)
+  {
+    socket_->close();
+    cerr << "Could not parse response when registering session: " << ex.what() << endl;
+    throw std::runtime_error("Invalid response received registering session");
+  }
+  catch (std::logic_error ex)
+  {
+    socket_->close();
+    cerr << "Error in registration response: " << ex.what() << endl;
+    throw std::runtime_error("Error in registration response");
+  }
 
   if (response.getHeader().length != reg_data->getLength())
   {
@@ -68,16 +84,30 @@ void Session::open(string hostname, string port)
        << response.getHeader().length << endl;
   }
 
-  response.getPayloadAs(*reg_data);
-  if (reg_data->protocol_version != EIP_PROTOCOL_VERSION)
+  bool response_valid = false;
+  try
+  {
+    response.getPayloadAs(*reg_data);
+    response_valid = true;
+  }
+  catch (std::length_error ex)
+  {
+    cerr << "Warning: Registration message too short, ignoring" << endl;
+  }
+  catch (std::logic_error ex)
+  {
+    cerr << "Warning: could not parse registration response: " << ex.what() << endl;
+  }
+
+  if (response_valid && reg_data->protocol_version != EIP_PROTOCOL_VERSION)
   {
     cerr << "Error: Wrong Ethernet Industrial Protocol Version. "
       "Expected " << EIP_PROTOCOL_VERSION << " got "
       << reg_data->protocol_version << endl;
-    // TODO(kshehata): Fail here
-    return;
+    socket_->close();
+    throw std::runtime_error("Received wrong Ethernet IP Protocol Version on registration");
   }
-  if (reg_data->options != 0)
+  if (response_valid && reg_data->options != 0)
   {
     cerr << "Warning: Registration message included non-zero options flags: "
       << reg_data->options << endl;
@@ -120,33 +150,30 @@ EncapPacket Session::sendCommand(EncapPacket& req)
       " bytes, but only " << reader.getByteCount() << " bytes used" << endl;
   }
 
-  if (!check_packet(result, req.getHeader().command))
-  {
-    throw std::logic_error("Invalid response received");
-  }
+  check_packet(result, req.getHeader().command);
   return result;
 }
 
-bool Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
+void Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
 {
   // verify that all fields are correct
   if (pkt.getHeader().command != exp_cmd)
   {
     cerr << "Reply received with wrong command. Expected " 
       << exp_cmd << ", received " << pkt.getHeader().command << endl;
-    return false;
+    throw std::logic_error("Reply received with wrong command");
   }
   if (session_id_ == 0 && pkt.getHeader().session_handle == 0)
   {
     cerr << "Warning: Zero session handle received on registration: " 
       << pkt.getHeader().session_handle << endl;
-    return false;
+    throw std::logic_error("Zero session handle received on registration");
   }
   if (session_id_ != 0 && pkt.getHeader().session_handle != session_id_)
   {
     cerr << "Warning: reply received with wrong session ID. Expected "
       << session_id_ << ", recieved " << pkt.getHeader().session_handle << endl;
-    return false;
+    throw std::logic_error("Wrong session ID received for command");
   }
   if (pkt.getHeader().status != 0)
   {
@@ -161,7 +188,6 @@ bool Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
   {
     cerr << "Warning: Non-zero options received: " << pkt.getHeader().options << endl;
   }
-  return true;
 }
 
 RRDataResponse Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id)
