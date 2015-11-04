@@ -61,7 +61,7 @@ public:
    * Get the ID number assigned to this session by the target
    * @return session ID number
    */
-  EIP_UINT getSessionID()
+  EIP_UDINT getSessionID()
   {
     return session_id_;
   }
@@ -88,7 +88,7 @@ public:
 
 private:
   shared_ptr<Socket> socket_;
-  EIP_UINT session_id_;
+  EIP_UDINT session_id_;
   EIP_BYTE recv_buffer_[4*1024];
   
   /**
