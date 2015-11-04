@@ -13,19 +13,22 @@ express permission of Clearpath Robotics.
 #define EIP_SESSION_H
 
 #include <string>
+#include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
 
 #include "eip/eip_types.h"
+#include "eip/socket/socket.h"
 #include "eip/serialization/serializable.h"
 #include "eip/encap_packet.h"
 #include "eip/rr_data_response.h"
 
 using std::string;
-using boost::asio::ip::tcp;
+using boost::shared_ptr;
 
 namespace eip {
 
 using serialization::Serializable;
+using socket::Socket;
 
 /**
  * Class to handle creating and managing Ethernet/IP Sessions
@@ -38,7 +41,7 @@ public:
    * Construct a session to use the given io_service. Doesn't actually open
    * the port or start a session.
    */
-  Session(boost::asio::io_service& io_service) : socket_(io_service), session_id_(0) { }
+  Session(shared_ptr<Socket> socket) : socket_(socket), session_id_(0) { }
 
   virtual ~Session();
 
@@ -84,15 +87,10 @@ public:
     EIP_USINT attribute_id, shared_ptr<Serializable> data);
 
 private:
-  tcp::socket socket_;
+  shared_ptr<Socket> socket_;
   EIP_UINT session_id_;
   EIP_BYTE recv_buffer_[4*1024];
   
-  /**
-   * Helper to send the given serializable out the socket
-   */
-  void send(const Serializable& msg);
-
   /**
    * Helper to check a returned encapsulation packet based on an expected command.
    * Note that there are some warnings given that do not produce a false result.

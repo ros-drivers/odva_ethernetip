@@ -22,8 +22,6 @@ express permission of Clearpath Robotics.
 #include "eip/rr_data_request.h"
 #include "eip/rr_data_response.h"
 
-using namespace boost::asio;
-using boost::asio::ip::tcp;
 using boost::shared_ptr;
 using boost::make_shared;
 using std::cerr;
@@ -53,10 +51,7 @@ Session::~Session()
 void Session::open(string hostname, string port)
 {
   cout << "Resolving hostname and connecting socket" << endl;
-  tcp::resolver resolver(socket_.get_io_service());
-  tcp::resolver::query query(hostname, port);
-  tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-  connect(socket_, endpoint_iterator);
+  socket_->open(hostname, port);
 
   // create the registration message
   cout << "Creating and sending the registration message" << endl;
@@ -98,29 +93,21 @@ void Session::close()
   
   // create the unregister session message
   EncapPacket reg_msg(EIP_CMD_UNREGISTER_SESSION, session_id_);
-  send(reg_msg);
+  socket_->send(reg_msg);
 
   cout << "Session closed" << endl;
 
-  socket_.close();
+  socket_->close();
   session_id_ = 0;
-}
-
-void Session::send(const Serializable& msg)
-{
-  std::vector<char> buf(msg.getLength());
-  BufferWriter writer(buffer(buf));
-  msg.serialize(writer);
-  socket_.send(buffer(buf));
 }
 
 EncapPacket Session::sendCommand(EncapPacket& req)
 {
   cout << "Sending Command" << endl;
-  send(req);
+  socket_->send(req);
 
   cout << "Waiting for response" << endl;
-  size_t n = socket_.receive(buffer(recv_buffer_));  
+  size_t n = socket_->receive(buffer(recv_buffer_));  
   cout << "Received response of " << n << " bytes" << endl;
 
   BufferReader reader(buffer(recv_buffer_, n));

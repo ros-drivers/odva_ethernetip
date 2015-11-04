@@ -10,12 +10,16 @@ express permission of Clearpath Robotics.
 */
 
 #include <ros/ros.h>
+#include <boost/shared_ptr.hpp>
 
+#include "eip/socket/tcp_socket.h"
 #include "os32c/os32c.h"
 #include "os32c/range_and_reflectance_measurement.h"
 
 using std::cout;
 using std::endl;
+using boost::shared_ptr;
+using eip::socket::TCPSocket;
 using os32c::OS32C;
 using os32c::RangeAndReflectanceMeasurement;
 
@@ -27,7 +31,8 @@ int main(int argc, char const *argv[])
     return 1;
   }
   boost::asio::io_service io_service;
-  OS32C os32c(io_service);
+  shared_ptr<TCPSocket> socket = shared_ptr<TCPSocket>(new TCPSocket(io_service));
+  OS32C os32c(socket);
   try
   {
     os32c.open(argv[1]);

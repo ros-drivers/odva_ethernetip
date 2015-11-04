@@ -14,12 +14,16 @@ express permission of Clearpath Robotics.
 
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 #include "eip/session.h"
+#include "eip/socket/socket.h"
 #include "os32c/range_and_reflectance_measurement.h"
 
 using std::vector;
+using boost::shared_ptr;
 using eip::Session;
+using eip::socket::Socket;
 
 namespace os32c {
 
@@ -33,9 +37,9 @@ class OS32C : public Session
 public:
   /**
    * Construct a new OS32C instance.
-   * @param io_service IO Service backend to use
+   * @param socket Socket instance to use for communication with the lidar
    */
-  OS32C(boost::asio::io_service& io_service) : Session(io_service) { }
+  OS32C(shared_ptr<Socket> socket) : Session(socket) { }
 
   /**
    * Make an explicit request for a single Range and Reflectance scan
