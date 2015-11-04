@@ -26,8 +26,7 @@ namespace eip {
 namespace socket {
 
 /**
- * Generic interface for sockets. Provides the ability to produce testable
- * implementations that don't rely on actual sockets.
+ * TCP Implementation of the Socket interface
  */
 class TCPSocket : public Socket
 {
