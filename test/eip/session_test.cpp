@@ -14,16 +14,15 @@ express permission of Clearpath Robotics.
 
 #include "eip/session.h"
 #include "eip/socket/test_socket.h"
+#include "eip/rr_data_response.h"
 #include "eip/serialization/serializable_buffer.h"
-#include "eip/serialization/buffer_writer.h"
-#include "eip/serialization/buffer_reader.h"
 
 using boost::make_shared;
 using namespace boost::asio;
 
 using namespace eip;
-using namespace eip::serialization;
 using namespace eip::socket;
+using namespace eip::serialization;
 
 class SessionTest : public :: testing :: Test
 {
@@ -308,4 +307,158 @@ TEST_F(SessionTest, test_open_wrong_version)
   EXPECT_EQ("example_host", ts->hostname);
   EXPECT_EQ("44818", ts->port);
   EXPECT_EQ(0, session.getSessionID());
+}
+
+
+
+TEST_F(SessionTest, test_get_single_attribute)
+{
+  char reg_resp_packet[] = {
+    // command for register session
+    0x65, 0x00,
+    // length
+    4, 0,
+    // session handle
+    0xEF, 0xBE, 0xAD, 0xDE,
+    // status
+    0, 0, 0, 0,
+    // sender context. Should probably mirror, but this will always be 0
+    0, 0, 0, 0, 0, 0, 0, 0,
+    // options
+    0, 0, 0, 0,
+    // protocol version
+    1, 0,
+    // more options flags
+    0, 0,
+  };
+
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(reg_resp_packet));
+  Session session(ts);
+  session.open("example_host");
+  EXPECT_TRUE(ts->is_open);
+  EXPECT_EQ("example_host", ts->hostname);
+  EXPECT_EQ("44818", ts->port);
+  EXPECT_EQ(0xDEADBEEF, session.getSessionID());
+
+  // clear out the tx buffer
+  ts->tx_count = 0;
+  memset(ts->tx_buffer, 0, sizeof(ts->tx_count));
+
+  char resp_packet[] = {
+    // command for register session
+    0x6F, 0x00,
+    // length
+    24, 0,
+    // session handle
+    0xEF, 0xBE, 0xAD, 0xDE,
+    // status
+    0, 0, 0, 0,
+    // sender context. Should probably mirror, but this will always be 0
+    0, 0, 0, 0, 0, 0, 0, 0,
+    // options
+    0, 0, 0, 0,
+    // interface handle
+    0, 0, 0, 0,
+    // timeout
+    0, 0,
+    // item count
+    2, 0,
+    // adress type
+    0, 0,
+    // address length
+    0, 0,
+    // data type
+    0xB2, 0x00,
+    // data length
+    0x08, 0x00,
+    // service code
+    0x0E,
+    // reserved
+    0,
+    // general status
+    0xA5,
+    // size of additional status
+    0,
+    // response data
+    0xEF, 0xCD, 0xAB, 0xAA,
+  };
+
+  ts->rx_buffer = buffer(resp_packet);
+
+  RRDataResponse resp = session.getSingleAttribute(0x75, 1, 3);
+
+  // check the unregistration packet
+  EXPECT_EQ(48, ts->tx_count);
+  // command
+  EXPECT_EQ(0x6F, ts->tx_buffer[0]);
+  EXPECT_EQ(   0, ts->tx_buffer[1]);
+  // length
+  EXPECT_EQ(  24, ts->tx_buffer[2]);
+  EXPECT_EQ(   0, ts->tx_buffer[3]);
+  // session handle
+  EXPECT_EQ(0xEF, ts->tx_buffer[4]);
+  EXPECT_EQ(0xBE, ts->tx_buffer[5]);
+  EXPECT_EQ(0xAD, ts->tx_buffer[6]);
+  EXPECT_EQ(0xDE, ts->tx_buffer[7]);
+  // status
+  EXPECT_EQ(   0, ts->tx_buffer[8]);
+  EXPECT_EQ(   0, ts->tx_buffer[9]);
+  EXPECT_EQ(   0, ts->tx_buffer[10]);
+  EXPECT_EQ(   0, ts->tx_buffer[11]);
+  // sender context
+  EXPECT_EQ(   0, ts->tx_buffer[12]);
+  EXPECT_EQ(   0, ts->tx_buffer[13]);
+  EXPECT_EQ(   0, ts->tx_buffer[14]);
+  EXPECT_EQ(   0, ts->tx_buffer[15]);
+  EXPECT_EQ(   0, ts->tx_buffer[16]);
+  EXPECT_EQ(   0, ts->tx_buffer[17]);
+  EXPECT_EQ(   0, ts->tx_buffer[18]);
+  EXPECT_EQ(   0, ts->tx_buffer[19]);
+  // options
+  EXPECT_EQ(   0, ts->tx_buffer[20]);
+  EXPECT_EQ(   0, ts->tx_buffer[21]);
+  EXPECT_EQ(   0, ts->tx_buffer[22]);
+  EXPECT_EQ(   0, ts->tx_buffer[23]);
+  // interface handle
+  EXPECT_EQ(   0, ts->tx_buffer[24]);
+  EXPECT_EQ(   0, ts->tx_buffer[25]);
+  EXPECT_EQ(   0, ts->tx_buffer[26]);
+  EXPECT_EQ(   0, ts->tx_buffer[27]);
+  // timeout
+  EXPECT_EQ(   0, ts->tx_buffer[28]);
+  EXPECT_EQ(   0, ts->tx_buffer[29]);
+  // item count
+  EXPECT_EQ(   2, ts->tx_buffer[30]);
+  EXPECT_EQ(   0, ts->tx_buffer[31]);
+  // adress type null
+  EXPECT_EQ(   0, ts->tx_buffer[32]);
+  EXPECT_EQ(   0, ts->tx_buffer[33]);
+  // address length 0
+  EXPECT_EQ(   0, ts->tx_buffer[34]);
+  EXPECT_EQ(   0, ts->tx_buffer[35]);
+  // data type for UCMM
+  EXPECT_EQ(0xB2, ts->tx_buffer[36]);
+  EXPECT_EQ(0x00, ts->tx_buffer[37]);
+  // data length
+  EXPECT_EQ(   8, ts->tx_buffer[38]);
+  EXPECT_EQ(   0, ts->tx_buffer[39]);
+  // service code
+  EXPECT_EQ(0x0E, ts->tx_buffer[40]);
+  // path
+  EXPECT_EQ(0x03, ts->tx_buffer[41]);
+  EXPECT_EQ(0x20, ts->tx_buffer[42]);
+  EXPECT_EQ(0x75, ts->tx_buffer[43]);
+  EXPECT_EQ(0x24, ts->tx_buffer[44]);
+  EXPECT_EQ(0x01, ts->tx_buffer[45]);
+  EXPECT_EQ(0x30, ts->tx_buffer[46]);
+  EXPECT_EQ(0x03, ts->tx_buffer[47]);
+
+  // check response data
+  EXPECT_EQ(0x0E, resp.getServiceCode());
+  EXPECT_EQ(0xA5, resp.getGeneralStatus());
+
+  SerializableBuffer sb;
+  resp.getResponseDataAs(sb);
+  EXPECT_EQ(4, sb.getLength());
+  EXPECT_EQ(0xAAABCDEF, *buffer_cast<EIP_UDINT*>(sb.getData()));
 }
