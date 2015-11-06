@@ -20,8 +20,7 @@ using std::cout;
 using std::endl;
 using boost::shared_ptr;
 using eip::socket::TCPSocket;
-using os32c::OS32C;
-using os32c::RangeAndReflectanceMeasurement;
+using namespace os32c;
 
 int main(int argc, char const *argv[])
 {
@@ -45,6 +44,10 @@ int main(int argc, char const *argv[])
 
   try
   {
+    os32c.setRangeFormat(RANGE_MEASURE_50M);
+    os32c.setReflectivityFormat(REFLECTIVITY_MEASURE_TOT_4PS);
+    os32c.selectBeams();
+
     RangeAndReflectanceMeasurement rr = os32c.getSingleRRScan();
     cout << "Received scan data" << endl;
     cout << "Scan count: " << rr.header.scan_count << endl;

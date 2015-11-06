@@ -21,26 +21,42 @@ using os32c::RangeAndReflectanceMeasurement;
 
 namespace os32c {
 
+EIP_UINT OS32C::getRangeFormat()
+{
+  return getSingleAttribute(0x73, 1, 4, (EIP_UINT)0);
+}
+
+void OS32C::setRangeFormat(EIP_UINT format)
+{
+  setSingleAttribute(0x73, 1, 4, format);
+}
+
+EIP_UINT OS32C::getReflectivityFormat()
+{
+  return getSingleAttribute(0x73, 1, 5, (EIP_UINT)0);
+}
+
+void OS32C::setReflectivityFormat(EIP_UINT format)
+{
+  setSingleAttribute(0x73, 1, 5, format);
+}
+
+void OS32C::selectBeams()
+{
+  // enable all beams
+  EIP_WORD beams[44];
+  memset(beams, 0xFF, sizeof(beams));
+  beams[43] = 0;
+  // only turn on the first 5 bits of the last word
+  beams[42] = 0x1F;
+  setSingleAttribute(0x73, 1, 12, beams);
+}
+
 RangeAndReflectanceMeasurement OS32C::getSingleRRScan()
 {
-  RRDataResponse resp = getSingleAttribute(0x75, 1, 3);
-  cout << "Got RRData Response" << endl;
-  cout << "Service code: " << (int)resp.getServiceCode() << endl;
-  cout << "General status: " << (int)resp.getGeneralStatus() << endl;
-  if (resp.getAdditionalStatus())
-  {
-    cout << "WARNING: Got additional status length: " << resp.getAdditionalStatus()->getLength() << endl;
-  }
-  if (resp.getResponseData())
-  {
-    RangeAndReflectanceMeasurement rr;
-    resp.getResponseDataAs(rr);
-    return rr;
-  }
-  else
-  {
-    throw std::logic_error("No response data received");
-  }
+  RangeAndReflectanceMeasurement rr;
+  getSingleAttributeSerializable(0x75, 1, 3, rr);
+  return rr;
 }
 
 } // namespace os32c
