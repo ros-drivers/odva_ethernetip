@@ -198,6 +198,7 @@ RRDataResponse Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instanc
   EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
 
   // send command and get response
+  // TODO: should catch exceptions here and send only runtime_errors
   EncapPacket response = sendCommand(encap_pkt);
 
   RRDataResponse resp_data;
@@ -214,6 +215,7 @@ RRDataResponse Session::setSingleAttribute(EIP_USINT class_id,
   EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
 
   // send command and get response
+  // TODO: should catch exceptions here and send only runtime_errors
   EncapPacket response = sendCommand(encap_pkt);
 
   RRDataResponse resp_data;
