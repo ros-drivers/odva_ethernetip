@@ -190,7 +190,7 @@ void Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
   }
 }
 
-void Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, 
+void Session::getSingleAttributeSerializable(EIP_USINT class_id, EIP_USINT instance_id, 
   EIP_USINT attribute_id, Serializable& result)
 {
   shared_ptr<Serializable> no_data;
@@ -200,7 +200,7 @@ void Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id,
   resp_data.getResponseDataAs(result);
 }
 
-void Session::setSingleAttribute(EIP_USINT class_id,
+void Session::setSingleAttributeSerializable(EIP_USINT class_id,
   EIP_USINT instance_id, EIP_USINT attribute_id, shared_ptr<Serializable> data)
 {
   RRDataResponse resp_data = sendRRDataCommand(0x10, class_id, instance_id, 

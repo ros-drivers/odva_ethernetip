@@ -385,8 +385,7 @@ TEST_F(SessionTest, test_get_single_attribute)
 
   ts->rx_buffer = buffer(resp_packet);
 
-  SerializableBuffer sb;
-  session.getSingleAttribute(0x75, 1, 3, sb);
+  EIP_UDINT result = session.getSingleAttribute(0x75, 1, 3, result);
 
   // check the unregistration packet
   EXPECT_EQ(48, ts->tx_count);
@@ -454,8 +453,7 @@ TEST_F(SessionTest, test_get_single_attribute)
   EXPECT_EQ(0x30, ts->tx_buffer[46]);
   EXPECT_EQ(0x03, ts->tx_buffer[47]);
 
-  EXPECT_EQ(4, sb.getLength());
-  EXPECT_EQ(0xAAABCDEF, *buffer_cast<EIP_UDINT*>(sb.getData()));
+  EXPECT_EQ(0xAAABCDEF, result);
 }
 
 
@@ -531,9 +529,7 @@ TEST_F(SessionTest, test_set_single_attribute)
 
   ts->rx_buffer = buffer(resp_packet);
 
-  shared_ptr< SerializablePrimitive <EIP_UINT> > set_data = 
-    make_shared< SerializablePrimitive <EIP_UINT> > (1);
-  session.setSingleAttribute(0x73, 1, 4, set_data);
+  session.setSingleAttribute(0x73, 1, 4, (EIP_UINT)1);
 
   // check the unregistration packet
   EXPECT_EQ(50, ts->tx_count);

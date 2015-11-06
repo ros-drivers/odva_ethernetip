@@ -14,20 +14,24 @@ express permission of Clearpath Robotics.
 
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/asio.hpp>
 
 #include "eip/eip_types.h"
 #include "eip/socket/socket.h"
 #include "eip/serialization/serializable.h"
+#include "eip/serialization/serializable_primitive.h"
 #include "eip/encap_packet.h"
 #include "eip/rr_data_response.h"
 
 using std::string;
 using boost::shared_ptr;
+using boost::make_shared;
 
 namespace eip {
 
 using serialization::Serializable;
+using serialization::SerializablePrimitive;
 using socket::Socket;
 
 /**
@@ -74,8 +78,23 @@ public:
    * @param attribute_id Attribute ID number for the path to get
    * @param result Serializable that will accept the result
    */
-  void getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, 
+  void getSingleAttributeSerializable(EIP_USINT class_id, EIP_USINT instance_id, 
     EIP_USINT attribute_id, Serializable& result);
+
+  /**
+   * Shortcut to get a single attribute as a primitive type
+   * @param class_id Class ID for the path to get
+   * @param instance_id Instance ID number for the path to get
+   * @param attribute_id Attribute ID number for the path to get
+   * @return Attribute value from target
+   */
+  template <typename T>
+  T getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id, T v)
+  {
+    SerializablePrimitive<T> data;
+    getSingleAttributeSerializable(class_id, instance_id, attribute_id, data);
+    return data.data;
+  }
 
   /**
    * Set a single attribute from the given class / instance / attribute path
@@ -84,8 +103,24 @@ public:
    * @param attribute_id Attribute ID number for the path to get
    * @param data Data to set the attribute to
    */
-  void setSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, 
+  void setSingleAttributeSerializable(EIP_USINT class_id, EIP_USINT instance_id, 
     EIP_USINT attribute_id, shared_ptr<Serializable> data);
+
+  /**
+   * Shortcut to set a single attribute from a primitive type
+   * @param class_id Class ID for the path to get
+   * @param instance_id Instance ID number for the path to get
+   * @param attribute_id Attribute ID number for the path to get
+   * @param v Value to set attribute to
+   */
+  template <typename T>
+  void setSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, 
+    EIP_USINT attribute_id, T v)
+  {
+    shared_ptr< SerializablePrimitive<T> > data = 
+      make_shared< SerializablePrimitive<T> > (v);
+    setSingleAttributeSerializable(class_id, instance_id, attribute_id, data);
+  }
 
 private:
   shared_ptr<Socket> socket_;
