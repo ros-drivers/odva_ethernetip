@@ -190,36 +190,76 @@ void Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
   }
 }
 
-RRDataResponse Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id)
+void Session::getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, 
+  EIP_USINT attribute_id, Serializable& result)
 {
-  cout << "Creating RR Data Request for Get Single Attribute" << endl;
-  shared_ptr<RRDataRequest> req_data = 
-    make_shared<RRDataRequest> (0x0E, class_id, instance_id, attribute_id);
-  EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
+  shared_ptr<Serializable> no_data;
+  RRDataResponse resp_data = sendRRDataCommand(0x0E, class_id, instance_id, 
+    attribute_id, no_data);
 
-  // send command and get response
-  // TODO: should catch exceptions here and send only runtime_errors
-  EncapPacket response = sendCommand(encap_pkt);
-
-  RRDataResponse resp_data;
-  response.getPayloadAs(resp_data);
-  return resp_data;
+  resp_data.getResponseDataAs(result);
 }
 
-RRDataResponse Session::setSingleAttribute(EIP_USINT class_id,
+void Session::setSingleAttribute(EIP_USINT class_id,
   EIP_USINT instance_id, EIP_USINT attribute_id, shared_ptr<Serializable> data)
 {
-  cout << "Creating RR Data Request for Set Single Attribute" << endl;
+  RRDataResponse resp_data = sendRRDataCommand(0x10, class_id, instance_id, 
+    attribute_id, data);
+}
+
+RRDataResponse Session::sendRRDataCommand(EIP_USINT service, EIP_USINT class_id,
+  EIP_USINT instance_id, EIP_USINT attribute_id, shared_ptr<Serializable> data)
+{
+  cout << "Creating RR Data Request" << endl;
   shared_ptr<RRDataRequest> req_data =
-    make_shared<RRDataRequest> (0x10, class_id, instance_id, attribute_id, data);
+    make_shared<RRDataRequest> (service, class_id, instance_id, attribute_id, data);
   EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
 
   // send command and get response
-  // TODO: should catch exceptions here and send only runtime_errors
-  EncapPacket response = sendCommand(encap_pkt);
+  EncapPacket response;
+  try
+  {
+    response = sendCommand(encap_pkt);
+  }
+  catch (std::length_error ex)
+  {
+    cerr << "Response packet to RR command too short: " << ex.what() << endl;
+    throw std::runtime_error("Packet response to RR Data Command too short");
+  }
+  catch (std::logic_error ex)
+  {
+    cerr << "Invalid response to RR command: " << ex.what() << endl;
+    throw std::runtime_error("Invalid packet response to RR Data Command");   
+  }
 
   RRDataResponse resp_data;
-  response.getPayloadAs(resp_data);
+  try
+  {
+    response.getPayloadAs(resp_data);
+  }
+  catch (std::length_error ex)
+  {
+    cerr << "Response data to RR command too short: " << ex.what() << endl;
+    throw std::runtime_error("Response data to RR Command too short");
+  }
+  catch (std::logic_error ex)
+  {
+    cerr << "Invalid data to RR command: " << ex.what() << endl;
+    throw std::runtime_error("Invalid data in response to RR command");
+  }
+
+  // check that responses are valid
+  if (resp_data.getServiceCode() != service)
+  {
+    cerr << "Wrong service code returned for RR Data command. Expected: "
+      << (int)service << " but received " << (int)resp_data.getServiceCode() << endl;
+    throw std::runtime_error("Wrong service code returned for RR Data command");
+  }
+  if (resp_data.getGeneralStatus())
+  {
+    cerr << "RR Data Command failed with status " << (int)resp_data.getGeneralStatus() << endl;
+    throw std::runtime_error("RR Data Command Failed");
+  }
   return resp_data;
 }
 

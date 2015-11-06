@@ -376,7 +376,7 @@ TEST_F(SessionTest, test_get_single_attribute)
     // reserved
     0,
     // general status
-    0xA5,
+    0x00,
     // size of additional status
     0,
     // response data
@@ -385,7 +385,8 @@ TEST_F(SessionTest, test_get_single_attribute)
 
   ts->rx_buffer = buffer(resp_packet);
 
-  RRDataResponse resp = session.getSingleAttribute(0x75, 1, 3);
+  SerializableBuffer sb;
+  session.getSingleAttribute(0x75, 1, 3, sb);
 
   // check the unregistration packet
   EXPECT_EQ(48, ts->tx_count);
@@ -453,12 +454,6 @@ TEST_F(SessionTest, test_get_single_attribute)
   EXPECT_EQ(0x30, ts->tx_buffer[46]);
   EXPECT_EQ(0x03, ts->tx_buffer[47]);
 
-  // check response data
-  EXPECT_EQ(0x0E, resp.getServiceCode());
-  EXPECT_EQ(0xA5, resp.getGeneralStatus());
-
-  SerializableBuffer sb;
-  resp.getResponseDataAs(sb);
   EXPECT_EQ(4, sb.getLength());
   EXPECT_EQ(0xAAABCDEF, *buffer_cast<EIP_UDINT*>(sb.getData()));
 }
@@ -538,7 +533,7 @@ TEST_F(SessionTest, test_set_single_attribute)
 
   shared_ptr< SerializablePrimitive <EIP_UINT> > set_data = 
     make_shared< SerializablePrimitive <EIP_UINT> > (1);
-  RRDataResponse resp = session.setSingleAttribute(0x73, 1, 4, set_data);
+  session.setSingleAttribute(0x73, 1, 4, set_data);
 
   // check the unregistration packet
   EXPECT_EQ(50, ts->tx_count);
@@ -608,11 +603,4 @@ TEST_F(SessionTest, test_set_single_attribute)
   // data itself
   EXPECT_EQ(0x01, ts->tx_buffer[48]);
   EXPECT_EQ(0x00, ts->tx_buffer[49]);
-
-  // check response data
-  EXPECT_EQ(0x10, resp.getServiceCode());
-  EXPECT_EQ(0x00, resp.getGeneralStatus());
-
-  EXPECT_FALSE(resp.getAdditionalStatus());
-  EXPECT_FALSE(resp.getResponseData());
 }

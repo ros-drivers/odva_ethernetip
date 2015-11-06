@@ -72,9 +72,10 @@ public:
    * @param class_id Class ID for the path to get
    * @param instance_id Instance ID number for the path to get
    * @param attribute_id Attribute ID number for the path to get
-   * @param response data, including status and data
+   * @param result Serializable that will accept the result
    */
-  RRDataResponse getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id);
+  void getSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, 
+    EIP_USINT attribute_id, Serializable& result);
 
   /**
    * Set a single attribute from the given class / instance / attribute path
@@ -82,9 +83,8 @@ public:
    * @param instance_id Instance ID number for the path to get
    * @param attribute_id Attribute ID number for the path to get
    * @param data Data to set the attribute to
-   * @param response data, including status and data
    */
-  RRDataResponse setSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, 
+  void setSingleAttribute(EIP_USINT class_id, EIP_USINT instance_id, 
     EIP_USINT attribute_id, shared_ptr<Serializable> data);
 
 private:
@@ -106,6 +106,18 @@ private:
    * @return Encapsulation packet received in response
    */
   EncapPacket sendCommand(EncapPacket& req);
+
+  /**
+   * Helper to send an RR Data command to the target
+   * @param service Service code to send
+   * @param class_id Class ID for the path
+   * @param instance_id Instance ID number for the path
+   * @param attribute_id Attribute ID number for the path
+   * @param data Data to include. If null, then no data sent
+   * @return RR Data Response
+   */
+  RRDataResponse sendRRDataCommand(EIP_USINT service, EIP_USINT class_id,
+    EIP_USINT instance_id, EIP_USINT attribute_id, shared_ptr<Serializable> data);
 };
 
 } // namespace eip
