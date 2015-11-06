@@ -124,6 +124,7 @@ catkin_add_gtest(eip-test
   test/eip/serialization/stream_writer_test.cpp
   test/eip/serialization/stream_reader_test.cpp
   test/eip/serialization/serializable_buffer_test.cpp
+  test/eip/serialization/serializable_primitive_test.cpp
   test/eip/test_socket_test.cpp
   test/eip/encap_header_test.cpp
   test/eip/encap_packet_test.cpp
