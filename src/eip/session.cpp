@@ -249,11 +249,11 @@ RRDataResponse Session::sendRRDataCommand(EIP_USINT service, EIP_USINT class_id,
   }
 
   // check that responses are valid
-  if (resp_data.getServiceCode() != service)
+  if (resp_data.getServiceCode() != (service | 0x80))
   {
-    cerr << "Wrong service code returned for RR Data command. Expected: "
+    cerr << "Warning: Wrong service code returned for RR Data command. Expected: "
       << (int)service << " but received " << (int)resp_data.getServiceCode() << endl;
-    throw std::runtime_error("Wrong service code returned for RR Data command");
+    // throw std::runtime_error("Wrong service code returned for RR Data command");
   }
   if (resp_data.getGeneralStatus())
   {

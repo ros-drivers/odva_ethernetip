@@ -372,7 +372,7 @@ TEST_F(SessionTest, test_get_single_attribute)
     // data length
     0x08, 0x00,
     // service code
-    0x0E,
+    0x8E,
     // reserved
     0,
     // general status
@@ -443,7 +443,7 @@ TEST_F(SessionTest, test_get_single_attribute)
   EXPECT_EQ(   8, ts->tx_buffer[38]);
   EXPECT_EQ(   0, ts->tx_buffer[39]);
   // service code
-  EXPECT_EQ(0x0E, ts->tx_buffer[40]);
+  EXPECT_EQ(0xE, ts->tx_buffer[40]);
   // path
   EXPECT_EQ(0x03, ts->tx_buffer[41]);
   EXPECT_EQ(0x20, ts->tx_buffer[42]);
@@ -518,7 +518,7 @@ TEST_F(SessionTest, test_set_single_attribute)
     // data length
     0x04, 0x00,
     // service code
-    0x10,
+    0x90,
     // reserved
     0,
     // general status
