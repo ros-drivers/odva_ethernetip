@@ -149,11 +149,12 @@ catkin_add_gtest(os32c-test
   test/os32c/measurement_report_header_test.cpp
   test/os32c/measurement_report_test.cpp
   test/os32c/range_and_reflectance_measurement_test.cpp
+  test/os32c/os32c_test.cpp
   test/os32c/test_main.cpp
 )
 
 if(TARGET os32c-test)
-  target_link_libraries(os32c-test ${Boost_LIBRARIES} eip)
+  target_link_libraries(os32c-test ${Boost_LIBRARIES} eip os32c_lib)
 endif()
 
 ## Add folders to be run by python nosetests
