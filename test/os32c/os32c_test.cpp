@@ -57,6 +57,112 @@ TEST_F(OS32CTest, test_calc_beam_centre)
   EXPECT_DOUBLE_EQ(-2.3596851486963333, OS32C::calcBeamCentre(676));
 }
 
+TEST_F(OS32CTest, test_calc_beam_mask_all)
+{
+  EIP_BYTE buffer[96]; // plus 32 bits on each end as guards
+  memset(buffer, 0xAA, sizeof(buffer));
+  EIP_BYTE* mask = buffer + 4;
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
+  OS32C os32c(ts);
+  os32c.calcBeamMask(OS32C::ANGLE_MAX, OS32C::ANGLE_MIN, mask);
+  for (size_t i = 0; i < 4; ++i)
+  {
+    EXPECT_EQ(0xAA, buffer[i]);
+  }
+  for (size_t i = 0; i < 84; ++i)
+  {
+    EXPECT_EQ(0xFF, mask[i]);
+  }
+  EXPECT_EQ(0x1F, mask[84]);
+  EXPECT_EQ(0, mask[85]);
+  EXPECT_EQ(0, mask[86]);
+  EXPECT_EQ(0, mask[87]);
+  for (size_t i = 92; i < 96; ++i)
+  {
+    EXPECT_EQ(0xAA, buffer[i]);
+  }
+}
+
+TEST_F(OS32CTest, test_calc_beam_at_90)
+{
+  EIP_BYTE buffer[96]; // plus 32 bits on each end as guards
+  memset(buffer, 0xAA, sizeof(buffer));
+  EIP_BYTE* mask = buffer + 4;
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
+  OS32C os32c(ts);
+  os32c.calcBeamMask(0.7853981633974483, -0.7853981633974483, mask);
+  for (size_t i = 0; i < 4; ++i)
+  {
+    EXPECT_EQ(0xAA, buffer[i]);
+  }
+  for (size_t i = 0; i < 28; ++i)
+  {
+    EXPECT_EQ(0, mask[i]);
+  }
+  EXPECT_EQ(0xFE, mask[28]);
+  for (size_t i = 29; i < 56; ++i)
+  {
+    EXPECT_EQ(0xFF, mask[i]);
+  }
+  EXPECT_EQ(0x07, mask[56]);
+  for (size_t i = 57; i < 88; ++i)
+  {
+    EXPECT_EQ(0, mask[i]);
+  }
+  for (size_t i = 92; i < 96; ++i)
+  {
+    EXPECT_EQ(0xAA, buffer[i]);
+  }
+}
+
+TEST_F(OS32CTest, test_calc_beam_boundaries)
+{
+  EIP_BYTE buffer[96]; // plus 32 bits on each end as guards
+  memset(buffer, 0xAA, sizeof(buffer));
+  EIP_BYTE* mask = buffer + 4;
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
+  OS32C os32c(ts);
+  os32c.calcBeamMask(0.6911503837897546, -0.7051130178057091, mask);
+  for (size_t i = 0; i < 4; ++i)
+  {
+    EXPECT_EQ(0xAA, buffer[i]);
+  }
+  for (size_t i = 0; i < 29; ++i)
+  {
+    EXPECT_EQ(0, mask[i]);
+  }
+  EXPECT_EQ(0x80, mask[29]);
+  for (size_t i = 30; i < 55; ++i)
+  {
+    EXPECT_EQ(0xFF, mask[i]);
+  }
+  for (size_t i = 55; i < 88; ++i)
+  {
+    EXPECT_EQ(0, mask[i]);
+  }
+  for (size_t i = 92; i < 96; ++i)
+  {
+    EXPECT_EQ(0xAA, buffer[i]);
+  }
+}
+
+TEST_F(OS32CTest, test_calc_beam_invalid_args)
+{
+  EIP_BYTE buffer[96]; // plus 32 bits on each end as guards
+  memset(buffer, 0xAA, sizeof(buffer));
+  EIP_BYTE* mask = buffer + 4;
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
+  OS32C os32c(ts);
+  EXPECT_THROW(os32c.calcBeamMask(2.3631758089456514, -0.7051130178057091, mask), 
+    std::invalid_argument);
+  EXPECT_THROW(os32c.calcBeamMask(0.6911503837897546, -2.3631758089456514, mask), 
+    std::invalid_argument);
+  EXPECT_THROW(os32c.calcBeamMask(0.6911503837897546, 0.6911503837897546, mask), 
+    std::invalid_argument);
+  EXPECT_THROW(os32c.calcBeamMask(0.6911503837897546, 0.6841690685271065, mask), 
+    std::invalid_argument);
+}
+
 TEST_F(OS32CTest, test_select_beams)
 {
   char reg_resp_packet[] = {
@@ -89,7 +195,7 @@ TEST_F(OS32CTest, test_select_beams)
   };
   ts->rx_buffer = buffer(resp_packet);
 
-  os32c.selectBeams();
+  os32c.selectBeams(OS32C::ANGLE_MAX, OS32C::ANGLE_MIN);
 
   // check the request packet
   EXPECT_EQ(136, ts->tx_count);

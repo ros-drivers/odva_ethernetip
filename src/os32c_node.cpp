@@ -46,7 +46,7 @@ int main(int argc, char const *argv[])
   {
     os32c.setRangeFormat(RANGE_MEASURE_50M);
     os32c.setReflectivityFormat(REFLECTIVITY_MEASURE_TOT_4PS);
-    os32c.selectBeams();
+    os32c.selectBeams(OS32C::ANGLE_MAX, OS32C::ANGLE_MIN);
 
     RangeAndReflectanceMeasurement rr = os32c.getSingleRRScan();
     cout << "Received scan data" << endl;

@@ -121,10 +121,13 @@ public:
 
 
   /**
-   * Currently just selects all beams. Will be changed in the future to provide
-   * ability to select which beams are being used
+   * Select which beams are to be measured. Must be set before requesting
+   * measurements. Angles are in ROS conventions. Zero is straight ahead.
+   * Positive numbers are CCW and all numbers are in radians.
+   * @param start_angle Start angle in ROS conventions
+   * @param end_angle End angle in ROS conventions
    */
-  void selectBeams();
+  void selectBeams(double start_angle, double end_angle);
 
   /**
    * Make an explicit request for a single Range and Reflectance scan
@@ -159,6 +162,14 @@ public:
   {
     return ANGLE_MAX - beam_num * ANGLE_INC;
   }
+
+  /**
+   * Helper to calculate the mask for a given start and end beam angle
+   * @param start_angle Angle of the first beam in the scan
+   * @param end_angle Angle of the last beam in the scan
+   * @param mask Holder for the mask data. Must be 88 bytes
+   */
+  void calcBeamMask(double start_angle, double end_angle, EIP_BYTE mask[]);
 
 private:
   double start_angle_;
