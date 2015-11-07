@@ -31,6 +31,32 @@ class OS32CTest : public :: testing :: Test
 
 };
 
+TEST_F(OS32CTest, test_calc_beam_number)
+{
+  EXPECT_EQ(  0, OS32C::calcBeamNumber(2.359685166149626 )); // 135.200001 degrees
+  EXPECT_EQ(  0, OS32C::calcBeamNumber(2.356194491937674 )); // 135.0000001
+  // EXPECT_EQ(  0, OS32C::calcBeamNumber(2.356194490192345 )); // 135
+  EXPECT_EQ(  1, OS32C::calcBeamNumber(2.3561944901748917)); // 134.999999999
+  EXPECT_EQ(  1, OS32C::calcBeamNumber(2.3492131733589003)); // 134.60000001
+  EXPECT_EQ(338, OS32C::calcBeamNumber(0.0034906583294557337)); // 0.19999999
+  EXPECT_EQ(338, OS32C::calcBeamNumber(0));
+  EXPECT_EQ(338, OS32C::calcBeamNumber(-0.0034906583294557337)); // -0.19999999
+  EXPECT_EQ(675, OS32C::calcBeamNumber(-2.3492131733589003)); // -134.60000001
+  EXPECT_EQ(675, OS32C::calcBeamNumber(-2.3561944901748917)); // -134.999999999
+  // EXPECT_EQ(676, OS32C::calcBeamNumber(-2.356194490192345 )); // -135
+  EXPECT_EQ(676, OS32C::calcBeamNumber(-2.356194491937674 )); // -135.0000001
+  EXPECT_EQ(676, OS32C::calcBeamNumber(-2.359685166149626 )); // -135.200001 degrees
+}
+
+TEST_F(OS32CTest, test_calc_beam_centre)
+{
+  EXPECT_DOUBLE_EQ(2.3596851486963333, OS32C::calcBeamCentre(0));
+  EXPECT_DOUBLE_EQ(2.3527038316883564, OS32C::calcBeamCentre(1));
+  EXPECT_NEAR(0, OS32C::calcBeamCentre(338), 0.00000000001);
+  EXPECT_DOUBLE_EQ(-2.3527038316883564, OS32C::calcBeamCentre(675));
+  EXPECT_DOUBLE_EQ(-2.3596851486963333, OS32C::calcBeamCentre(676));
+}
+
 TEST_F(OS32CTest, test_select_beams)
 {
   char reg_resp_packet[] = {

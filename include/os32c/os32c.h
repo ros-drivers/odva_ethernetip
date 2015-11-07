@@ -25,6 +25,9 @@ using boost::shared_ptr;
 using eip::Session;
 using eip::socket::Socket;
 
+#define DEG2RAD(a) (a * M_PI / 180)
+#define RAD2DEG(a) (a * 180 / M_PI)
+
 namespace os32c {
 
 
@@ -57,7 +60,32 @@ public:
    * Construct a new OS32C instance.
    * @param socket Socket instance to use for communication with the lidar
    */
-  OS32C(shared_ptr<Socket> socket) : Session(socket) { }
+  OS32C(shared_ptr<Socket> socket) : Session(socket), frame_id_("OS32C"),
+    start_angle_(ANGLE_MAX), end_angle_(ANGLE_MIN) { }
+
+  static const double ANGLE_MIN = DEG2RAD(-135.2);
+  static const double ANGLE_MAX = DEG2RAD( 135.2);
+  static const double ANGLE_INC = DEG2RAD(0.4);
+  static const double DISTANCE_MIN = 0; // TODO: VERIFY DISTANCES
+  static const double DISTANCE_MAX = 50;
+
+  /**
+   * Get the frame ID to be sent with laser scans
+   * @return Current frame ID
+   */
+  const string& getFrameID() const
+  {
+    return frame_id_;
+  }
+
+  /**
+   * Set the frame ID to be sent with laser scans
+   * @param frame_id Frame ID to send
+   */
+  void setFrameID(string& frame_id)
+  {
+    frame_id_ = frame_id;
+  }
 
   /**
    * Get the range format code. Does a Get Single Attribute to the scanner
@@ -104,6 +132,38 @@ public:
    * @throw std::logic_error if data not received
    */
   RangeAndReflectanceMeasurement getSingleRRScan();
+
+  /**
+   * Calculate the beam number on the lidar for a given ROS angle. Note that
+   * in ROS angles are given as radians CCW with zero being straight ahead,
+   * While the lidar start its scan at the most CCW position and moves positive
+   * CW, with zero being at halfway through the scan.
+   * Based on my calculations and the OS32C docs, there are 677 beams and the scan
+   * area is 135.4 to -135.4 degrees, with a 0.4 degree pitch. The beam centres
+   * must then be at 135.2, 134.8, ... 0.4, 0, 0.4, ... -134.8, -135.2.
+   * @param angle Radians CCW from straight ahead
+   * @return OS32C beam number
+   */
+  static inline int calcBeamNumber(double angle)
+  {
+    return (ANGLE_MAX - angle + ANGLE_INC / 2) / ANGLE_INC;
+  }
+
+  /**
+   * Calculate the ROS angle for a beam given the OS32C beam number
+   * @param beam_num Beam number, starting with 0 being the most CCW beam and 
+   *  positive moving CW around the scan
+   * @return ROS Angle
+   */
+  static inline double calcBeamCentre(int beam_num)
+  {
+    return ANGLE_MAX - beam_num * ANGLE_INC;
+  }
+
+private:
+  double start_angle_;
+  double end_angle_;
+  string frame_id_;
 };
 
 } // namespace os32c
