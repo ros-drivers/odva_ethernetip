@@ -10,12 +10,20 @@ express permission of Clearpath Robotics.
 */
 
 #include <ros/ros.h>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/asio.hpp>
 
 #include "os32c/os32c.h"
+#include "eip/serialization/serializable_buffer.h"
 
 using std::cout;
 using std::endl;
+using boost::shared_ptr;
+using boost::make_shared;
+using boost::asio::buffer;
 using eip::Session;
+using eip::serialization::SerializableBuffer;
 using eip::RRDataResponse;
 using os32c::RangeAndReflectanceMeasurement;
 
@@ -49,7 +57,8 @@ void OS32C::selectBeams()
   beams[43] = 0;
   // only turn on the first 5 bits of the last word
   beams[42] = 0x1F;
-  setSingleAttribute(0x73, 1, 12, beams);
+  shared_ptr<SerializableBuffer> sb = make_shared<SerializableBuffer>(buffer(beams));
+  setSingleAttributeSerializable(0x73, 1, 12, sb);
 }
 
 RangeAndReflectanceMeasurement OS32C::getSingleRRScan()
