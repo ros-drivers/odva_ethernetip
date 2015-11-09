@@ -139,6 +139,7 @@ catkin_add_gtest(eip-test
   test/eip/rr_data_response_test.cpp
   test/eip/forward_open_request_test.cpp
   test/eip/forward_open_success_test.cpp
+  test/eip/forward_close_request_test.cpp
   test/eip/session_test.cpp
   test/eip/test_main.cpp
 )

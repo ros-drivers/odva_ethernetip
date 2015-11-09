@@ -38,9 +38,22 @@ class Path
 public:
 
   /**
-   * Construct an empty path
+   * Construct an empty path.
+   * @param pad_after_length set to true to enable pad byte after length when
+   *   serializing the path.
    */
-  Path();
+  Path(bool pad_after_length = false);
+
+  /**
+   * In some special cases, need to add a pad byte after the length when 
+   * serializing the path. Set this flag to true to enable that behaviour.
+   * @param pad if set to true, will add a pad byte after the path length when
+   *   serializing the path.
+   */
+  void setPadAfterLength(bool pad)
+  {
+    pad_after_length_ = pad;
+  }
 
   /**
    * Add a logical class segment
@@ -78,7 +91,20 @@ public:
    * @return the writer again
    * @throw std::length_error if the buffer is too small for the header data
    */
-  virtual Writer& serialize(Writer& writer) const;
+  virtual Writer& serialize(Writer& writer) const
+  {
+    serialize(writer, pad_after_length_);
+  }
+
+  /**
+   * Serialize data into the given buffer with a flag for adding a pad after
+   * the length field.
+   * @param writer Writer to use for serialization
+   * @param pad_after_length set to true to add a byte after the length field
+   * @return the writer again
+   * @throw std::length_error if the buffer is too small for the header data
+   */
+  virtual Writer& serialize(Writer& writer, bool pad_after_length) const;
 
   /**
    * Not actually implemented
@@ -97,6 +123,7 @@ public:
   }
 
 private:
+  bool pad_after_length_;
   vector<EIP_USINT> path_buf_;
 
   /**

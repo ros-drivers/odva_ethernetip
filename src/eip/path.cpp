@@ -15,7 +15,7 @@ express permission of Clearpath Robotics.
 
 namespace eip {
 
-Path::Path()
+Path::Path(bool pad_after_length) : pad_after_length_(pad_after_length)
 {
   path_buf_.reserve(6);
 }
@@ -51,10 +51,15 @@ size_t Path::getLength() const
   return sizeof(EIP_USINT) + path_buf_.size() * sizeof(EIP_USINT);
 }
 
-Writer& Path::serialize(Writer& writer) const
+Writer& Path::serialize(Writer& writer, bool pad_after_length) const
 {
   EIP_USINT length = path_buf_.size() / 2;
   writer.write(length);
+  if (pad_after_length)
+  {
+    EIP_BYTE reserved = 0;
+    writer.write(reserved);
+  }
   writer.writeBuffer(boost::asio::buffer(path_buf_));
   return writer;
 }
