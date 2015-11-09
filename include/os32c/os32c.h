@@ -166,6 +166,13 @@ public:
     return ANGLE_MAX - beam_num * ANGLE_INC;
   }
 
+  /**
+   * Helper to convert a Range and Reflectance Measurement to a ROS LaserScan
+   * @param rr Measurement to convert
+   * @return ROS LaserScan
+   */
+  LaserScan convertToLaserScan(const RangeAndReflectanceMeasurement& rr);
+
 private:
   // allow unit tests to access the helpers below for direct testing
   FRIEND_TEST(OS32CTest, test_calc_beam_mask_all);
@@ -185,13 +192,6 @@ private:
    * @param mask Holder for the mask data. Must be 88 bytes
    */
   void calcBeamMask(double start_angle, double end_angle, EIP_BYTE mask[]);
-
-  /**
-   * Helper to convert a Range and Reflectance Measurement to a ROS LaserScan
-   * @param rr Measurement to convert
-   * @return ROS LaserScan
-   */
-  LaserScan convertToLaserScan(const RangeAndReflectanceMeasurement& rr);
 };
 
 } // namespace os32c

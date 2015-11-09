@@ -29,6 +29,12 @@ using os32c::RangeAndReflectanceMeasurement;
 
 namespace os32c {
 
+const double OS32C::ANGLE_MIN;
+const double OS32C::ANGLE_MAX;
+const double OS32C::ANGLE_INC;
+const double OS32C::DISTANCE_MIN;
+const double OS32C::DISTANCE_MAX;
+
 EIP_UINT OS32C::getRangeFormat()
 {
   return getSingleAttribute(0x73, 1, 4, (EIP_UINT)0);

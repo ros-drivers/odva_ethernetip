@@ -11,6 +11,7 @@ express permission of Clearpath Robotics.
 
 #include <ros/ros.h>
 #include <boost/shared_ptr.hpp>
+#include <sensor_msgs/LaserScan.h>
 
 #include "eip/socket/tcp_socket.h"
 #include "os32c/os32c.h"
@@ -19,22 +20,33 @@ express permission of Clearpath Robotics.
 using std::cout;
 using std::endl;
 using boost::shared_ptr;
+using sensor_msgs::LaserScan;
 using eip::socket::TCPSocket;
 using namespace os32c;
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
-  if (argc != 2)
-  {
-    cout << "Usage: os32c_node [hostname]" << endl;
-    return 1;
-  }
+  ros::init(argc, argv, "os32c");
+  ros::NodeHandle nh;
+
+  // get sensor config from params
+  string hostname, frame_id;
+  double start_angle, end_angle;
+  ros::param::param<std::string>("~hostname", hostname, "192.168.1.1");
+  ros::param::param<std::string>("~frame_id", frame_id, "OS32C");
+  ros::param::param<double>("~start_angle", start_angle, OS32C::ANGLE_MAX);
+  ros::param::param<double>("~end_angle", end_angle, OS32C::ANGLE_MIN);
+
+  // publisher for laserscans
+  ros::Publisher laserscan_pub = nh.advertise<LaserScan>("laser", 1);
+
   boost::asio::io_service io_service;
   shared_ptr<TCPSocket> socket = shared_ptr<TCPSocket>(new TCPSocket(io_service));
   OS32C os32c(socket);
+
   try
   {
-    os32c.open(argv[1]);
+    os32c.open(hostname);
   }
   catch (std::runtime_error ex)
   {
@@ -46,30 +58,30 @@ int main(int argc, char const *argv[])
   {
     os32c.setRangeFormat(RANGE_MEASURE_50M);
     os32c.setReflectivityFormat(REFLECTIVITY_MEASURE_TOT_4PS);
-    os32c.selectBeams(OS32C::ANGLE_MAX, OS32C::ANGLE_MIN);
+    os32c.selectBeams(start_angle, end_angle);
+  }
+  catch (std::invalid_argument ex)
+  {
+    cout << "Invalid arguments in sensor configuration: " << ex.what() << endl;
+    return -1;
+  }
 
-    RangeAndReflectanceMeasurement rr = os32c.getSingleRRScan();
-    cout << "Received scan data" << endl;
-    cout << "Scan count: " << rr.header.scan_count << endl;
-    cout << "Scan period: " << rr.header.scan_rate << endl;
-    cout << "Scan timestamp: " << rr.header.scan_timestamp << endl;
-    cout << "Scan beam period: " << rr.header.scan_beam_period << endl;
-    cout << "Range report format: " << rr.header.range_report_format << endl;
-    cout << "Reflectivity report format: " << rr.header.refletivity_report_format << endl;
-    cout << "Number of beams: " << rr.header.num_beams << endl;
-    cout << endl << "Beam Data" << endl;
-    for (int i = 0; i < rr.header.num_beams; ++i)
+  while (ros::ok())
+  {
+    try
     {
-      cout << i << ": " << rr.range_data[i] << " / " << rr.reflectance_data[i] << endl;
+      RangeAndReflectanceMeasurement rr = os32c.getSingleRRScan();
+      LaserScan ls = os32c.convertToLaserScan(rr);
+      laserscan_pub.publish(ls);
     }
-  }
-  catch (std::runtime_error ex)
-  {
-    cout << "Exception caught requesting scan data: " << ex.what() << endl;
-  }
-  catch (std::logic_error ex)
-  {
-    cout << "Error parsing return data: " << ex.what() << endl;
+    catch (std::runtime_error ex)
+    {
+      cout << "Exception caught requesting scan data: " << ex.what() << endl;
+    }
+    catch (std::logic_error ex)
+    {
+      cout << "Error parsing return data: " << ex.what() << endl;
+    }
   }
 
   os32c.close();
