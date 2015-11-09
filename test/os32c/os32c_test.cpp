@@ -338,3 +338,77 @@ TEST_F(OS32CTest, test_select_beams)
   EXPECT_EQ(0x00, ts->tx_buffer[134]);
   EXPECT_EQ(0x00, ts->tx_buffer[135]);
 }
+
+TEST_F(OS32CTest, test_convert_to_laserscan)
+{
+  shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
+  OS32C os32c(ts);
+  os32c.setFrameID("testframe");
+  RangeAndReflectanceMeasurement rr;
+  rr.header.scan_count = 0xDEADBEEF;
+  rr.header.scan_rate = 38609;
+  rr.header.scan_timestamp = 140420933;
+  rr.header.scan_beam_period = 42898;
+  rr.header.machine_state = 3;
+  rr.header.machine_stop_reasons = 7;
+  rr.header.active_zone_set = 0;
+  rr.header.zone_inputs = 0;
+  rr.header.detection_zone_status = 0;
+  rr.header.output_status = 0;
+  rr.header.input_status = 0;
+  rr.header.display_status = 0x1B1B;
+  rr.header.range_report_format = RANGE_MEASURE_50M;
+  rr.header.refletivity_report_format = REFLECTIVITY_MEASURE_TOT_4PS;
+  rr.header.num_beams = 10;
+  rr.range_data.resize(10);
+  rr.range_data[0] = 1000;
+  rr.range_data[1] = 1253;
+  rr.range_data[2] = 1000;
+  rr.range_data[3] = 1;
+  rr.range_data[4] = 48750;
+  rr.range_data[5] = 49999;
+  rr.range_data[6] = 50001;
+  rr.range_data[7] = 48135;
+  rr.range_data[8] = 0xFFFF;
+  rr.range_data[9] = 0xFFFF;
+  rr.reflectance_data.resize(10);
+  rr.reflectance_data[0] = 44000;
+  rr.reflectance_data[1] = 42123;
+  rr.reflectance_data[2] = 53987;
+  rr.reflectance_data[3] = 0;
+  rr.reflectance_data[4] = 123;
+  rr.reflectance_data[5] = 555;
+  rr.reflectance_data[6] = 65535;
+  rr.reflectance_data[7] = 1013;
+  rr.reflectance_data[8] = 0;
+  rr.reflectance_data[9] = 0;
+
+  sensor_msgs::LaserScan ls = os32c.convertToLaserScan(rr);
+  EXPECT_EQ("testframe", ls.header.frame_id);
+  EXPECT_FLOAT_EQ(OS32C::ANGLE_MAX, ls.angle_min);
+  EXPECT_FLOAT_EQ(OS32C::ANGLE_MIN, ls.angle_max);
+  EXPECT_FLOAT_EQ(OS32C::ANGLE_INC, ls.angle_increment);
+  EXPECT_FLOAT_EQ(42898E-9, ls.time_increment);
+  EXPECT_FLOAT_EQ( 0.002, ls.range_min);
+  EXPECT_FLOAT_EQ(50.0  , ls.range_max);
+  EXPECT_FLOAT_EQ( 1.0  , ls.ranges[0]);
+  EXPECT_FLOAT_EQ( 1.253, ls.ranges[1]);
+  EXPECT_FLOAT_EQ( 1.0  , ls.ranges[2]);
+  EXPECT_FLOAT_EQ( 0.0  , ls.ranges[3]);
+  EXPECT_FLOAT_EQ(48.750, ls.ranges[4]);
+  EXPECT_FLOAT_EQ(49.999, ls.ranges[5]);
+  EXPECT_FLOAT_EQ(50.001, ls.ranges[6]);
+  EXPECT_FLOAT_EQ(48.135, ls.ranges[7]);
+  EXPECT_FLOAT_EQ(50.000, ls.ranges[8]);
+  EXPECT_FLOAT_EQ(50.000, ls.ranges[9]);
+  EXPECT_FLOAT_EQ(44000, ls.intensities[0]);
+  EXPECT_FLOAT_EQ(42123, ls.intensities[1]);
+  EXPECT_FLOAT_EQ(53987, ls.intensities[2]);
+  EXPECT_FLOAT_EQ(0, ls.intensities[3]);
+  EXPECT_FLOAT_EQ(123, ls.intensities[4]);
+  EXPECT_FLOAT_EQ(555, ls.intensities[5]);
+  EXPECT_FLOAT_EQ(65535, ls.intensities[6]);
+  EXPECT_FLOAT_EQ(1013, ls.intensities[7]);
+  EXPECT_FLOAT_EQ(0, ls.intensities[8]);
+  EXPECT_FLOAT_EQ(0, ls.intensities[9]);
+}

@@ -15,6 +15,7 @@ express permission of Clearpath Robotics.
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <sensor_msgs/LaserScan.h>
 
 #include "eip/session.h"
 #include "eip/socket/socket.h"
@@ -22,6 +23,7 @@ express permission of Clearpath Robotics.
 
 using std::vector;
 using boost::shared_ptr;
+using sensor_msgs::LaserScan;
 using eip::Session;
 using eip::socket::Socket;
 
@@ -66,7 +68,7 @@ public:
   static const double ANGLE_MIN = DEG2RAD(-135.2);
   static const double ANGLE_MAX = DEG2RAD( 135.2);
   static const double ANGLE_INC = DEG2RAD(0.4);
-  static const double DISTANCE_MIN = 0; // TODO: VERIFY DISTANCES
+  static const double DISTANCE_MIN = 0.002;
   static const double DISTANCE_MAX = 50;
 
   /**
@@ -82,7 +84,7 @@ public:
    * Set the frame ID to be sent with laser scans
    * @param frame_id Frame ID to send
    */
-  void setFrameID(string& frame_id)
+  void setFrameID(const string& frame_id)
   {
     frame_id_ = frame_id;
   }
@@ -170,6 +172,13 @@ public:
    * @param mask Holder for the mask data. Must be 88 bytes
    */
   void calcBeamMask(double start_angle, double end_angle, EIP_BYTE mask[]);
+
+  /**
+   * Helper to convert a Range and Reflectance Measurement to a ROS LaserScan
+   * @param rr Measurement to convert
+   * @return ROS LaserScan
+   */
+  LaserScan convertToLaserScan(const RangeAndReflectanceMeasurement& rr);
 
 private:
   double start_angle_;
