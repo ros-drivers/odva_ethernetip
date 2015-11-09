@@ -41,6 +41,11 @@ void Path::addLogicalAttribute(EIP_USINT attribute_id)
   addSegment(0x30, attribute_id);
 }
 
+void Path::addLogicalConnectionPoint(EIP_USINT connection_id)
+{
+  addSegment(0x2C, connection_id);
+}
+
 size_t Path::getLength() const
 {
   return sizeof(EIP_USINT) + path_buf_.size() * sizeof(EIP_USINT);

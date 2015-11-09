@@ -44,3 +44,27 @@ TEST_F(PathTest, test_attribute)
   EXPECT_EQ(0x30, d[5]);
   EXPECT_EQ(   4, d[6]);
 }
+
+TEST_F(PathTest, test_connection)
+{
+  EIP_BYTE d[9];
+
+  Path p;
+  p.addLogicalClass(4);
+  p.addLogicalInstance(1);
+  p.addLogicalConnectionPoint(0x71);
+  p.addLogicalConnectionPoint(0x66);
+  EXPECT_EQ(sizeof(d), p.getLength());
+  BufferWriter writer(buffer(d));
+  p.serialize(writer);
+  EXPECT_EQ(sizeof(d), writer.getByteCount());
+  EXPECT_EQ(   4, d[0]);
+  EXPECT_EQ(0x20, d[1]);
+  EXPECT_EQ(   4, d[2]);
+  EXPECT_EQ(0x24, d[3]);
+  EXPECT_EQ(   1, d[4]);
+  EXPECT_EQ(0x2C, d[5]);
+  EXPECT_EQ(0x71, d[6]);
+  EXPECT_EQ(0x2C, d[7]);
+  EXPECT_EQ(0x66, d[8]);
+}

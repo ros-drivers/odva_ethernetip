@@ -61,6 +61,12 @@ public:
   void addLogicalAttribute(EIP_USINT attribute_id);
 
   /**
+   * Add a logical connection point segment
+   * @param ID number of the connection point (usually assembly ID)
+   */
+  void addLogicalConnectionPoint(EIP_USINT connection_id);
+
+  /**
    * Get the length of serialized data that would be produced if serialized
    * @return Total length in bytes to be serialized
    */
