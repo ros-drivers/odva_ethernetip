@@ -386,6 +386,7 @@ TEST_F(OS32CTest, test_convert_to_laserscan)
   rr.reflectance_data[9] = 0;
 
   sensor_msgs::LaserScan ls = os32c.convertToLaserScan(rr);
+  EXPECT_EQ(0xDEADBEEF, ls.header.seq);
   EXPECT_EQ("testframe", ls.header.frame_id);
   EXPECT_FLOAT_EQ(OS32C::ANGLE_MAX, ls.angle_min);
   EXPECT_FLOAT_EQ(OS32C::ANGLE_MIN, ls.angle_max);

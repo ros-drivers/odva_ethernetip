@@ -124,6 +124,7 @@ LaserScan OS32C::convertToLaserScan(const RangeAndReflectanceMeasurement& rr)
   }
 
   LaserScan ls;
+  ls.header.seq = rr.header.scan_count;
   ls.header.frame_id = frame_id_;
   // TODO: figure out time stamp conversion
   // ls.header.stamp = rr.header.scan_timestamp;
