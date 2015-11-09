@@ -46,7 +46,7 @@ TEST_F(ForwardOpenRequestTest, test_calc_net_params)
 TEST_F(ForwardOpenRequestTest, test_serialize)
 {
   // 39 plus path
-  EIP_BYTE d[44];
+  EIP_BYTE d[48];
 
   ForwardOpenRequest data;
   data.timeout_tick_size = 6;
@@ -64,6 +64,8 @@ TEST_F(ForwardOpenRequestTest, test_serialize)
   data.conn_type = 1;
   data.getPath().addLogicalClass(0x04);
   data.getPath().addLogicalInstance(1);
+  data.getPath().addLogicalConnectionPoint(0x71);
+  data.getPath().addLogicalConnectionPoint(0x66);
 
   EXPECT_EQ(sizeof(d), data.getLength());
   BufferWriter writer(buffer(d));
@@ -123,11 +125,15 @@ TEST_F(ForwardOpenRequestTest, test_serialize)
   // trigger
   EXPECT_EQ(   1, d[38]);
   // path
-  EXPECT_EQ(   2, d[39]);
+  EXPECT_EQ(   4, d[39]);
   EXPECT_EQ(0x20, d[40]);
   EXPECT_EQ(   4, d[41]);
   EXPECT_EQ(0x24, d[42]);
   EXPECT_EQ(   1, d[43]);
+  EXPECT_EQ(0x2C, d[44]);
+  EXPECT_EQ(0x71, d[45]);
+  EXPECT_EQ(0x2C, d[46]);
+  EXPECT_EQ(0x66, d[47]);
 }
 
 } // namespace eip
