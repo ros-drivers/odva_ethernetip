@@ -24,7 +24,6 @@ using namespace boost::asio;
 using namespace eip;
 using namespace eip::socket;
 using namespace eip::serialization;
-using namespace os32c;
 
 namespace os32c {
 
@@ -67,6 +66,8 @@ TEST_F(OS32CTest, test_calc_beam_mask_all)
   shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
   OS32C os32c(ts);
   os32c.calcBeamMask(OS32C::ANGLE_MAX, OS32C::ANGLE_MIN, mask);
+  EXPECT_DOUBLE_EQ(2.3596851486963333, os32c.start_angle_);
+  EXPECT_DOUBLE_EQ(-2.3596851486963333, os32c.end_angle_);
   for (size_t i = 0; i < 4; ++i)
   {
     EXPECT_EQ(0xAA, buffer[i]);
@@ -93,6 +94,8 @@ TEST_F(OS32CTest, test_calc_beam_at_90)
   shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
   OS32C os32c(ts);
   os32c.calcBeamMask(0.7853981633974483, -0.7853981633974483, mask);
+  EXPECT_DOUBLE_EQ(0.788888821901437, os32c.start_angle_);
+  EXPECT_DOUBLE_EQ(-0.7819075048934596, os32c.end_angle_);
   for (size_t i = 0; i < 4; ++i)
   {
     EXPECT_EQ(0xAA, buffer[i]);
@@ -125,6 +128,8 @@ TEST_F(OS32CTest, test_calc_beam_boundaries)
   shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
   OS32C os32c(ts);
   os32c.calcBeamMask(0.6911503837897546, -0.7051130178057091, mask);
+  EXPECT_DOUBLE_EQ(0.6911503837897546, os32c.start_angle_);
+  EXPECT_DOUBLE_EQ(-0.70511301780570967, os32c.end_angle_);
   for (size_t i = 0; i < 4; ++i)
   {
     EXPECT_EQ(0xAA, buffer[i]);
@@ -346,6 +351,9 @@ TEST_F(OS32CTest, test_convert_to_laserscan)
   shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
   OS32C os32c(ts);
   os32c.setFrameID("testframe");
+  os32c.start_angle_ = 0.778416846389471; // 44.6 degrees
+  os32c.end_angle_ = -0.6597344572538565; //-37.8 degrees
+
   RangeAndReflectanceMeasurement rr;
   rr.header.scan_count = 0xDEADBEEF;
   rr.header.scan_rate = 38609;
@@ -388,8 +396,8 @@ TEST_F(OS32CTest, test_convert_to_laserscan)
   sensor_msgs::LaserScan ls = os32c.convertToLaserScan(rr);
   EXPECT_EQ(0xDEADBEEF, ls.header.seq);
   EXPECT_EQ("testframe", ls.header.frame_id);
-  EXPECT_FLOAT_EQ(OS32C::ANGLE_MAX, ls.angle_min);
-  EXPECT_FLOAT_EQ(OS32C::ANGLE_MIN, ls.angle_max);
+  EXPECT_FLOAT_EQ(0.778416846389471, ls.angle_min);
+  EXPECT_FLOAT_EQ(-0.6597344572538565, ls.angle_max);
   EXPECT_FLOAT_EQ(OS32C::ANGLE_INC, ls.angle_increment);
   EXPECT_FLOAT_EQ(42898E-9, ls.time_increment);
   EXPECT_FLOAT_EQ( 0.002, ls.range_min);

@@ -66,6 +66,8 @@ void OS32C::calcBeamMask(double start_angle, double end_angle, EIP_BYTE mask[])
 
   int start_beam = calcBeamNumber(start_angle);
   int end_beam = calcBeamNumber(end_angle);
+  start_angle_ = calcBeamCentre(start_beam);
+  end_angle_ = calcBeamCentre(end_beam);
 
   // figure out where we're starting and ending in the array
   int start_byte = start_beam / 8;
