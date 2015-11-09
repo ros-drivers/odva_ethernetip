@@ -12,6 +12,7 @@ express permission of Clearpath Robotics.
 #ifndef OS32C_OS32C_H
 #define OS32C_OS32C_H
 
+#include <gtest/gtest_prod.h>
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -165,6 +166,18 @@ public:
     return ANGLE_MAX - beam_num * ANGLE_INC;
   }
 
+private:
+  // allow unit tests to access the helpers below for direct testing
+  FRIEND_TEST(OS32CTest, test_calc_beam_mask_all);
+  FRIEND_TEST(OS32CTest, test_calc_beam_at_90);
+  FRIEND_TEST(OS32CTest, test_calc_beam_boundaries);
+  FRIEND_TEST(OS32CTest, test_calc_beam_invalid_args);
+  FRIEND_TEST(OS32CTest, test_convert_to_laserscan);
+
+  double start_angle_;
+  double end_angle_;
+  string frame_id_;
+
   /**
    * Helper to calculate the mask for a given start and end beam angle
    * @param start_angle Angle of the first beam in the scan
@@ -179,11 +192,6 @@ public:
    * @return ROS LaserScan
    */
   LaserScan convertToLaserScan(const RangeAndReflectanceMeasurement& rr);
-
-private:
-  double start_angle_;
-  double end_angle_;
-  string frame_id_;
 };
 
 } // namespace os32c

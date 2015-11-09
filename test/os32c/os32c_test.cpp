@@ -26,6 +26,8 @@ using namespace eip::socket;
 using namespace eip::serialization;
 using namespace os32c;
 
+namespace os32c {
+
 class OS32CTest : public :: testing :: Test
 {
 
@@ -412,3 +414,5 @@ TEST_F(OS32CTest, test_convert_to_laserscan)
   EXPECT_FLOAT_EQ(0, ls.intensities[8]);
   EXPECT_FLOAT_EQ(0, ls.intensities[9]);
 }
+
+} // namespace os32c
