@@ -48,6 +48,7 @@ add_library(eip
   src/eip/path.cpp
   src/eip/rr_data.cpp
   src/eip/message_router_response.cpp
+  src/eip/connection.cpp
 )
 
 add_library(os32c_lib

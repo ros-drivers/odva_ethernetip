@@ -29,7 +29,7 @@ Path::Path(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id,
   addLogicalAttribute(attribute_id);
 }
 
-Path::Path(EIP_USINT class_id, EIP_USINT instance_id)
+Path::Path(EIP_USINT class_id, EIP_USINT instance_id) : pad_after_length_(false)
 {
   path_buf_.reserve(4);
   addLogicalClass(class_id);
@@ -64,7 +64,7 @@ void Path::addLogicalConnectionPoint(EIP_USINT connection_id)
 
 size_t Path::getLength() const
 {
-  return sizeof(EIP_USINT) + path_buf_.size() * sizeof(EIP_USINT);
+  return sizeof(EIP_USINT) + path_buf_.size() * sizeof(EIP_USINT) + (pad_after_length_ ? 1 : 0);
 }
 
 Writer& Path::serialize(Writer& writer, bool pad_after_length) const

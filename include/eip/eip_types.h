@@ -82,12 +82,12 @@ typedef enum
 
 typedef struct
 {
-  EIP_UINT  command;
-  EIP_UINT  length;
-  EIP_UDINT session_handle;
-  EIP_DWORD status;
-  EIP_DWORD context[2];
-  EIP_DWORD options;
-} EIP_ENCAP_HEADER;
+  /// Assembly ID for this endpoint of the connection
+  EIP_USINT assembly_id;
+  /// Buffer size to be used for routing
+  EIP_UINT buffer_size;
+  /// Request packet interval
+  EIP_UDINT rpi;
+} EIP_CONNECTION_INFO_T;
 
 #endif  // EIP_EIP_TYPES_H

@@ -13,6 +13,7 @@ express permission of Clearpath Robotics.
 #define EIP_SESSION_H
 
 #include <string>
+#include <gtest/gtest_prod.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/asio.hpp>
@@ -24,6 +25,7 @@ express permission of Clearpath Robotics.
 #include "eip/encap_packet.h"
 #include "eip/rr_data_response.h"
 #include "eip/path.h"
+#include "eip/connection.h"
 
 using std::string;
 using boost::shared_ptr;
@@ -123,10 +125,25 @@ public:
     setSingleAttributeSerializable(class_id, instance_id, attribute_id, data);
   }
 
+  /**
+   * Create an Ethernet/IP Connection for sending implicit messages
+   * @param o_to_t Origin to target connection info
+   * @param t_to_o Target to origin connection info
+   */
+  void createConnection(const EIP_CONNECTION_INFO_T& o_to_t,
+    const EIP_CONNECTION_INFO_T& t_to_o);
+
 private:
+  FRIEND_TEST(SessionTest, test_create_connection);
+
   shared_ptr<Socket> socket_;
   EIP_UDINT session_id_;
   EIP_BYTE recv_buffer_[4*1024];
+
+  EIP_UINT my_vendor_id_;
+  EIP_UDINT my_serial_num_;
+  EIP_UINT next_connection_sn_;
+  EIP_UDINT next_connection_id_;
   
   /**
    * Helper to check a returned encapsulation packet based on an expected command.
