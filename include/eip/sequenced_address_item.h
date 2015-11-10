@@ -32,10 +32,10 @@ using serialization::Writer;
 class SequencedAddressItem : public Serializable
 {
 public:
-  EIP_UINT connection_id;
-  EIP_UINT sequence_num;
+  EIP_UDINT connection_id;
+  EIP_UDINT sequence_num;
 
-  SequencedAddressItem(EIP_UINT connection = 0, EIP_UINT sequence = 0) 
+  SequencedAddressItem(EIP_UDINT connection = 0, EIP_UDINT sequence = 0) 
     : connection_id(connection), sequence_num(sequence) { }
 
   /**
