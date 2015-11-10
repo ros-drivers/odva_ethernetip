@@ -130,6 +130,7 @@ catkin_add_gtest(eip-test
   test/eip/encap_packet_test.cpp
   test/eip/cpf_item_test.cpp
   test/eip/cpf_packet_test.cpp
+  test/eip/sequenced_address_item_test.cpp
   test/eip/identity_item_data_test.cpp
   test/eip/path_test.cpp
   test/eip/rr_data_test.cpp
