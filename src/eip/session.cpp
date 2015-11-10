@@ -282,6 +282,8 @@ void Session::createConnection(const EIP_CONNECTION_INFO_T& o_to_t,
     cerr << "Received invalid response to forward open request" << endl;
     throw std::logic_error("Forward Open Response Invalid");
   }
+
+  connections_.push_back(conn);
 }
 
 } // namespace eip

@@ -28,7 +28,20 @@ namespace eip {
 
 class SessionTest : public :: testing :: Test
 {
+public:
+  SessionTest() : session(ts, ts_io) { }
 
+protected:
+  virtual void SetUp()
+  {
+    ts = make_shared<TestSocket> ();
+    ts_io = make_shared<TestSocket> ();
+    session = Session(ts, ts_io);
+  }
+
+  shared_ptr<TestSocket> ts;
+  shared_ptr<TestSocket> ts_io;
+  Session session;
 };
 
 TEST_F(SessionTest, test_open)
@@ -52,8 +65,7 @@ TEST_F(SessionTest, test_open)
     0, 0,
   };
 
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
-  Session session(ts);
+  ts->rx_buffer = buffer(resp_packet);
   session.open("example_host");
   EXPECT_TRUE(ts->is_open);
   EXPECT_EQ("example_host", ts->hostname);
@@ -162,8 +174,7 @@ TEST_F(SessionTest, test_open_wrong_command_id)
     0, 0, 0, 0,
   };
 
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
-  Session session(ts);
+  ts->rx_buffer = buffer(resp_packet);
   EXPECT_THROW(session.open("example_host"), std::runtime_error);
   EXPECT_FALSE(ts->is_open);
   EXPECT_EQ("example_host", ts->hostname);
@@ -188,8 +199,7 @@ TEST_F(SessionTest, test_open_zero_session)
     0, 0, 0, 0,
   };
 
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
-  Session session(ts);
+  ts->rx_buffer = buffer(resp_packet);
   EXPECT_THROW(session.open("example_host"), std::runtime_error);
   EXPECT_FALSE(ts->is_open);
   EXPECT_EQ("example_host", ts->hostname);
@@ -214,8 +224,7 @@ TEST_F(SessionTest, test_open_short_packet)
     0, 0, 0, 0,
   };
 
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
-  Session session(ts);
+  ts->rx_buffer = buffer(resp_packet);
   EXPECT_THROW(session.open("example_host"), std::runtime_error);
   EXPECT_FALSE(ts->is_open);
   EXPECT_EQ("example_host", ts->hostname);
@@ -242,8 +251,7 @@ TEST_F(SessionTest, test_open_short_data)
     1, 0,
   };
 
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
-  Session session(ts);
+  ts->rx_buffer = buffer(resp_packet);
   session.open("example_host");
   EXPECT_TRUE(ts->is_open);
   EXPECT_EQ("example_host", ts->hostname);
@@ -272,8 +280,7 @@ TEST_F(SessionTest, test_open_extra_data)
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
   };
 
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
-  Session session(ts);
+  ts->rx_buffer = buffer(resp_packet);
   session.open("example_host");
   EXPECT_TRUE(ts->is_open);
   EXPECT_EQ("example_host", ts->hostname);
@@ -302,8 +309,7 @@ TEST_F(SessionTest, test_open_wrong_version)
     0, 0,
   };
 
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(resp_packet));
-  Session session(ts);
+  ts->rx_buffer = buffer(resp_packet);
   EXPECT_THROW(session.open("example_host"), std::runtime_error);
   EXPECT_FALSE(ts->is_open);
   EXPECT_EQ("example_host", ts->hostname);
@@ -333,8 +339,7 @@ TEST_F(SessionTest, test_get_single_attribute)
     0, 0,
   };
 
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(reg_resp_packet));
-  Session session(ts);
+  ts->rx_buffer = buffer(reg_resp_packet);
   session.open("example_host");
   EXPECT_TRUE(ts->is_open);
   EXPECT_EQ("example_host", ts->hostname);
@@ -479,8 +484,7 @@ TEST_F(SessionTest, test_set_single_attribute)
     0, 0,
   };
 
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(reg_resp_packet));
-  Session session(ts);
+  ts->rx_buffer = buffer(reg_resp_packet);
   session.open("example_host");
   EXPECT_TRUE(ts->is_open);
   EXPECT_EQ("example_host", ts->hostname);
@@ -624,8 +628,7 @@ TEST_F(SessionTest, test_create_connection)
     0, 0,
   };
 
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(reg_resp_packet));
-  Session session(ts);
+  ts->rx_buffer = buffer(reg_resp_packet);
   session.open("example_host");
   EXPECT_TRUE(ts->is_open);
   EXPECT_EQ("example_host", ts->hostname);
@@ -813,6 +816,23 @@ TEST_F(SessionTest, test_create_connection)
   EXPECT_EQ(0x71, ts->tx_buffer[91]);
   EXPECT_EQ(0x2C, ts->tx_buffer[92]);
   EXPECT_EQ(0x66, ts->tx_buffer[93]);
+
+  // verify that connection added to list
+  ASSERT_EQ(1, session.connections_.size());
+  EXPECT_EQ(0x0195, session.connections_[0].originator_vendor_id);
+  EXPECT_EQ(0x00004321, session.connections_[0].originator_sn);
+  EXPECT_EQ(0x6789, session.connections_[0].connection_sn);
+  EXPECT_EQ(0x780C0002, session.connections_[0].o_to_t_connection_id);
+  EXPECT_EQ(0x00020004, session.connections_[0].t_to_o_connection_id);
+  EXPECT_EQ(6, session.connections_[0].timeout_tick_size);
+  EXPECT_EQ(80, session.connections_[0].timeout_ticks);
+  EXPECT_EQ(0x00177FA0, session.connections_[0].o_to_t_rpi);
+  EXPECT_EQ(0x00013070, session.connections_[0].t_to_o_rpi);
+  EXPECT_EQ(0x006E, session.connections_[0].o_to_t_buffer_size);
+  EXPECT_EQ(0x0584, session.connections_[0].t_to_o_buffer_size);
+  EXPECT_EQ(0x001781D0, session.connections_[0].o_to_t_api);
+  EXPECT_EQ(0x00025CD8, session.connections_[0].t_to_o_api);
+  // TODO: verify path ?
 }
 
 } // namespace eip

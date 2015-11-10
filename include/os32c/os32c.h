@@ -63,8 +63,9 @@ public:
    * Construct a new OS32C instance.
    * @param socket Socket instance to use for communication with the lidar
    */
-  OS32C(shared_ptr<Socket> socket) : Session(socket), frame_id_("OS32C"),
-    start_angle_(ANGLE_MAX), end_angle_(ANGLE_MIN) { }
+  OS32C(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket) 
+    : Session(socket, io_socket), frame_id_("OS32C"),
+      start_angle_(ANGLE_MAX), end_angle_(ANGLE_MIN) { }
 
   static const double ANGLE_MIN = DEG2RAD(-135.2);
   static const double ANGLE_MAX = DEG2RAD( 135.2);

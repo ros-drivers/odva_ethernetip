@@ -42,7 +42,9 @@ int main(int argc, char *argv[])
 
   boost::asio::io_service io_service;
   shared_ptr<TCPSocket> socket = shared_ptr<TCPSocket>(new TCPSocket(io_service));
-  OS32C os32c(socket);
+  // TODO: this should be a UDP socket directed at the hostname
+  shared_ptr<TCPSocket> io_socket = shared_ptr<TCPSocket>(new TCPSocket(io_service));
+  OS32C os32c(socket, io_socket);
 
   try
   {

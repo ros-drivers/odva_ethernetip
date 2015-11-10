@@ -48,12 +48,16 @@ class Session
 public:
 
   /**
-   * Construct a session to use the given io_service. Doesn't actually open
-   * the port or start a session.
+   * Construct a session to use the given sockets
+   * @param socket Control socket, usually a TCP socket
+   * @param io_socket IO Socket, usually a UDP socket directed at the same host
+   * @param vendor_id My vendor ID number to be used if different than the default
+   * @param serial_num My serial number to use when setting up connections
    */
-  Session(shared_ptr<Socket> socket, EIP_UINT vendor_id = DEFAULT_VENDOR_ID,
-    EIP_UDINT serial_num = DEFAULT_SERIAL_NUM)
-    : socket_(socket), session_id_(0), my_vendor_id_(vendor_id), my_serial_num_(serial_num) { }
+  Session(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket,
+    EIP_UINT vendor_id = DEFAULT_VENDOR_ID, EIP_UDINT serial_num = DEFAULT_SERIAL_NUM)
+    : socket_(socket), io_socket_(io_socket), session_id_(0), 
+      my_vendor_id_(vendor_id), my_serial_num_(serial_num) { }
 
   virtual ~Session();
 
@@ -160,6 +164,7 @@ private:
   FRIEND_TEST(SessionTest, test_create_connection);
 
   shared_ptr<Socket> socket_;
+  shared_ptr<Socket> io_socket_;
   EIP_UDINT session_id_;
   EIP_BYTE recv_buffer_[4*1024];
 
@@ -167,6 +172,8 @@ private:
   EIP_UDINT my_serial_num_;
   EIP_UINT next_connection_sn_;
   EIP_UDINT next_connection_id_;
+
+  vector<Connection> connections_;
   
   /**
    * Helper to check a returned encapsulation packet based on an expected command.

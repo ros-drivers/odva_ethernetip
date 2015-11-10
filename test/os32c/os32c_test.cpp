@@ -29,6 +29,20 @@ namespace os32c {
 
 class OS32CTest : public :: testing :: Test
 {
+public:
+  OS32CTest() : os32c(ts, ts_io) { }
+
+protected:
+  virtual void SetUp()
+  {
+    ts = make_shared<TestSocket> ();
+    ts_io = make_shared<TestSocket> ();
+    os32c = OS32C(ts, ts_io);
+  }
+
+  shared_ptr<TestSocket> ts;
+  shared_ptr<TestSocket> ts_io;
+  OS32C os32c;
 
 };
 
@@ -63,8 +77,6 @@ TEST_F(OS32CTest, test_calc_beam_mask_all)
   EIP_BYTE buffer[96]; // plus 32 bits on each end as guards
   memset(buffer, 0xAA, sizeof(buffer));
   EIP_BYTE* mask = buffer + 4;
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
-  OS32C os32c(ts);
   os32c.calcBeamMask(OS32C::ANGLE_MAX, OS32C::ANGLE_MIN, mask);
   EXPECT_DOUBLE_EQ(2.3596851486963333, os32c.start_angle_);
   EXPECT_DOUBLE_EQ(-2.3596851486963333, os32c.end_angle_);
@@ -91,8 +103,6 @@ TEST_F(OS32CTest, test_calc_beam_at_90)
   EIP_BYTE buffer[96]; // plus 32 bits on each end as guards
   memset(buffer, 0xAA, sizeof(buffer));
   EIP_BYTE* mask = buffer + 4;
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
-  OS32C os32c(ts);
   os32c.calcBeamMask(0.7853981633974483, -0.7853981633974483, mask);
   EXPECT_DOUBLE_EQ(0.788888821901437, os32c.start_angle_);
   EXPECT_DOUBLE_EQ(-0.7819075048934596, os32c.end_angle_);
@@ -125,8 +135,6 @@ TEST_F(OS32CTest, test_calc_beam_boundaries)
   EIP_BYTE buffer[96]; // plus 32 bits on each end as guards
   memset(buffer, 0xAA, sizeof(buffer));
   EIP_BYTE* mask = buffer + 4;
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
-  OS32C os32c(ts);
   os32c.calcBeamMask(0.6911503837897546, -0.7051130178057091, mask);
   EXPECT_DOUBLE_EQ(0.6911503837897546, os32c.start_angle_);
   EXPECT_DOUBLE_EQ(-0.70511301780570967, os32c.end_angle_);
@@ -158,8 +166,6 @@ TEST_F(OS32CTest, test_calc_beam_invalid_args)
   EIP_BYTE buffer[96]; // plus 32 bits on each end as guards
   memset(buffer, 0xAA, sizeof(buffer));
   EIP_BYTE* mask = buffer + 4;
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
-  OS32C os32c(ts);
   EXPECT_THROW(os32c.calcBeamMask(2.3631758089456514, -0.7051130178057091, mask), 
     std::invalid_argument);
   EXPECT_THROW(os32c.calcBeamMask(0.6911503837897546, -2.3631758089456514, mask), 
@@ -179,8 +185,7 @@ TEST_F(OS32CTest, test_select_beams)
     0x01, 0x00, 0x00, 0x00,
   };
 
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> (buffer(reg_resp_packet));
-  OS32C os32c(ts);
+  ts->rx_buffer = buffer(reg_resp_packet);
   os32c.open("example_host");
   EXPECT_TRUE(ts->is_open);
   EXPECT_EQ("example_host", ts->hostname);
@@ -348,8 +353,6 @@ TEST_F(OS32CTest, test_select_beams)
 
 TEST_F(OS32CTest, test_convert_to_laserscan)
 {
-  shared_ptr<TestSocket> ts = make_shared<TestSocket> ();
-  OS32C os32c(ts);
   os32c.setFrameID("testframe");
   os32c.start_angle_ = 0.778416846389471; // 44.6 degrees
   os32c.end_angle_ = -0.6597344572538565; //-37.8 degrees

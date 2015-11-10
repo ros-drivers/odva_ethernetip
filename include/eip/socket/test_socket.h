@@ -99,6 +99,15 @@ public:
     return n;
   }
 
+  /**
+   * Helper to clear out the TX buffer between tests
+   */
+  void clearTxBuffer()
+  {
+    tx_count = 0;
+    memset(tx_buffer, 0, sizeof(tx_count));
+  }
+
 };
 
 } // namespace socket
