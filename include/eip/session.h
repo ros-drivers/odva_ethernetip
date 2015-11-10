@@ -37,6 +37,9 @@ using serialization::Serializable;
 using serialization::SerializablePrimitive;
 using socket::Socket;
 
+#define DEFAULT_VENDOR_ID 0x1234
+#define DEFAULT_SERIAL_NUM 0x6789
+
 /**
  * Class to handle creating and managing Ethernet/IP Sessions
  */
@@ -48,7 +51,9 @@ public:
    * Construct a session to use the given io_service. Doesn't actually open
    * the port or start a session.
    */
-  Session(shared_ptr<Socket> socket) : socket_(socket), session_id_(0) { }
+  Session(shared_ptr<Socket> socket, EIP_UINT vendor_id = DEFAULT_VENDOR_ID,
+    EIP_UDINT serial_num = DEFAULT_SERIAL_NUM)
+    : socket_(socket), session_id_(0), my_vendor_id_(vendor_id), my_serial_num_(serial_num) { }
 
   virtual ~Session();
 
@@ -132,6 +137,24 @@ public:
    */
   void createConnection(const EIP_CONNECTION_INFO_T& o_to_t,
     const EIP_CONNECTION_INFO_T& t_to_o);
+
+  /**
+   * Accessor for the Vendor ID to be used for this session
+   * @return Vendor ID that will be sent to the target with any requests
+   */
+  inline EIP_UINT getVendorID() const
+  {
+    return my_vendor_id_;
+  }
+
+  /**
+   * Accessor for serial number that will be used for this session
+   * @return Serial number that will be sent to the target with any requests
+   */
+  inline EIP_UDINT getSerialNum() const
+  {
+    return my_serial_num_;
+  }
 
 private:
   FRIEND_TEST(SessionTest, test_create_connection);
