@@ -152,6 +152,7 @@ if(TARGET eip-test)
 endif()
 
 catkin_add_gtest(os32c-test
+  test/os32c/measurement_report_config_test.cpp
   test/os32c/measurement_report_header_test.cpp
   test/os32c/measurement_report_test.cpp
   test/os32c/range_and_reflectance_measurement_test.cpp
