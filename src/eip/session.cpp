@@ -194,8 +194,8 @@ void Session::getSingleAttributeSerializable(EIP_USINT class_id, EIP_USINT insta
   EIP_USINT attribute_id, Serializable& result)
 {
   shared_ptr<Serializable> no_data;
-  RRDataResponse resp_data = sendRRDataCommand(0x0E, class_id, instance_id, 
-    attribute_id, no_data);
+  RRDataResponse resp_data = sendRRDataCommand(0x0E,
+    Path(class_id, instance_id, attribute_id), no_data);
 
   resp_data.getResponseDataAs(result);
 }
@@ -203,16 +203,16 @@ void Session::getSingleAttributeSerializable(EIP_USINT class_id, EIP_USINT insta
 void Session::setSingleAttributeSerializable(EIP_USINT class_id,
   EIP_USINT instance_id, EIP_USINT attribute_id, shared_ptr<Serializable> data)
 {
-  RRDataResponse resp_data = sendRRDataCommand(0x10, class_id, instance_id, 
-    attribute_id, data);
+  RRDataResponse resp_data = sendRRDataCommand(0x10,
+    Path(class_id, instance_id, attribute_id), data);
 }
 
-RRDataResponse Session::sendRRDataCommand(EIP_USINT service, EIP_USINT class_id,
-  EIP_USINT instance_id, EIP_USINT attribute_id, shared_ptr<Serializable> data)
+RRDataResponse Session::sendRRDataCommand(EIP_USINT service, const Path& path,
+  shared_ptr<Serializable> data)
 {
   cout << "Creating RR Data Request" << endl;
   shared_ptr<RRDataRequest> req_data =
-    make_shared<RRDataRequest> (service, class_id, instance_id, attribute_id, data);
+    make_shared<RRDataRequest> (service, path, data);
   EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
 
   // send command and get response

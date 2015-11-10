@@ -45,6 +45,27 @@ public:
   Path(bool pad_after_length = false);
 
   /**
+   * Shortcut to construct a path to the given logical class instance and
+   * attribute IDs.
+   * @param class_id Logical Class ID for the first segment of the path
+   * @param instance_id Logical instance ID for the second segment of the path
+   * @param attribute_id Logical instance ID for the third segment of the path
+   * @param pad_after_length set to true to enable pad byte after length when
+   *   serializing the path.
+   */
+  Path(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id,
+    bool pad_after_length = false);
+
+  /**
+   * Shortcut to construct a path to the given logical class instance
+   * @param class_id Logical Class ID for the first segment of the path
+   * @param instance_id Logical instance ID for the second segment of the path
+   * @param pad_after_length set to true to enable pad byte after length when
+   *   serializing the path.
+   */
+  Path(EIP_USINT class_id, EIP_USINT instance_id);
+
+  /**
    * In some special cases, need to add a pad byte after the length when 
    * serializing the path. Set this flag to true to enable that behaviour.
    * @param pad if set to true, will add a pad byte after the path length when
@@ -78,6 +99,14 @@ public:
    * @param ID number of the connection point (usually assembly ID)
    */
   void addLogicalConnectionPoint(EIP_USINT connection_id);
+
+  /**
+   * Clear out anything currently in the path
+   */
+  void reset()
+  {
+    path_buf_.clear();
+  }
 
   /**
    * Get the length of serialized data that would be produced if serialized

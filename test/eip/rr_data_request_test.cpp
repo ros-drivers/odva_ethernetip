@@ -15,6 +15,7 @@ express permission of Clearpath Robotics.
 #include <boost/asio.hpp>
 
 #include "eip/rr_data_request.h"
+#include "eip/path.h"
 #include "eip/serialization/serializable_buffer.h"
 #include "eip/serialization/buffer_reader.h"
 #include "eip/serialization/buffer_writer.h"
@@ -23,6 +24,7 @@ using boost::shared_ptr;
 using boost::make_shared;
 using namespace boost::asio;
 using eip::RRDataRequest;
+using eip::Path;
 using eip::serialization::SerializableBuffer;
 using eip::serialization::BufferReader;
 using eip::serialization::BufferWriter;
@@ -81,7 +83,7 @@ TEST_F(RRDataRequestTest, test_serialize_with_data)
   data.getPath().addLogicalClass(0x73);
   data.getPath().addLogicalInstance(1);
   data.getPath().addLogicalAttribute(4);
-  data.setData(sb);
+  data.setMRData(sb);
 
   EXPECT_EQ(sizeof(d), data.getLength());
   BufferWriter writer(buffer(d));
@@ -134,7 +136,7 @@ TEST_F(RRDataRequestTest, test_serialize_with_data_via_constructor)
 
   EIP_BYTE sample_data[] = {0xEF, 0xBE, 0xAD, 0xDE};
   shared_ptr<SerializableBuffer> sb = make_shared<SerializableBuffer>(buffer(sample_data));
-  RRDataRequest data(0xAA, 0x73, 1, 4, sb);
+  RRDataRequest data(0xAA, Path(0x73, 1, 4), sb);
 
   EXPECT_EQ(sizeof(d), data.getLength());
   BufferWriter writer(buffer(d));

@@ -52,26 +52,20 @@ public:
   /**
    * Construct an RR data request for the given path and data
    */
-  RRDataRequest(EIP_USINT service_code, EIP_USINT class_id, EIP_USINT instance_id, 
-    EIP_USINT attribute_id, shared_ptr<Serializable> data)
+  RRDataRequest(EIP_USINT service_code, const Path& path, shared_ptr<Serializable> data)
   {
     mr_data_ = make_shared<MessageRouterRequest>(service_code);
-    mr_data_->getPath().addLogicalClass(class_id);
-    mr_data_->getPath().addLogicalInstance(instance_id);
-    mr_data_->getPath().addLogicalAttribute(attribute_id);
+    mr_data_->getPath() = path;
     mr_data_->setData(data);
   }
 
   /**
    * Construct an RR data request for the given path and without data
    */
-  RRDataRequest(EIP_USINT service_code, EIP_USINT class_id, EIP_USINT instance_id, 
-    EIP_USINT attribute_id)
+  RRDataRequest(EIP_USINT service_code, const Path& path)
   {
     mr_data_ = make_shared<MessageRouterRequest>(service_code);
-    mr_data_->getPath().addLogicalClass(class_id);
-    mr_data_->getPath().addLogicalInstance(instance_id);
-    mr_data_->getPath().addLogicalAttribute(attribute_id);
+    mr_data_->getPath() = path;
   }
 
   /**
@@ -106,7 +100,7 @@ public:
    * to be supplied, pointer is null.
    * @return shared pointer to data to be sent with request
    */
-  shared_ptr<Serializable> getData()
+  shared_ptr<Serializable> getMRData()
   {
     return mr_data_->getData();
   }
@@ -116,7 +110,7 @@ public:
    * set to null (i.e. the default value of a shared_ptr).
    * @param data Data to be sent with the request
    */
-  void setData(shared_ptr<Serializable> data)
+  void setMRData(shared_ptr<Serializable> data)
   {
     mr_data_->setData(data);
   }

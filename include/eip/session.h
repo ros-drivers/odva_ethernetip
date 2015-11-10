@@ -23,6 +23,7 @@ express permission of Clearpath Robotics.
 #include "eip/serialization/serializable_primitive.h"
 #include "eip/encap_packet.h"
 #include "eip/rr_data_response.h"
+#include "eip/path.h"
 
 using std::string;
 using boost::shared_ptr;
@@ -151,8 +152,8 @@ private:
    * @param data Data to include. If null, then no data sent
    * @return RR Data Response
    */
-  RRDataResponse sendRRDataCommand(EIP_USINT service, EIP_USINT class_id,
-    EIP_USINT instance_id, EIP_USINT attribute_id, shared_ptr<Serializable> data);
+  RRDataResponse sendRRDataCommand(EIP_USINT service, const Path& path,
+    shared_ptr<Serializable> data);
 };
 
 } // namespace eip

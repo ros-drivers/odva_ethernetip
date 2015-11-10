@@ -20,6 +20,22 @@ Path::Path(bool pad_after_length) : pad_after_length_(pad_after_length)
   path_buf_.reserve(6);
 }
 
+Path::Path(EIP_USINT class_id, EIP_USINT instance_id, EIP_USINT attribute_id,
+  bool pad_after_length) : pad_after_length_(pad_after_length)
+{
+  path_buf_.reserve(6);
+  addLogicalClass(class_id);
+  addLogicalInstance(instance_id);
+  addLogicalAttribute(attribute_id);
+}
+
+Path::Path(EIP_USINT class_id, EIP_USINT instance_id)
+{
+  path_buf_.reserve(4);
+  addLogicalClass(class_id);
+  addLogicalInstance(instance_id);
+}
+
 void Path::addSegment(EIP_USINT type, EIP_USINT data)
 {
   path_buf_.push_back(type);
