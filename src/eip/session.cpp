@@ -1,7 +1,7 @@
 /**
 Software License Agreement (proprietary)
 
-\file      eip_session.cpp
+\file      session.cpp
 \authors   Kareem Shehata <kshehata@clearpathrobotics.com>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
