@@ -23,6 +23,7 @@ express permission of Clearpath Robotics.
 #include "eip/serialization/serializable.h"
 #include "eip/serialization/serializable_primitive.h"
 #include "eip/encap_packet.h"
+#include "eip/cpf_packet.h"
 #include "eip/rr_data_response.h"
 #include "eip/path.h"
 #include "eip/connection.h"
@@ -175,6 +176,14 @@ public:
   {
     return connections_[n];
   }
+
+  /**
+   * Receive the next packet from the IO socket.
+   * This is a hack. I'd really much prefer to have the Session receive and do
+   * callback through the connection object, but there's no time for that now.
+   * @param CPFPacket the received packet
+   */
+  CPFPacket receiveIOPacket();
 
 private:
   FRIEND_TEST(SessionTest, test_create_connection);

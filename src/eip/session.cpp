@@ -303,5 +303,24 @@ void Session::closeConnection(size_t n)
   connections_.erase(connections_.begin() + n);
 }
 
+CPFPacket Session::receiveIOPacket()
+{
+  cout << "Receiving IO packet" << endl;
+  size_t n = io_socket_->receive(buffer(recv_buffer_));
+  cout << "Received IO of " << n << " bytes" << endl;
+
+  BufferReader reader(buffer(recv_buffer_, n));
+  CPFPacket result;
+  result.deserialize(reader);
+
+  if (reader.getByteCount() != n)
+  {
+    cerr << "Warning: IO packet received with " << n <<
+      " bytes, but only " << reader.getByteCount() << " bytes used" << endl;
+  }
+
+  return result;
+}
+
 
 } // namespace eip
