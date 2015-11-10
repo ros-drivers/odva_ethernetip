@@ -139,8 +139,14 @@ public:
    * @param o_to_t Origin to target connection info
    * @param t_to_o Target to origin connection info
    */
-  void createConnection(const EIP_CONNECTION_INFO_T& o_to_t,
+  int createConnection(const EIP_CONNECTION_INFO_T& o_to_t,
     const EIP_CONNECTION_INFO_T& t_to_o);
+
+  /**
+   * Close the given connection number
+   * @param n Connection number to close
+   */
+  void closeConnection(size_t n);
 
   /**
    * Accessor for the Vendor ID to be used for this session
@@ -158,6 +164,16 @@ public:
   inline EIP_UDINT getSerialNum() const
   {
     return my_serial_num_;
+  }
+
+  /**
+   * Accessor for connection info
+   * @param n Connection number to access
+   * @return Connection details
+   */
+  const Connection& getConnection(size_t n)
+  {
+    return connections_[n];
   }
 
 private:

@@ -702,9 +702,9 @@ TEST_F(SessionTest, test_create_connection)
   session.next_connection_sn_ = 0x6789;
   session.next_connection_id_ = 0x00020003;
 
-  session.createConnection(o_to_t, t_to_o);
+  int conn_num = session.createConnection(o_to_t, t_to_o);
 
-  // check the unregistration packet
+  // check the forward open packet
   EXPECT_EQ(94, ts->tx_count);
   // command
   EXPECT_EQ(0x6F, ts->tx_buffer[0]);
@@ -819,6 +819,7 @@ TEST_F(SessionTest, test_create_connection)
 
   // verify that connection added to list
   ASSERT_EQ(1, session.connections_.size());
+  EXPECT_EQ(0, conn_num);
   EXPECT_EQ(0x0195, session.connections_[0].originator_vendor_id);
   EXPECT_EQ(0x00004321, session.connections_[0].originator_sn);
   EXPECT_EQ(0x6789, session.connections_[0].connection_sn);
@@ -833,6 +834,102 @@ TEST_F(SessionTest, test_create_connection)
   EXPECT_EQ(0x001781D0, session.connections_[0].o_to_t_api);
   EXPECT_EQ(0x00025CD8, session.connections_[0].t_to_o_api);
   // TODO: verify path ?
+
+  char close_resp_packet[] = {
+    0x6F, 0x00, 0x1E, 0x00, 0xEF, 0xBE, 0xAD, 0xDE, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0xB2, 0x00, 0x0E, 0x00, 
+    0xCE, 0x00, 0x00, 0x00, 0x89, 0x67, 0x95, 0x01, 
+    0x21, 0x43, 0x00, 0x00, 0x00, 0x00,
+  };
+
+  ts->rx_buffer = buffer(close_resp_packet);
+  ts->clearTxBuffer();
+  session.closeConnection(conn_num);
+
+  // check the forward close packet
+  EXPECT_EQ(62, ts->tx_count);
+  // command
+  EXPECT_EQ(0x6F, ts->tx_buffer[0]);
+  EXPECT_EQ(0x00, ts->tx_buffer[1]);
+  // length
+  EXPECT_EQ(0x26, ts->tx_buffer[2]);
+  EXPECT_EQ(0x00, ts->tx_buffer[3]);
+  // session handle
+  EXPECT_EQ(0xEF, ts->tx_buffer[4]);
+  EXPECT_EQ(0xBE, ts->tx_buffer[5]);
+  EXPECT_EQ(0xAD, ts->tx_buffer[6]);
+  EXPECT_EQ(0xDE, ts->tx_buffer[7]);
+  // status
+  EXPECT_EQ(0x00, ts->tx_buffer[8]);
+  EXPECT_EQ(0x00, ts->tx_buffer[9]);
+  EXPECT_EQ(0x00, ts->tx_buffer[10]);
+  EXPECT_EQ(0x00, ts->tx_buffer[11]);
+  // sender context
+  EXPECT_EQ(0x00, ts->tx_buffer[12]);
+  EXPECT_EQ(0x00, ts->tx_buffer[13]);
+  EXPECT_EQ(0x00, ts->tx_buffer[14]);
+  EXPECT_EQ(0x00, ts->tx_buffer[15]);
+  EXPECT_EQ(0x00, ts->tx_buffer[16]);
+  EXPECT_EQ(0x00, ts->tx_buffer[17]);
+  EXPECT_EQ(0x00, ts->tx_buffer[18]);
+  EXPECT_EQ(0x00, ts->tx_buffer[19]);
+  // options
+  EXPECT_EQ(0x00, ts->tx_buffer[20]);
+  EXPECT_EQ(0x00, ts->tx_buffer[21]);
+  EXPECT_EQ(0x00, ts->tx_buffer[22]);
+  EXPECT_EQ(0x00, ts->tx_buffer[23]);
+  // interface handle
+  EXPECT_EQ(0x00, ts->tx_buffer[24]);
+  EXPECT_EQ(0x00, ts->tx_buffer[25]);
+  EXPECT_EQ(0x00, ts->tx_buffer[26]);
+  EXPECT_EQ(0x00, ts->tx_buffer[27]);
+  // timeout
+  EXPECT_EQ(0x00, ts->tx_buffer[28]);
+  EXPECT_EQ(0x00, ts->tx_buffer[29]);
+  // items
+  EXPECT_EQ(0x02, ts->tx_buffer[30]);
+  EXPECT_EQ(0x00, ts->tx_buffer[31]);
+  // null address item
+  EXPECT_EQ(0x00, ts->tx_buffer[32]);
+  EXPECT_EQ(0x00, ts->tx_buffer[33]);
+  EXPECT_EQ(0x00, ts->tx_buffer[34]);
+  EXPECT_EQ(0x00, ts->tx_buffer[35]);
+  // UCMM data type
+  EXPECT_EQ(0xB2, ts->tx_buffer[36]);
+  EXPECT_EQ(0x00, ts->tx_buffer[37]);
+  // length
+  EXPECT_EQ(0x16, ts->tx_buffer[38]);
+  EXPECT_EQ(0x00, ts->tx_buffer[39]);
+  // service code
+  EXPECT_EQ(0x4E, ts->tx_buffer[40]);
+  // path length and path
+  EXPECT_EQ(0x02, ts->tx_buffer[41]);
+  EXPECT_EQ(0x20, ts->tx_buffer[42]);
+  EXPECT_EQ(0x06, ts->tx_buffer[43]);
+  EXPECT_EQ(0x24, ts->tx_buffer[44]);
+  EXPECT_EQ(0x01, ts->tx_buffer[45]);
+  // actual data
+  EXPECT_EQ(0x06, ts->tx_buffer[46]);
+  EXPECT_EQ(0x50, ts->tx_buffer[47]);
+  EXPECT_EQ(0x89, ts->tx_buffer[48]);
+  EXPECT_EQ(0x67, ts->tx_buffer[49]);
+  EXPECT_EQ(0x95, ts->tx_buffer[50]);
+  EXPECT_EQ(0x01, ts->tx_buffer[51]);
+  EXPECT_EQ(0x21, ts->tx_buffer[52]);
+  EXPECT_EQ(0x43, ts->tx_buffer[53]);
+  EXPECT_EQ(0x00, ts->tx_buffer[54]);
+  EXPECT_EQ(0x00, ts->tx_buffer[55]);
+  EXPECT_EQ(0x02, ts->tx_buffer[56]);
+  EXPECT_EQ(0x00, ts->tx_buffer[57]);
+  EXPECT_EQ(0x20, ts->tx_buffer[58]);
+  EXPECT_EQ(0x02, ts->tx_buffer[59]);
+  EXPECT_EQ(0x24, ts->tx_buffer[60]);
+  EXPECT_EQ(0x01, ts->tx_buffer[61]);
+
+  ASSERT_EQ(0, session.connections_.size());
 }
 
 } // namespace eip

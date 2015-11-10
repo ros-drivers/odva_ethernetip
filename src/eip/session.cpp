@@ -119,6 +119,7 @@ void Session::open(string hostname, string port)
 
 void Session::close()
 {
+  // TODO: should close all connections and the IO port
   cout << "Closing session" << endl;
   
   // create the unregister session message
@@ -263,7 +264,7 @@ RRDataResponse Session::sendRRDataCommand(EIP_USINT service, const Path& path,
   return resp_data;
 }
 
-void Session::createConnection(const EIP_CONNECTION_INFO_T& o_to_t, 
+int Session::createConnection(const EIP_CONNECTION_INFO_T& o_to_t, 
   const EIP_CONNECTION_INFO_T& t_to_o)
 {
   Connection conn(o_to_t, t_to_o);
@@ -284,6 +285,23 @@ void Session::createConnection(const EIP_CONNECTION_INFO_T& o_to_t,
   }
 
   connections_.push_back(conn);
+  return connections_.size() - 1;
 }
+
+void Session::closeConnection(size_t n)
+{
+  shared_ptr<ForwardCloseRequest> req = connections_[n].createForwardCloseRequest();
+  RRDataResponse resp_data = sendRRDataCommand(0x4E, Path(0x06, 1), req);
+  ForwardCloseSuccess result;
+  resp_data.getResponseDataAs(result);
+  if (!connections_[n].verifyForwardCloseResult(result))
+  {
+    cerr << "Received invalid response to forward close request" << endl;
+    throw std::logic_error("Forward Close Response Invalid");
+  }
+  // remove the connection from the list
+  connections_.erase(connections_.begin() + n);
+}
+
 
 } // namespace eip

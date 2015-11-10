@@ -80,7 +80,10 @@ shared_ptr<ForwardCloseRequest> Connection::createForwardCloseRequest()
 
   req->timeout_tick_size = timeout_tick_size;
   req->timeout_ticks = timeout_ticks;
-  req->getPath() = path_;
+
+  // path is actually to the connection manager, not the path of the assemblies
+  // don't really understand why, but the example from Omron does this
+  req->getPath() = Path(0x02, 0x01);
   return req;
 }
 
@@ -113,6 +116,10 @@ bool Connection::verifyForwardOpenResult(const ForwardOpenSuccess& result)
 
 bool Connection::verifyForwardCloseResult(const ForwardCloseSuccess& result)
 {
+  // printf("Comparing Forward Close Result: Expected vs Actual\n");
+  // printf("Vendor ID: 0x%08X vs 0x%08X\n", originator_vendor_id, result.originator_vendor_id);
+  // printf("Origin SN: 0x%08X vs 0x%08X\n", originator_sn, result.originator_sn);
+  printf("Connection SN: 0x%08X vs 0x%08X\n", connection_sn, result.connection_sn);
   return (result.connection_sn == connection_sn
     && result.originator_vendor_id == originator_vendor_id
     && result.originator_sn == originator_sn);
