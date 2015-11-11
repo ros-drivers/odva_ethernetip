@@ -39,6 +39,12 @@ public:
   EIP_UINT reflectivity_report_format;
   EIP_BYTE beam_selection_mask[88];
 
+  MeasurementReportConfig() : sequence_num(1), trigger(3),
+    range_report_format(1), reflectivity_report_format(2)
+  {
+    memset(beam_selection_mask, 0, sizeof(beam_selection_mask));
+  }
+
   /**
    * From OS32C-DM Ethernet/IP addendum, header is always 56 bytes
    */

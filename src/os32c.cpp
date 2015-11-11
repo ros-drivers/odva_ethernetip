@@ -45,22 +45,26 @@ const double OS32C::DISTANCE_MAX;
 
 EIP_UINT OS32C::getRangeFormat()
 {
-  return getSingleAttribute(0x73, 1, 4, (EIP_UINT)0);
+  mrc_.range_report_format = getSingleAttribute(0x73, 1, 4, (EIP_UINT)0);
+  return mrc_.range_report_format;
 }
 
 void OS32C::setRangeFormat(EIP_UINT format)
 {
   setSingleAttribute(0x73, 1, 4, format);
+  mrc_.range_report_format = format;
 }
 
 EIP_UINT OS32C::getReflectivityFormat()
 {
-  return getSingleAttribute(0x73, 1, 5, (EIP_UINT)0);
+  mrc_.reflectivity_report_format = getSingleAttribute(0x73, 1, 5, (EIP_UINT)0);
+  return mrc_.reflectivity_report_format;
 }
 
 void OS32C::setReflectivityFormat(EIP_UINT format)
 {
   setSingleAttribute(0x73, 1, 5, format);
+  mrc_.reflectivity_report_format = format;
 }
 
 void OS32C::calcBeamMask(double start_angle, double end_angle, EIP_BYTE mask[])
@@ -118,9 +122,9 @@ void OS32C::calcBeamMask(double start_angle, double end_angle, EIP_BYTE mask[])
 
 void OS32C::selectBeams(double start_angle, double end_angle)
 {
-  EIP_BYTE beams[88];
-  calcBeamMask(start_angle, end_angle, beams);
-  shared_ptr<SerializableBuffer> sb = make_shared<SerializableBuffer>(buffer(beams));
+  calcBeamMask(start_angle, end_angle, mrc_.beam_selection_mask);
+  shared_ptr<SerializableBuffer> sb = make_shared<SerializableBuffer>(
+    buffer(mrc_.beam_selection_mask));
   setSingleAttributeSerializable(0x73, 1, 12, sb);
 }
 
@@ -209,6 +213,19 @@ MeasurementReport OS32C::receiveMeasurementReportUDP()
   SequencedDataItem<MeasurementReport> data;
   pkt.getItems()[1].getDataAs(data);
   return data;
+}
+
+void OS32C::startUDPIO()
+{
+  EIP_CONNECTION_INFO_T o_to_t, t_to_o;
+  o_to_t.assembly_id = 0x71;
+  o_to_t.buffer_size = 0x006E;
+  o_to_t.rpi = 0x00177FA0;
+  t_to_o.assembly_id = 0x66;
+  t_to_o.buffer_size = 0x0584;
+  t_to_o.rpi = 0x00013070;
+
+  connection_num_ = createConnection(o_to_t, t_to_o);
 }
 
 } // namespace os32c

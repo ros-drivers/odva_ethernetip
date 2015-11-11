@@ -67,7 +67,8 @@ public:
    */
   OS32C(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket) 
     : Session(socket, io_socket), frame_id_("OS32C"),
-      start_angle_(ANGLE_MAX), end_angle_(ANGLE_MIN), connection_num_(-1) { }
+      start_angle_(ANGLE_MAX), end_angle_(ANGLE_MIN),
+      connection_num_(-1), mrc_sequence_num_(1) { }
 
   static const double ANGLE_MIN = DEG2RAD(-135.2);
   static const double ANGLE_MAX = DEG2RAD( 135.2);
@@ -179,6 +180,8 @@ public:
   void sendMeasurmentReportConfigUDP();
 
   MeasurementReport receiveMeasurementReportUDP();
+
+  void startUDPIO();
 
 private:
   // allow unit tests to access the helpers below for direct testing
