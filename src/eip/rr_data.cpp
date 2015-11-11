@@ -40,9 +40,13 @@ Reader& RRData::deserialize(Reader& reader)
   pkt.deserialize(reader);
 
   // check that CPF items are correct
-  if (pkt.getItemCount() != 2)
+  if (pkt.getItemCount() < 2)
   {
-    throw std::logic_error("Unexpected number of items in RR Data");
+    throw std::logic_error("Not enough items in RR Data");
+  }
+  if (pkt.getItemCount() > 2)
+  {
+    std::cout << "Warning: more than 2 items in RR data response" << std::endl;
   }
   if (pkt.getItems().at(0).getItemType() != EIP_ITEM_NULL)
   {

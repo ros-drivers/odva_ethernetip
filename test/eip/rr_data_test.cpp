@@ -134,7 +134,7 @@ TEST_F(RRDataTest, test_deserialize_too_few_items)
   BufferReader reader(buffer(d));
   ASSERT_THROW(data.deserialize(reader), std::logic_error);
 }
-
+/*
 TEST_F(RRDataTest, test_deserialize_too_many_items)
 {
   EIP_BYTE d[] = {
@@ -161,7 +161,7 @@ TEST_F(RRDataTest, test_deserialize_too_many_items)
   BufferReader reader(buffer(d));
   ASSERT_THROW(data.deserialize(reader), std::logic_error);
 }
-
+*/
 TEST_F(RRDataTest, test_deserialize_wrong_address_type)
 {
   EIP_BYTE d[] = {
