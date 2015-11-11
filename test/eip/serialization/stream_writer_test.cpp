@@ -18,7 +18,6 @@ express permission of Clearpath Robotics.
 
 #include "eip/serialization/stream_writer.h"
 
-using boost::make_shared;
 using namespace boost::asio;
 using namespace boost::iostreams;
 using namespace eip::serialization;
@@ -31,9 +30,9 @@ class StreamWriterTest : public :: testing :: Test
 TEST_F(StreamWriterTest, test_write_int)
 {
   unsigned char d[8];
-  basic_array_sink<char> sr((char*)d, sizeof(d));  
-  shared_ptr<std::ostream> osp = make_shared< stream< basic_array_sink<char> > > (sr);
-  shared_ptr<Writer> writer = make_shared<StreamWriter> (osp);
+  basic_array_sink<char> sr((char*)d, sizeof(d));
+  shared_ptr<std::ostream> osp(boost::make_shared< stream< basic_array_sink<char> > > (sr));
+  boost::shared_ptr<Writer> writer(boost::make_shared<StreamWriter> (osp));
 
   EIP_UDINT value = 0x123455AA;
   writer->write(value);
@@ -55,7 +54,7 @@ TEST_F(StreamWriterTest, test_write_int)
 TEST_F(StreamWriterTest, test_write_int_short_buffer)
 {
   unsigned char d[7];
-  basic_array_sink<char> sr((char*)d, sizeof(d));  
+  basic_array_sink<char> sr((char*)d, sizeof(d));
   shared_ptr<std::ostream> osp = make_shared< stream< basic_array_sink<char> > > (sr);
   shared_ptr<Writer> writer = make_shared<StreamWriter> (osp);
 
@@ -71,9 +70,9 @@ TEST_F(StreamWriterTest, test_write_bytes)
   unsigned char d[8];
   unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
 
-  basic_array_sink<char> sr((char*)d, sizeof(d));  
-  shared_ptr<std::ostream> osp = make_shared< stream< basic_array_sink<char> > > (sr);
-  shared_ptr<Writer> writer = make_shared<StreamWriter> (osp);
+  basic_array_sink<char> sr((char*)d, sizeof(d));
+  boost::shared_ptr<std::ostream> osp = boost::make_shared< stream< basic_array_sink<char> > > (sr);
+  boost::shared_ptr<Writer> writer(boost::make_shared<StreamWriter> (osp));
 
   writer->writeBytes(input, sizeof(input));
   EXPECT_EQ(8, writer->getByteCount());
@@ -102,9 +101,9 @@ TEST_F(StreamWriterTest, test_write_buffer)
   unsigned char d[8];
   unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
 
-  basic_array_sink<char> sr((char*)d, sizeof(d));  
-  shared_ptr<std::ostream> osp = make_shared< stream< basic_array_sink<char> > > (sr);
-  shared_ptr<Writer> writer = make_shared<StreamWriter> (osp);
+  basic_array_sink<char> sr((char*)d, sizeof(d));
+  boost::shared_ptr<std::ostream> osp(boost::make_shared< stream< basic_array_sink<char> > > (sr));
+  boost::shared_ptr<Writer> writer(boost::make_shared<StreamWriter> (osp));
 
   writer->writeBuffer(buffer(input));
   EXPECT_EQ(8, writer->getByteCount());

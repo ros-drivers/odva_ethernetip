@@ -35,8 +35,8 @@ TEST_F(StreamReaderTest, test_read_int)
   unsigned char d[] = { 0xAA, 0x55, 0x34, 0x12, 0xEF, 0xBE, 0xAD, 0xDE };
 
   basic_array_source<char> sr((const char*)d, sizeof(d));
-  shared_ptr<std::istream> isp = make_shared< stream< basic_array_source<char> > > (sr);
-  shared_ptr<Reader> reader = make_shared<StreamReader> (isp);
+  shared_ptr<std::istream> isp(boost::make_shared< stream< basic_array_source<char> > > (sr));
+  shared_ptr<Reader> reader(boost::make_shared<StreamReader> (isp));
 
   EIP_UDINT value;
   reader->read(value);
@@ -66,8 +66,8 @@ TEST_F(StreamReaderTest, test_read_bytes)
   unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
 
   basic_array_source<char> sr((const char*)input, sizeof(input));
-  shared_ptr<std::istream> isp = make_shared< stream< basic_array_source<char> > > (sr);
-  shared_ptr<Reader> reader = make_shared<StreamReader> (isp);
+  boost::shared_ptr<std::istream> isp(boost::make_shared< stream< basic_array_source<char> > > (sr));
+  boost::shared_ptr<Reader> reader(boost::make_shared<StreamReader> (isp));
 
   reader->readBytes(d, sizeof(d));
   EXPECT_EQ(8, reader->getByteCount());
@@ -98,8 +98,8 @@ TEST_F(StreamReaderTest, test_read_buffer)
   unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
 
   basic_array_source<char> sr((const char*)input, sizeof(input));
-  shared_ptr<std::istream> isp = make_shared< stream< basic_array_source<char> > > (sr);
-  shared_ptr<Reader> reader = make_shared<StreamReader> (isp);
+  boost::shared_ptr<std::istream> isp(boost::make_shared< stream< basic_array_source<char> > > (sr));
+  boost::shared_ptr<Reader> reader(boost::make_shared<StreamReader> (isp));
 
   reader->readBuffer(buffer(d));
   EXPECT_EQ(8, reader->getByteCount());
@@ -130,8 +130,8 @@ TEST_F(StreamReaderTest, test_read_skip)
   unsigned char input[] = { 0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0x12, 0x34 };
 
   basic_array_source<char> sr((const char*)input, sizeof(input));
-  shared_ptr<std::istream> isp = make_shared< stream< basic_array_source<char> > > (sr);
-  shared_ptr<Reader> reader = make_shared<StreamReader> (isp);
+  boost::shared_ptr<std::istream> isp(boost::make_shared< stream< basic_array_source<char> > > (sr));
+  boost::shared_ptr<Reader> reader(boost::make_shared<StreamReader> (isp));
 
   reader->readBuffer(buffer(d,2));
   reader->skip(4);
@@ -142,4 +142,3 @@ TEST_F(StreamReaderTest, test_read_skip)
   EXPECT_EQ(0x12, d[2]);
   EXPECT_EQ(0x34, d[3]);
 }
-
