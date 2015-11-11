@@ -322,5 +322,11 @@ CPFPacket Session::receiveIOPacket()
   return result;
 }
 
+void Session::sendIOPacket(CPFPacket& pkt)
+{
+  cout << "Sending CPF Packet on IO Socket" << endl;
+  io_socket_->send(pkt);
+}
+
 
 } // namespace eip

@@ -20,6 +20,8 @@ express permission of Clearpath Robotics.
 
 #include "eip/session.h"
 #include "eip/socket/socket.h"
+#include "os32c/measurement_report.h"
+#include "os32c/measurement_report_config.h"
 #include "os32c/range_and_reflectance_measurement.h"
 
 using std::vector;
@@ -65,7 +67,7 @@ public:
    */
   OS32C(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket) 
     : Session(socket, io_socket), frame_id_("OS32C"),
-      start_angle_(ANGLE_MAX), end_angle_(ANGLE_MIN) { }
+      start_angle_(ANGLE_MAX), end_angle_(ANGLE_MIN), connection_num_(-1) { }
 
   static const double ANGLE_MIN = DEG2RAD(-135.2);
   static const double ANGLE_MAX = DEG2RAD( 135.2);
@@ -174,6 +176,10 @@ public:
    */
   LaserScan convertToLaserScan(const RangeAndReflectanceMeasurement& rr);
 
+  void sendMeasurmentReportConfigUDP();
+
+  MeasurementReport receiveMeasurementReportUDP();
+
 private:
   // allow unit tests to access the helpers below for direct testing
   FRIEND_TEST(OS32CTest, test_calc_beam_mask_all);
@@ -185,6 +191,11 @@ private:
   double start_angle_;
   double end_angle_;
   string frame_id_;
+
+  // data for sending to lidar to keep UDP session alive
+  int connection_num_;
+  MeasurementReportConfig mrc_;
+  EIP_UDINT mrc_sequence_num_;
 
   /**
    * Helper to calculate the mask for a given start and end beam angle

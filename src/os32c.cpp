@@ -16,6 +16,10 @@ express permission of Clearpath Robotics.
 
 #include "os32c/os32c.h"
 #include "eip/serialization/serializable_buffer.h"
+#include "eip/cpf_packet.h"
+#include "eip/cpf_item.h"
+#include "eip/sequenced_address_item.h"
+#include "eip/sequenced_data_item.h"
 
 using std::cout;
 using std::endl;
@@ -25,6 +29,10 @@ using boost::asio::buffer;
 using eip::Session;
 using eip::serialization::SerializableBuffer;
 using eip::RRDataResponse;
+using eip::CPFItem;
+using eip::CPFPacket;
+using eip::SequencedAddressItem;
+using eip::SequencedDataItem;
 using os32c::RangeAndReflectanceMeasurement;
 
 namespace os32c {
@@ -170,6 +178,37 @@ LaserScan OS32C::convertToLaserScan(const RangeAndReflectanceMeasurement& rr)
     ls.intensities[i] = rr.reflectance_data[i];
   }
   return ls;
+}
+
+void OS32C::sendMeasurmentReportConfigUDP()
+{
+  // TODO: check that connection is valid
+  CPFPacket pkt;
+  shared_ptr<SequencedAddressItem> address =
+    make_shared<SequencedAddressItem>(
+      getConnection(connection_num_).o_to_t_connection_id, mrc_sequence_num_++);
+  shared_ptr<MeasurementReportConfig> data = make_shared<MeasurementReportConfig>();
+  *data = mrc_;
+  pkt.getItems().push_back(CPFItem(0x8002, address));
+  pkt.getItems().push_back(CPFItem(0x00B1, data));
+  sendIOPacket(pkt);
+}
+
+MeasurementReport OS32C::receiveMeasurementReportUDP()
+{
+  CPFPacket pkt = receiveIOPacket();
+  if (pkt.getItemCount() != 2)
+  {
+    throw std::logic_error("IO Packet received with wrong number of items");
+  }
+  if (pkt.getItems()[1].getItemType() != 0x00B1)
+  {
+    throw std::logic_error("IO Packet received with wrong data type");
+  }
+
+  SequencedDataItem<MeasurementReport> data;
+  pkt.getItems()[1].getDataAs(data);
+  return data;
 }
 
 } // namespace os32c

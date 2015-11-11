@@ -427,4 +427,69 @@ TEST_F(OS32CTest, test_convert_to_laserscan)
   EXPECT_FLOAT_EQ(0, ls.intensities[9]);
 }
 
+
+TEST_F(OS32CTest, test_receive_measurement_report)
+{
+  char io_packet[] = {
+    0x02, 0x00, 0x02, 0x80, 0x08, 0x00, 0x04, 0x00,
+    0x02, 0x00, 0x15, 0x00, 0x00, 0x00, 0xB1, 0x00,
+    0x62, 0x00, 0xA1, 0x00, 0x76, 0x53, 0x04, 0x00,
+    0x64, 0x96, 0x00, 0x00, 0x18, 0xBE, 0x97, 0x8A,
+    0x19, 0xA7, 0x00, 0x00, 0x03, 0x00, 0x07, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
+    0x00, 0x00, 0x08, 0x07, 0x88, 0x33, 0xAE, 0x31,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x02, 0x00,
+    0x00, 0x00, 0x14, 0x00, 0x52, 0x08, 0x42, 0x08,
+    0x52, 0x08, 0x40, 0x08, 0x52, 0x08, 0x40, 0x08,
+    0x53, 0x08, 0x58, 0x08, 0x52, 0x08, 0x40, 0x08,
+    0x58, 0x08, 0x58, 0x08, 0x58, 0x08, 0x5E, 0x08,
+    0x67, 0x08, 0x5D, 0x08, 0x67, 0x08, 0x5E, 0x08,
+    0x5E, 0x08, 0x6F, 0x08,
+  };
+
+  ts_io->rx_buffer = buffer(io_packet);
+  MeasurementReport data = os32c.receiveMeasurementReportUDP();
+  EXPECT_EQ(0x0060, data.getLength());
+  EXPECT_EQ(0x00045376, data.header.scan_count);
+  EXPECT_EQ(0x00009664, data.header.scan_rate);
+  EXPECT_EQ(0x8a97BE18, data.header.scan_timestamp);
+  EXPECT_EQ(0x0000A719, data.header.scan_beam_period);
+  EXPECT_EQ(3, data.header.machine_state);
+  EXPECT_EQ(7, data.header.machine_stop_reasons);
+  EXPECT_EQ(0, data.header.active_zone_set);
+  EXPECT_EQ(0, data.header.zone_inputs);
+  EXPECT_EQ(0, data.header.detection_zone_status);
+  EXPECT_EQ(1, data.header.output_status);
+  EXPECT_EQ(0, data.header.input_status);
+  EXPECT_EQ(0x0708, data.header.display_status);
+  EXPECT_EQ(0x3388, data.header.non_safety_config_checksum);
+  EXPECT_EQ(0x31AE, data.header.safety_config_checksum);
+  EXPECT_EQ(1, data.header.range_report_format);
+  EXPECT_EQ(2, data.header.refletivity_report_format);
+  EXPECT_EQ(20, data.header.num_beams);
+  ASSERT_EQ(20, data.measurement_data.size());
+  EXPECT_EQ(0x0852, data.measurement_data[0]);
+  EXPECT_EQ(0x0842, data.measurement_data[1]);
+  EXPECT_EQ(0x0852, data.measurement_data[2]);
+  EXPECT_EQ(0x0840, data.measurement_data[3]);
+  EXPECT_EQ(0x0852, data.measurement_data[4]);
+  EXPECT_EQ(0x0840, data.measurement_data[5]);
+  EXPECT_EQ(0x0853, data.measurement_data[6]);
+  EXPECT_EQ(0x0858, data.measurement_data[7]);
+  EXPECT_EQ(0x0852, data.measurement_data[8]);
+  EXPECT_EQ(0x0840, data.measurement_data[9]);
+  EXPECT_EQ(0x0858, data.measurement_data[10]);
+  EXPECT_EQ(0x0858, data.measurement_data[11]);
+  EXPECT_EQ(0x0858, data.measurement_data[12]);
+  EXPECT_EQ(0x085E, data.measurement_data[13]);
+  EXPECT_EQ(0x0867, data.measurement_data[14]);
+  EXPECT_EQ(0x085D, data.measurement_data[15]);
+  EXPECT_EQ(0x0867, data.measurement_data[16]);
+  EXPECT_EQ(0x085E, data.measurement_data[17]);
+  EXPECT_EQ(0x085E, data.measurement_data[18]);
+  EXPECT_EQ(0x086F, data.measurement_data[19]);
+}
+
+
 } // namespace os32c

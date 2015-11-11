@@ -185,6 +185,12 @@ public:
    */
   CPFPacket receiveIOPacket();
 
+  /**
+   * Send an IO packet. Yet another hack. Should really keep track of sequence
+   * numbers and things inside of the session, but again no time for that.
+   */
+  void sendIOPacket(CPFPacket& pkt);
+
 private:
   FRIEND_TEST(SessionTest, test_create_connection);
 
