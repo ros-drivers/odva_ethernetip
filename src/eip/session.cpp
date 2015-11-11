@@ -12,6 +12,8 @@ express permission of Clearpath Robotics.
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
 
 #include "eip/serialization/buffer_reader.h"
 #include "eip/serialization/buffer_writer.h"
@@ -32,6 +34,21 @@ namespace eip {
 
 using serialization::BufferReader;
 using serialization::BufferWriter;
+
+Session::Session(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket,
+    EIP_UINT vendor_id, EIP_UDINT serial_num)
+    : socket_(socket), io_socket_(io_socket), session_id_(0), 
+      my_vendor_id_(vendor_id), my_serial_num_(serial_num)
+{
+  // generate pseudo-random connection ID and connection SN starting points
+  boost::random::mt19937 gen;
+  gen.seed(std::time(0));
+  boost::random::uniform_int_distribution<> dist(0, 0xFFFF);
+  next_connection_id_ = gen();
+  next_connection_sn_ = dist(gen);
+  cout << "Generated starting connection ID " << next_connection_id_
+    << " and SN " << next_connection_sn_ << endl;;
+}
 
 Session::~Session()
 {

@@ -56,9 +56,7 @@ public:
    * @param serial_num My serial number to use when setting up connections
    */
   Session(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket,
-    EIP_UINT vendor_id = DEFAULT_VENDOR_ID, EIP_UDINT serial_num = DEFAULT_SERIAL_NUM)
-    : socket_(socket), io_socket_(io_socket), session_id_(0), 
-      my_vendor_id_(vendor_id), my_serial_num_(serial_num) { }
+    EIP_UINT vendor_id = DEFAULT_VENDOR_ID, EIP_UDINT serial_num = DEFAULT_SERIAL_NUM);
 
   virtual ~Session();
 
