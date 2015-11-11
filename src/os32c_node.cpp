@@ -14,6 +14,7 @@ express permission of Clearpath Robotics.
 #include <sensor_msgs/LaserScan.h>
 
 #include "eip/socket/tcp_socket.h"
+#include "eip/socket/udp_socket.h"
 #include "os32c/os32c.h"
 #include "os32c/range_and_reflectance_measurement.h"
 
@@ -22,6 +23,7 @@ using std::endl;
 using boost::shared_ptr;
 using sensor_msgs::LaserScan;
 using eip::socket::TCPSocket;
+using eip::socket::UDPSocket;
 using namespace os32c;
 
 int main(int argc, char *argv[])
@@ -42,8 +44,7 @@ int main(int argc, char *argv[])
 
   boost::asio::io_service io_service;
   shared_ptr<TCPSocket> socket = shared_ptr<TCPSocket>(new TCPSocket(io_service));
-  // TODO: this should be a UDP socket directed at the hostname
-  shared_ptr<TCPSocket> io_socket = shared_ptr<TCPSocket>(new TCPSocket(io_service));
+  shared_ptr<UDPSocket> io_socket = shared_ptr<UDPSocket>(new UDPSocket(io_service));
   OS32C os32c(socket, io_socket);
 
   try
@@ -68,13 +69,29 @@ int main(int argc, char *argv[])
     return -1;
   }
 
+  try
+  {
+    os32c.startUDPIO();
+  }
+  catch (std::logic_error ex)
+  {
+    cout << "Could not start UDP IO: " << ex.what() << endl;
+    return -1;
+  }
+
+  int ctr = 10;
   while (ros::ok())
   {
     try
     {
-      RangeAndReflectanceMeasurement rr = os32c.getSingleRRScan();
-      LaserScan ls = os32c.convertToLaserScan(rr);
+      MeasurementReport mr = os32c.receiveMeasurementReportUDP();
+      LaserScan ls = os32c.convertToLaserScan(mr);
       laserscan_pub.publish(ls);
+      if (++ctr > 10)
+      {
+        os32c.sendMeasurmentReportConfigUDP();
+        ctr = 0;
+      }
     }
     catch (std::runtime_error ex)
     {
@@ -86,6 +103,7 @@ int main(int argc, char *argv[])
     }
   }
 
+  os32c.closeConnection(0);
   os32c.close();
   return 0;
 }

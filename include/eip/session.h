@@ -68,7 +68,7 @@ public:
    * @param port port to use if other than the standard
    * @throw std::runtime_error on problem opening the connection
    */
-  void open(string hostname, string port = "44818");
+  void open(string hostname, string port = "44818", string io_port = "2222");
 
   /**
    * Close the session by unregistering the session and then closing the port

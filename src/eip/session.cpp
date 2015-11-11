@@ -48,10 +48,11 @@ Session::~Session()
   }
 }
 
-void Session::open(string hostname, string port)
+void Session::open(string hostname, string port, string io_port)
 {
   cout << "Resolving hostname and connecting socket" << endl;
   socket_->open(hostname, port);
+  io_socket_->open(hostname, io_port);
 
   // create the registration message
   cout << "Creating and sending the registration message" << endl;
@@ -67,12 +68,14 @@ void Session::open(string hostname, string port)
   catch (std::length_error ex)
   {
     socket_->close();
+    io_socket_->close();
     cerr << "Could not parse response when registering session: " << ex.what() << endl;
     throw std::runtime_error("Invalid response received registering session");
   }
   catch (std::logic_error ex)
   {
     socket_->close();
+    io_socket_->close();
     cerr << "Error in registration response: " << ex.what() << endl;
     throw std::runtime_error("Error in registration response");
   }
@@ -105,6 +108,7 @@ void Session::open(string hostname, string port)
       "Expected " << EIP_PROTOCOL_VERSION << " got "
       << reg_data->protocol_version << endl;
     socket_->close();
+    io_socket_->close();
     throw std::runtime_error("Received wrong Ethernet IP Protocol Version on registration");
   }
   if (response_valid && reg_data->options != 0)
@@ -129,6 +133,7 @@ void Session::close()
   cout << "Session closed" << endl;
 
   socket_->close();
+  io_socket_->close();
   session_id_ = 0;
 }
 
