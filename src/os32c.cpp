@@ -184,6 +184,52 @@ LaserScan OS32C::convertToLaserScan(const RangeAndReflectanceMeasurement& rr)
   return ls;
 }
 
+LaserScan OS32C::convertToLaserScan(const MeasurementReport& mr)
+{
+  if (mr.measurement_data.size() != mr.header.num_beams)
+  {
+    throw std::invalid_argument("Number of beams does not match vector size");
+  }
+
+  LaserScan ls;
+  ls.header.seq = mr.header.scan_count;
+  ls.header.frame_id = frame_id_;
+  // TODO: figure out time stamp conversion
+  // ls.header.stamp = mr.header.scan_timestamp;
+  // TODO: seq number?
+  ls.angle_min = start_angle_;
+  ls.angle_max = end_angle_;
+  ls.angle_increment = ANGLE_INC;
+  // beam period is in ns
+  ls.time_increment = mr.header.scan_beam_period / 1000000000.0;
+  // scan rate (more correctly, scan period) is in us
+  ls.scan_time = mr.header.scan_rate / 1000000.0;
+  ls.range_min = DISTANCE_MIN;
+  ls.range_max = DISTANCE_MAX;
+
+  // TODO: this currently makes assumptions of the report format. Should likely
+  // accomodate all of them, or at least anything reasonable.
+  ls.ranges.resize(mr.header.num_beams);
+  for (int i = 0; i < mr.header.num_beams; ++i)
+  {
+    if (mr.measurement_data[i] == 0x0001)
+    {
+      // noisy beam detected
+      ls.ranges[i] = 0;
+    }
+    else if (mr.measurement_data[i] == 0xFFFF)
+    {
+      // no return
+      ls.ranges[i] = DISTANCE_MAX;
+    }
+    else
+    {
+      ls.ranges[i] = mr.measurement_data[i] / 1000.0;
+    }
+  }
+  return ls;
+}
+
 void OS32C::sendMeasurmentReportConfigUDP()
 {
   // TODO: check that connection is valid

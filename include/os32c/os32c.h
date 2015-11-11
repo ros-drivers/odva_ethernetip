@@ -177,6 +177,13 @@ public:
    */
   LaserScan convertToLaserScan(const RangeAndReflectanceMeasurement& rr);
 
+  /**
+   * Helper to convert a Measurement Report to a ROS LaserScan
+   * @param mr Measurement to convert
+   * @return ROS LaserScan
+   */
+  LaserScan convertToLaserScan(const MeasurementReport& mr);
+
   void sendMeasurmentReportConfigUDP();
 
   MeasurementReport receiveMeasurementReportUDP();
