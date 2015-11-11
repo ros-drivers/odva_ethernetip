@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
   boost::asio::io_service io_service;
   shared_ptr<TCPSocket> socket = shared_ptr<TCPSocket>(new TCPSocket(io_service));
-  shared_ptr<UDPSocket> io_socket = shared_ptr<UDPSocket>(new UDPSocket(io_service));
+  shared_ptr<UDPSocket> io_socket = shared_ptr<UDPSocket>(new UDPSocket(io_service, 2222));
   OS32C os32c(socket, io_socket);
 
   try
@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
   try
   {
     os32c.startUDPIO();
+    os32c.sendMeasurmentReportConfigUDP();
   }
   catch (std::logic_error ex)
   {

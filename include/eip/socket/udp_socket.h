@@ -32,7 +32,8 @@ class UDPSocket : public Socket
 {
 public:
 
-  UDPSocket(io_service& io_serv) : socket_(io_serv) { }
+  UDPSocket(io_service& io_serv, unsigned short local_port)
+    : socket_(io_serv), local_endpoint_(udp::v4(), local_port) { }
 
   /**
    * Open the socket to connect to the given hostname and port
@@ -43,8 +44,9 @@ public:
   {
     udp::resolver resolver(socket_.get_io_service());
     udp::resolver::query query(udp::v4(), hostname, port);
-    endpoint_ = *resolver.resolve(query);
+    remote_endpoint_ = *resolver.resolve(query);
     socket_.open(udp::v4());
+    socket_.bind(local_endpoint_);
   }
 
   /**
@@ -62,7 +64,7 @@ public:
    */
   virtual size_t send(const_buffer buf)
   {
-    return socket_.send_to(const_buffers_1(buf), endpoint_);
+    return socket_.send_to(const_buffers_1(buf), remote_endpoint_);
   }
 
   /**
@@ -79,7 +81,8 @@ public:
 
 private:
   udp::socket socket_;
-  udp::endpoint endpoint_;
+  udp::endpoint local_endpoint_;
+  udp::endpoint remote_endpoint_;
 };
 
 } // namespace socket
