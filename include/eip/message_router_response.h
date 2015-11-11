@@ -75,7 +75,7 @@ public:
    */
   virtual Writer& serialize(Writer& writer) const
   {
-    std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented");
   }
 
   /**
@@ -88,7 +88,7 @@ public:
    */
   virtual Reader& deserialize(Reader& reader)
   {
-    std::logic_error("Must have size to deserialize");
+    throw std::logic_error("Must have size to deserialize");
   }
 
 private:
@@ -99,7 +99,7 @@ private:
    * Helper to read data fields. Simply produces SerializableBuffers
    * of the given length, or a null pointer if length <= 0.
    * @param reader Reader to use to read buffer data
-   * @param length Length in bytes to read. If less than or equal to zero, then 
+   * @param length Length in bytes to read. If less than or equal to zero, then
    *   null pointer is returned.
    * @return shared_ptr to a SerializableBuffer with the data read
    */

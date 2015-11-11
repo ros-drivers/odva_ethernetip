@@ -79,6 +79,7 @@ public:
       throw std::length_error("Invalid length given for encapsulation packet header");
     }
     deserialize(reader);
+    return reader;
   }
 
   /**

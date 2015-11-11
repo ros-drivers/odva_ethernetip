@@ -97,6 +97,7 @@ public:
     if (data_) {
       data_->serialize(writer);
     }
+    return writer;
   }
 
   /**
@@ -104,7 +105,7 @@ public:
    */
   virtual Reader& deserialize(Reader& reader, size_t length)
   {
-    std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented");
   }
 
   /**
@@ -112,7 +113,7 @@ public:
    */
   virtual Reader& deserialize(Reader& reader)
   {
-    std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented");
   }
 
 private:

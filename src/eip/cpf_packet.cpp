@@ -50,6 +50,7 @@ Reader& CPFPacket::deserialize(Reader& reader)
     item.deserialize(reader);
     items_.push_back(item);
   }
+  return reader;
 }
 
 } // namespace eip

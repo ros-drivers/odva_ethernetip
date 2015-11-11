@@ -37,11 +37,11 @@ using os32c::RangeAndReflectanceMeasurement;
 
 namespace os32c {
 
-const double OS32C::ANGLE_MIN;
-const double OS32C::ANGLE_MAX;
-const double OS32C::ANGLE_INC;
-const double OS32C::DISTANCE_MIN;
-const double OS32C::DISTANCE_MAX;
+const double OS32C::ANGLE_MIN = DEG2RAD(-135.2);
+const double OS32C::ANGLE_MAX = DEG2RAD( 135.2);
+const double OS32C::ANGLE_INC = DEG2RAD(0.4);
+const double OS32C::DISTANCE_MIN = 0.002;
+const double OS32C::DISTANCE_MAX = 50;
 
 EIP_UINT OS32C::getRangeFormat()
 {
@@ -114,7 +114,7 @@ void OS32C::calcBeamMask(double start_angle, double end_angle, EIP_BYTE mask[])
   memset(mask + start_byte + 1, 0xFF, end_byte - start_byte - 1);
 
   // clear out the bits above the end beam
-  mask[end_byte] = (1 << end_bit + 1) - 1;
+  mask[end_byte] = (1 << (end_bit + 1)) - 1;
 
   // zero out everything after the end
   memset(mask + end_byte + 1, 0, 87 - end_byte);

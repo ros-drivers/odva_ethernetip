@@ -89,6 +89,7 @@ public:
   virtual Writer& serialize(Writer& writer) const
   {
     writer.writeBuffer(data_);
+    return writer;
   }
 
   /**
@@ -97,7 +98,7 @@ public:
    * @param reader Reader to use for deserialization
    * @param length Length expected for data
    * @return the reader again
-   * @throw std::length_error if the given length is greater than allocated 
+   * @throw std::length_error if the given length is greater than allocated
    *   data buffer
    */
   virtual Reader& deserialize(Reader& reader, size_t length)
@@ -120,6 +121,7 @@ public:
       }
       reader.readBuffer(data_);
     }
+    return reader;
   }
 
   /**
@@ -132,6 +134,7 @@ public:
   virtual Reader& deserialize(Reader& reader)
   {
     reader.readBuffer(data_);
+    return reader;
   }
 
   void operator=(mutable_buffer b)

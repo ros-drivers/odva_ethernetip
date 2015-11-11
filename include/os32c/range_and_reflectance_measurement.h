@@ -69,6 +69,7 @@ public:
   virtual Reader& deserialize(Reader& reader, size_t length)
   {
     deserialize(reader);
+    return reader;
   }
 
   /**

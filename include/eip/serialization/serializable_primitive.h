@@ -60,6 +60,7 @@ public:
   virtual Writer& serialize(Writer& writer) const
   {
     writer.write(data);
+    return writer;
   }
 
   /**
@@ -67,12 +68,13 @@ public:
    * @param reader Reader to use for deserialization
    * @param length Ignored
    * @return the reader again
-   * @throw std::length_error if the given length is greater than allocated 
+   * @throw std::length_error if the given length is greater than allocated
    *   data buffer
    */
   virtual Reader& deserialize(Reader& reader, size_t length)
   {
     deserialize(reader);
+    return reader;
   }
 
   /**
@@ -85,6 +87,7 @@ public:
   virtual Reader& deserialize(Reader& reader)
   {
     reader.read(data);
+    return reader;
   }
 };
 

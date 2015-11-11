@@ -67,13 +67,15 @@ public:
    */
   OS32C(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket) 
     : Session(socket, io_socket), start_angle_(ANGLE_MAX), end_angle_(ANGLE_MIN),
-      connection_num_(-1), mrc_sequence_num_(1) { }
+      connection_num_(-1), mrc_sequence_num_(1)
+  {
+  }
 
-  static const double ANGLE_MIN = DEG2RAD(-135.2);
-  static const double ANGLE_MAX = DEG2RAD( 135.2);
-  static const double ANGLE_INC = DEG2RAD(0.4);
-  static const double DISTANCE_MIN = 0.002;
-  static const double DISTANCE_MAX = 50;
+  static const double ANGLE_MIN;
+  static const double ANGLE_MAX;
+  static const double ANGLE_INC;
+  static const double DISTANCE_MIN;
+  static const double DISTANCE_MAX;
 
   /**
    * Get the range format code. Does a Get Single Attribute to the scanner
@@ -142,7 +144,7 @@ public:
 
   /**
    * Calculate the ROS angle for a beam given the OS32C beam number
-   * @param beam_num Beam number, starting with 0 being the most CCW beam and 
+   * @param beam_num Beam number, starting with 0 being the most CCW beam and
    *  positive moving CW around the scan
    * @return ROS Angle
    */

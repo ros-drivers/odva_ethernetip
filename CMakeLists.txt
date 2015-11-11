@@ -25,14 +25,9 @@ catkin_package(
 ## Build ##
 ###########
 
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-# include_directories(include)
-# TODO: Check names of system library include directories (boost)
 include_directories(
   include
   ${Boost_INCLUDE_DIRS}
-  ${boost_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library for just Ethernet/IP generic stuff
@@ -50,33 +45,29 @@ add_library(eip
   src/eip/message_router_response.cpp
   src/eip/connection.cpp
 )
+target_link_libraries(eip
+  ${Boost_LIBRARIES}
+)
 
-add_library(os32c_lib
-  src/os32c.cpp
+add_library(os32c_lib src/os32c.cpp)
+target_link_libraries(os32c_lib
+  eip
 )
 
 ## Declare a cpp executable
 add_executable(scanner src/scanner_node.cpp)
-add_executable(os32c src/os32c_node.cpp)
-
-## Add cmake target dependencies of the executable/library
-## as an example, message headers may need to be generated before nodes
-# add_dependencies(os32c_node os32c_generate_messages_cpp)
-
-## Specify libraries to link a library or executable target against
 target_link_libraries(scanner
   eip
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
-  ${boost_LIBRARIES}
 )
 
+add_executable(os32c src/os32c_node.cpp)
 target_link_libraries(os32c
   eip
   os32c_lib
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
-  ${boost_LIBRARIES}
 )
 
 #############
