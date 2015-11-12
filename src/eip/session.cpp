@@ -327,9 +327,9 @@ void Session::closeConnection(size_t n)
 
 CPFPacket Session::receiveIOPacket()
 {
-  cout << "Receiving IO packet" << endl;
+  // cout << "Receiving IO packet" << endl;
   size_t n = io_socket_->receive(buffer(recv_buffer_));
-  cout << "Received IO of " << n << " bytes" << endl;
+  // cout << "Received IO of " << n << " bytes" << endl;
 
   BufferReader reader(buffer(recv_buffer_, n));
   CPFPacket result;
@@ -346,7 +346,7 @@ CPFPacket Session::receiveIOPacket()
 
 void Session::sendIOPacket(CPFPacket& pkt)
 {
-  cout << "Sending CPF Packet on IO Socket" << endl;
+  // cout << "Sending CPF Packet on IO Socket" << endl;
   io_socket_->send(pkt);
 }
 
