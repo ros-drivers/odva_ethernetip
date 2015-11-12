@@ -82,6 +82,7 @@ public:
     // add reserved byte should be after the path size.
     // seriously. Who thought this out? Dumbest standard ever.
     path_.serialize(writer, true);
+    return writer;
   }
 
   /**
@@ -89,7 +90,7 @@ public:
    */
   virtual Reader& deserialize(Reader& reader, size_t length)
   {
-    std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented");
   }
 
   /**
@@ -97,7 +98,7 @@ public:
    */
   virtual Reader& deserialize(Reader& reader)
   {
-    std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented");
   }
 
 private:

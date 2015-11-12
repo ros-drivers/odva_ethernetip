@@ -86,7 +86,7 @@ public:
    */
   virtual Writer& serialize(Writer& writer) const
   {
-    std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented");
   }
 
   /**
@@ -94,7 +94,7 @@ public:
    */
   virtual Reader& deserialize(Reader& reader, size_t length)
   {
-    deserialize(reader);
+    return deserialize(reader);
   }
 
   /**
@@ -122,6 +122,7 @@ public:
     {
       response_data_ = shared_ptr<Serializable>();
     }
+    return reader;
   }
 
 private:

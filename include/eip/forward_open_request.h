@@ -89,6 +89,7 @@ public:
     EIP_BYTE type, bool shared)
   {
     o_to_t_conn_params = calcConnectionParams(size, variable, priority, type, shared);
+    return 0;
   }
 
   /**
@@ -98,6 +99,7 @@ public:
     EIP_BYTE type, bool shared)
   {
     t_to_o_conn_params = calcConnectionParams(size, variable, priority, type, shared);
+    return 0;
   }
 
   /**
@@ -158,6 +160,7 @@ public:
     writer.write(t_to_o_conn_params);
     writer.write(conn_type);
     path_.serialize(writer);
+    return writer;
   }
 
   /**
@@ -165,7 +168,7 @@ public:
    */
   virtual Reader& deserialize(Reader& reader, size_t length)
   {
-    std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented");
   }
 
   /**
@@ -173,7 +176,7 @@ public:
    */
   virtual Reader& deserialize(Reader& reader)
   {
-    std::logic_error("Not implemented");
+    throw std::logic_error("Not implemented");
   }
 
 private:
