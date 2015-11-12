@@ -123,6 +123,7 @@ public:
   virtual Writer& serialize(Writer& writer) const
   {
     serialize(writer, pad_after_length_);
+    return writer;
   }
 
   /**

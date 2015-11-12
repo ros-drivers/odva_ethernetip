@@ -3,7 +3,10 @@ dist: trusty
 language: generic
 compiler:
   - gcc
-  - llvm
+  - clang
+env:
+  - CC=gcc CXX=g++
+  - CC=clang CXX=clang++
 install:
   - export CI_ROS_DISTRO=indigo
   - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list'
