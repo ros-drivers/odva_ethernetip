@@ -12,6 +12,7 @@ express permission of Clearpath Robotics.
 #include "eip/connection.h"
 
 #include <boost/make_shared.hpp>
+#include <iostream>
 
 using std::cout;
 using std::endl;

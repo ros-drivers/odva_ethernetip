@@ -66,8 +66,7 @@ public:
    * @param socket Socket instance to use for communication with the lidar
    */
   OS32C(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket) 
-    : Session(socket, io_socket), frame_id_("OS32C"),
-      start_angle_(ANGLE_MAX), end_angle_(ANGLE_MIN),
+    : Session(socket, io_socket), start_angle_(ANGLE_MAX), end_angle_(ANGLE_MIN),
       connection_num_(-1), mrc_sequence_num_(1) { }
 
   static const double ANGLE_MIN = DEG2RAD(-135.2);
@@ -75,24 +74,6 @@ public:
   static const double ANGLE_INC = DEG2RAD(0.4);
   static const double DISTANCE_MIN = 0.002;
   static const double DISTANCE_MAX = 50;
-
-  /**
-   * Get the frame ID to be sent with laser scans
-   * @return Current frame ID
-   */
-  const string& getFrameID() const
-  {
-    return frame_id_;
-  }
-
-  /**
-   * Set the frame ID to be sent with laser scans
-   * @param frame_id Frame ID to send
-   */
-  void setFrameID(const string& frame_id)
-  {
-    frame_id_ = frame_id;
-  }
 
   /**
    * Get the range format code. Does a Get Single Attribute to the scanner
@@ -171,18 +152,27 @@ public:
   }
 
   /**
-   * Helper to convert a Range and Reflectance Measurement to a ROS LaserScan
-   * @param rr Measurement to convert
-   * @return ROS LaserScan
+   * Populate the unchanging parts of a ROS LaserScan, including the start_angle and stop_angle,
+   * which are configured by the user but ultimately reported by the device.
+   * @param ls Laserscan message to populate.
    */
-  LaserScan convertToLaserScan(const RangeAndReflectanceMeasurement& rr);
+  void fillLaserScanStaticConfig(sensor_msgs::LaserScan* ls);
+
+  /**
+   * Helper to convert a Range and Reflectance Measurement to a ROS LaserScan. LaserScan
+   * is passed as a pointer to avoid a bunch of memory allocation associated with resizing a vector
+   * on each scan.
+   * @param rr Measurement to convert
+   * @param ls Laserscan message to populate.
+   */
+  static void convertToLaserScan(const RangeAndReflectanceMeasurement& rr, sensor_msgs::LaserScan* ls);
 
   /**
    * Helper to convert a Measurement Report to a ROS LaserScan
    * @param mr Measurement to convert
-   * @return ROS LaserScan
+   * @param ls Laserscan message to populate.
    */
-  LaserScan convertToLaserScan(const MeasurementReport& mr);
+  static void convertToLaserScan(const MeasurementReport& mr, sensor_msgs::LaserScan* ls);
 
   void sendMeasurmentReportConfigUDP();
 
@@ -200,7 +190,6 @@ private:
 
   double start_angle_;
   double end_angle_;
-  string frame_id_;
 
   // data for sending to lidar to keep UDP session alive
   int connection_num_;

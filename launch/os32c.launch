@@ -1,7 +1,9 @@
 <launch>
+  <arg name="host" default="192.168.1.1" />
+
   <node pkg="os32c" type="os32c" name="os32c">
-    <param name="hostname" value="192.168.1.1" />
-    <param name="frame_id" value="os32c" />
+    <param name="host" value="$(arg host)" />
+    <param name="frame_id" value="laser" />
     <param name="start_angle" value="2.3596851486963333" />
     <param name="end_angle" value="-2.3596851486963333" />
   </node>

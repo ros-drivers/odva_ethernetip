@@ -32,15 +32,15 @@ int main(int argc, char *argv[])
   ros::NodeHandle nh;
 
   // get sensor config from params
-  string hostname, frame_id;
+  string host, frame_id;
   double start_angle, end_angle;
-  ros::param::param<std::string>("~hostname", hostname, "192.168.1.1");
-  ros::param::param<std::string>("~frame_id", frame_id, "OS32C");
+  ros::param::param<std::string>("~host", host, "192.168.1.1");
+  ros::param::param<std::string>("~frame_id", frame_id, "laser");
   ros::param::param<double>("~start_angle", start_angle, OS32C::ANGLE_MAX);
   ros::param::param<double>("~end_angle", end_angle, OS32C::ANGLE_MIN);
 
   // publisher for laserscans
-  ros::Publisher laserscan_pub = nh.advertise<LaserScan>("laser", 1);
+  ros::Publisher laserscan_pub = nh.advertise<LaserScan>("scan", 1);
 
   boost::asio::io_service io_service;
   shared_ptr<TCPSocket> socket = shared_ptr<TCPSocket>(new TCPSocket(io_service));
@@ -49,11 +49,11 @@ int main(int argc, char *argv[])
 
   try
   {
-    os32c.open(hostname);
+    os32c.open(host);
   }
   catch (std::runtime_error ex)
   {
-    cout << "Exception caught opening session: " << ex.what() << endl;
+    ROS_FATAL_STREAM("Exception caught opening session: " << ex.what());
     return -1;
   }
 
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
   }
   catch (std::invalid_argument ex)
   {
-    cout << "Invalid arguments in sensor configuration: " << ex.what() << endl;
+    ROS_FATAL_STREAM("Invalid arguments in sensor configuration: " << ex.what());
     return -1;
   }
 
@@ -76,18 +76,30 @@ int main(int argc, char *argv[])
   }
   catch (std::logic_error ex)
   {
-    cout << "Could not start UDP IO: " << ex.what() << endl;
+    ROS_FATAL_STREAM("Could not start UDP IO: " << ex.what());
     return -1;
   }
 
   int ctr = 10;
+  sensor_msgs::LaserScan laserscan_msg;
+  os32c.fillLaserScanStaticConfig(&laserscan_msg);
+  laserscan_msg.header.frame_id = frame_id;
+
   while (ros::ok())
   {
     try
     {
-      MeasurementReport mr = os32c.receiveMeasurementReportUDP();
-      LaserScan ls = os32c.convertToLaserScan(mr);
-      laserscan_pub.publish(ls);
+      // Collect measurement from device, convert to ROS message format.
+      MeasurementReport report = os32c.receiveMeasurementReportUDP();
+      OS32C::convertToLaserScan(report, &laserscan_msg);
+
+      // Stamp and publish message.
+      laserscan_msg.header.stamp = ros::Time::now();
+      laserscan_msg.header.seq++;
+      laserscan_pub.publish(laserscan_msg);
+
+      // Every tenth message received, send the keepalive message in response.
+      // TODO: Make this time-based instead of message-count based.
       if (++ctr > 10)
       {
         os32c.sendMeasurmentReportConfigUDP();
@@ -96,12 +108,14 @@ int main(int argc, char *argv[])
     }
     catch (std::runtime_error ex)
     {
-      cout << "Exception caught requesting scan data: " << ex.what() << endl;
+      ROS_ERROR_STREAM("Exception caught requesting scan data: " << ex.what());
     }
     catch (std::logic_error ex)
     {
-      cout << "Error parsing return data: " << ex.what() << endl;
+      ROS_ERROR_STREAM("Problem parsing return data: " << ex.what());
     }
+
+    ros::spinOnce();
   }
 
   os32c.closeConnection(0);
