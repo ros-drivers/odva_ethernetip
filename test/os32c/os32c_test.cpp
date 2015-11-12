@@ -353,10 +353,6 @@ TEST_F(OS32CTest, test_select_beams)
 
 TEST_F(OS32CTest, test_convert_to_laserscan)
 {
-  os32c.setFrameID("testframe");
-  os32c.start_angle_ = 0.778416846389471; // 44.6 degrees
-  os32c.end_angle_ = -0.6597344572538565; //-37.8 degrees
-
   RangeAndReflectanceMeasurement rr;
   rr.header.scan_count = 0xDEADBEEF;
   rr.header.scan_rate = 38609;
@@ -396,15 +392,9 @@ TEST_F(OS32CTest, test_convert_to_laserscan)
   rr.reflectance_data[8] = 0;
   rr.reflectance_data[9] = 0;
 
-  sensor_msgs::LaserScan ls = os32c.convertToLaserScan(rr);
-  EXPECT_EQ(0xDEADBEEF, ls.header.seq);
-  EXPECT_EQ("testframe", ls.header.frame_id);
-  EXPECT_FLOAT_EQ(0.778416846389471, ls.angle_min);
-  EXPECT_FLOAT_EQ(-0.6597344572538565, ls.angle_max);
-  EXPECT_FLOAT_EQ(OS32C::ANGLE_INC, ls.angle_increment);
+  sensor_msgs::LaserScan ls;
+  OS32C::convertToLaserScan(rr, &ls);
   EXPECT_FLOAT_EQ(42898E-9, ls.time_increment);
-  EXPECT_FLOAT_EQ( 0.002, ls.range_min);
-  EXPECT_FLOAT_EQ(50.0  , ls.range_max);
   EXPECT_FLOAT_EQ( 1.0  , ls.ranges[0]);
   EXPECT_FLOAT_EQ( 1.253, ls.ranges[1]);
   EXPECT_FLOAT_EQ( 1.0  , ls.ranges[2]);
