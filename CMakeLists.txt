@@ -5,25 +5,11 @@ find_package(catkin REQUIRED roscpp)
 
 find_package(Boost REQUIRED COMPONENTS system)
 
-
-###################################
-## catkin specific configuration ##
-###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if you package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp
   DEPENDS boost
 )
-
-###########
-## Build ##
-###########
 
 include_directories(
   include
@@ -105,55 +91,46 @@ target_link_libraries(os32c
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-#############
-## Testing ##
-#############
 
-## Add gtest based cpp test target and link libraries
-catkin_add_gtest(eip-test
-  test/eip/serialization/buffer_writer_test.cpp
-  test/eip/serialization/buffer_reader_test.cpp
-  test/eip/serialization/stream_writer_test.cpp
-  test/eip/serialization/stream_reader_test.cpp
-  test/eip/serialization/serializable_buffer_test.cpp
-  test/eip/serialization/serializable_primitive_test.cpp
-  test/eip/test_socket_test.cpp
-  test/eip/encap_header_test.cpp
-  test/eip/encap_packet_test.cpp
-  test/eip/cpf_item_test.cpp
-  test/eip/cpf_packet_test.cpp
-  test/eip/sequenced_address_item_test.cpp
-  test/eip/identity_item_data_test.cpp
-  test/eip/path_test.cpp
-  test/eip/rr_data_test.cpp
-  test/eip/message_router_request_test.cpp
-  test/eip/message_router_response_test.cpp
-  test/eip/rr_data_request_test.cpp
-  test/eip/rr_data_response_test.cpp
-  test/eip/forward_open_request_test.cpp
-  test/eip/forward_open_success_test.cpp
-  test/eip/forward_close_request_test.cpp
-  test/eip/forward_close_success_test.cpp
-  test/eip/session_test.cpp
-  test/eip/test_main.cpp
-)
-
-if(TARGET eip-test)
+if (CATKIN_ENABLE_TESTING)
+  ## Add gtest based cpp test target and link libraries
+  catkin_add_gtest(eip-test
+    test/eip/serialization/buffer_writer_test.cpp
+    test/eip/serialization/buffer_reader_test.cpp
+    test/eip/serialization/stream_writer_test.cpp
+    test/eip/serialization/stream_reader_test.cpp
+    test/eip/serialization/serializable_buffer_test.cpp
+    test/eip/serialization/serializable_primitive_test.cpp
+    test/eip/test_socket_test.cpp
+    test/eip/encap_header_test.cpp
+    test/eip/encap_packet_test.cpp
+    test/eip/cpf_item_test.cpp
+    test/eip/cpf_packet_test.cpp
+    test/eip/sequenced_address_item_test.cpp
+    test/eip/identity_item_data_test.cpp
+    test/eip/path_test.cpp
+    test/eip/rr_data_test.cpp
+    test/eip/message_router_request_test.cpp
+    test/eip/message_router_response_test.cpp
+    test/eip/rr_data_request_test.cpp
+    test/eip/rr_data_response_test.cpp
+    test/eip/forward_open_request_test.cpp
+    test/eip/forward_open_success_test.cpp
+    test/eip/forward_close_request_test.cpp
+    test/eip/forward_close_success_test.cpp
+    test/eip/session_test.cpp
+    test/eip/test_main.cpp
+  )
   target_link_libraries(eip-test ${Boost_LIBRARIES} eip)
-endif()
 
-catkin_add_gtest(os32c-test
-  test/os32c/measurement_report_config_test.cpp
-  test/os32c/measurement_report_header_test.cpp
-  test/os32c/measurement_report_test.cpp
-  test/os32c/range_and_reflectance_measurement_test.cpp
-  test/os32c/os32c_test.cpp
-  test/os32c/test_main.cpp
-)
-
-if(TARGET os32c-test)
+  catkin_add_gtest(os32c-test
+    test/os32c/measurement_report_config_test.cpp
+    test/os32c/measurement_report_header_test.cpp
+    test/os32c/measurement_report_test.cpp
+    test/os32c/range_and_reflectance_measurement_test.cpp
+    test/os32c/os32c_test.cpp
+    test/os32c/test_main.cpp
+  )
   target_link_libraries(os32c-test ${Boost_LIBRARIES} eip os32c_lib)
 endif()
 
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)

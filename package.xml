@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>os32c</name>
   <version>0.0.0</version>
   <description>Interface driver for Omron OS32C Lidar via Ethernet/IP (Industrial Protocol)</description>
 
-  <maintainer email="kshehata@clearpathrobotics.com">Kareem Shehata</maintainer>
-  <license>Proprietary</license>
+  <license>BSD</license>
+  <maintainer email="mpurvis@clearpathrobotics.com">Mike Purvis</maintainer>
   <author email="kshehata@clearpathrobotics.com">Kareem Shehata</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>roscpp</build_depend>
-  <build_depend>boost</build_depend>
+  <depend>boost</depend>
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
 
-  <run_depend>roscpp</run_depend>
-  <run_depend>boost</run_depend>
+  <test_depend>gtest</test_depend>
 </package>
