@@ -3,7 +3,7 @@ project(os32c)
 
 find_package(catkin REQUIRED roscpp)
 
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost 1.47 REQUIRED COMPONENTS system)
 
 catkin_package(
   INCLUDE_DIRS include
