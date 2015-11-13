@@ -1,4 +1,4 @@
-OS32C [![Build Status](https://travis-ci.org/mikepurvis/os32c.svg)](https://travis-ci.org/mikepurvis/os32c)
+OS32C [![Build Status](https://travis-ci.org/mikepurvis/os32c.svg?branch=indigo-devel)](https://travis-ci.org/mikepurvis/os32c)
 =====
 
 This package contains a ROS device driver for the OMRON OS32C, an EtherNet/IP-based
