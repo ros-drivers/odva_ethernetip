@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>os32c</name>
+  <name>ovda_ethernetip</name>
   <version>0.0.0</version>
-  <description>Interface driver for Omron OS32C Lidar via Ethernet/IP (Industrial Protocol)</description>
+  <description>Library implementing OVDA EtherNet/IP (Industrial Protocol).</description>
 
   <license>BSD</license>
   <maintainer email="mpurvis@clearpathrobotics.com">Mike Purvis</maintainer>
@@ -11,8 +11,5 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>boost</depend>
-  <depend>roscpp</depend>
-  <depend>sensor_msgs</depend>
-
   <test_depend>gtest</test_depend>
 </package>
