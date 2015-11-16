@@ -9,4 +9,4 @@ https://www.ia.omron.com/products/family/2717/
 
 Please find information on the ROS Wiki:
 
-http://wiki.ros.org/os32c (coming soon)
+http://wiki.ros.org/omron_os32c_driver (coming soon)
