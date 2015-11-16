@@ -1,12 +1,8 @@
-OS32C [![Build Status](https://travis-ci.org/mikepurvis/os32c.svg?branch=indigo-devel)](https://travis-ci.org/mikepurvis/os32c)
-=====
+ovda_ethernetip
+===============
 
-This package contains a ROS device driver for the OMRON OS32C, an EtherNet/IP-based
-safety-rated laser scanner (LIDAR). You can find more information on this product
-here:
+This repo contains a ROS-ready library which implements EtherNet/IP (Industrial Protocol).
 
-https://www.ia.omron.com/products/family/2717/
+Please find more information on the ROS Wiki:
 
-Please find information on the ROS Wiki:
-
-http://wiki.ros.org/omron_os32c_driver (coming soon)
+http://wiki.ros.org/ovda_ethernetip (coming soon)
