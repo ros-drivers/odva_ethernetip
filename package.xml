@@ -6,7 +6,7 @@
 
   <license>BSD</license>
   <maintainer email="mpurvis@clearpathrobotics.com">Mike Purvis</maintainer>
-  <author email="kshehata@clearpathrobotics.com">Kareem Shehata</author>
+  <author email="kareem@shehata.ca">Kareem Shehata</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 

@@ -1,8 +1,8 @@
 /**
-Software License Agreement (proprietary)
+Software License Agreement (BSD)
 
 \file      eip_types.h
-\authors   Kareem Shehata <kshehata@clearpathrobotics.com>
+\authors   Kareem Shehata <kareem@shehata.ca>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, is not permitted without the
