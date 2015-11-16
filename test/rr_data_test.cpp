@@ -12,9 +12,9 @@ express permission of Clearpath Robotics.
 #include <gtest/gtest.h>
 #include <boost/asio.hpp>
 
-#include "eip/rr_data.h"
-#include "eip/serialization/buffer_reader.h"
-#include "eip/serialization/buffer_writer.h"
+#include "ovda_ethernetip/rr_data.h"
+#include "ovda_ethernetip/serialization/buffer_reader.h"
+#include "ovda_ethernetip/serialization/buffer_writer.h"
 
 using namespace boost::asio;
 using eip::RRData;

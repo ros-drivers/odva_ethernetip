@@ -15,7 +15,7 @@ express permission of Clearpath Robotics.
 #include <string>
 #include <boost/asio.hpp>
 
-#include "eip/eip_types.h"
+#include "ovda_ethernetip/eip_types.h"
 
 using std::string;
 using boost::asio::ip::udp;

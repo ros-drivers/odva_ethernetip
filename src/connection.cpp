@@ -9,7 +9,7 @@ Redistribution and use in source and binary forms, with or without modification,
 express permission of Clearpath Robotics.
 */
 
-#include "eip/connection.h"
+#include "ovda_ethernetip/connection.h"
 
 #include <boost/make_shared.hpp>
 #include <iostream>

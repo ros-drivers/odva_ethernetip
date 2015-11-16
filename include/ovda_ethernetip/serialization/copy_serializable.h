@@ -12,7 +12,7 @@ express permission of Clearpath Robotics.
 #ifndef EIP_COPY_SERIALIZABLE_H
 #define EIP_COPY_SERIALIZABLE_H
 
-#include "eip/serialization/serializable.h"
+#include "ovda_ethernetip/serialization/serializable.h"
 
 namespace eip {
 namespace serialization {

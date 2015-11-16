@@ -14,7 +14,7 @@ express permission of Clearpath Robotics.
 
 #include <boost/asio.hpp>
 
-#include "eip/eip_types.h"
+#include "ovda_ethernetip/eip_types.h"
 
 using boost::asio::const_buffer;
 

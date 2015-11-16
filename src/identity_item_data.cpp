@@ -9,7 +9,7 @@ Redistribution and use in source and binary forms, with or without modification,
 express permission of Clearpath Robotics.
 */
 
-#include "eip/identity_item_data.h"
+#include "ovda_ethernetip/identity_item_data.h"
 
 namespace eip {
 

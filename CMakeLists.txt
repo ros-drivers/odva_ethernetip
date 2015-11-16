@@ -7,6 +7,7 @@ find_package(Boost 1.47 REQUIRED COMPONENTS system)
 
 catkin_package(
   INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
   DEPENDS boost
 )
 

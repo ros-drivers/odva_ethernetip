@@ -13,10 +13,10 @@ express permission of Clearpath Robotics.
 #include <boost/make_shared.hpp>
 #include <boost/asio.hpp>
 
-#include "eip/cpf_item.h"
-#include "eip/serialization/serializable_buffer.h"
-#include "eip/serialization/buffer_writer.h"
-#include "eip/serialization/buffer_reader.h"
+#include "ovda_ethernetip/cpf_item.h"
+#include "ovda_ethernetip/serialization/serializable_buffer.h"
+#include "ovda_ethernetip/serialization/buffer_writer.h"
+#include "ovda_ethernetip/serialization/buffer_reader.h"
 
 using boost::make_shared;
 using namespace eip;

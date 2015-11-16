@@ -16,7 +16,7 @@ express permission of Clearpath Robotics.
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/device/array.hpp>
 
-#include "eip/serialization/stream_reader.h"
+#include "ovda_ethernetip/serialization/stream_reader.h"
 
 using boost::shared_ptr;
 using boost::make_shared;

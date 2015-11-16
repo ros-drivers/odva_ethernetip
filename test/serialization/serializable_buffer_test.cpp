@@ -16,10 +16,10 @@ express permission of Clearpath Robotics.
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/device/array.hpp>
 
-#include "eip/serialization/buffer_writer.h"
-#include "eip/serialization/buffer_reader.h"
-#include "eip/serialization/stream_reader.h"
-#include "eip/serialization/serializable_buffer.h"
+#include "ovda_ethernetip/serialization/buffer_writer.h"
+#include "ovda_ethernetip/serialization/buffer_reader.h"
+#include "ovda_ethernetip/serialization/stream_reader.h"
+#include "ovda_ethernetip/serialization/serializable_buffer.h"
 
 using boost::shared_ptr;
 using boost::make_shared;

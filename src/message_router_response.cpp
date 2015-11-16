@@ -11,8 +11,8 @@ express permission of Clearpath Robotics.
 
 #include <boost/make_shared.hpp>
 
-#include "eip/message_router_response.h"
-#include "eip/serialization/serializable_buffer.h"
+#include "ovda_ethernetip/message_router_response.h"
+#include "ovda_ethernetip/serialization/serializable_buffer.h"
 
 using boost::make_shared;
 

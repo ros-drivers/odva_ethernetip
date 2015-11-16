@@ -15,14 +15,14 @@ express permission of Clearpath Robotics.
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 
-#include "eip/serialization/buffer_reader.h"
-#include "eip/serialization/buffer_writer.h"
-#include "eip/session.h"
-#include "eip/eip_types.h"
-#include "eip/encap_packet.h"
-#include "eip/register_session_data.h"
-#include "eip/rr_data_request.h"
-#include "eip/rr_data_response.h"
+#include "ovda_ethernetip/serialization/buffer_reader.h"
+#include "ovda_ethernetip/serialization/buffer_writer.h"
+#include "ovda_ethernetip/session.h"
+#include "ovda_ethernetip/eip_types.h"
+#include "ovda_ethernetip/encap_packet.h"
+#include "ovda_ethernetip/register_session_data.h"
+#include "ovda_ethernetip/rr_data_request.h"
+#include "ovda_ethernetip/rr_data_response.h"
 
 using boost::shared_ptr;
 using boost::make_shared;

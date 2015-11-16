@@ -12,14 +12,14 @@ express permission of Clearpath Robotics.
 #include <gtest/gtest.h>
 #include <boost/make_shared.hpp>
 
-#include "eip/session.h"
-#include "eip/socket/test_socket.h"
-#include "eip/rr_data_response.h"
-#include "eip/sequenced_address_item.h"
-#include "eip/sequenced_data_item.h"
-#include "eip/serialization/serializable_buffer.h"
-#include "eip/serialization/serializable_primitive.h"
-#include "os32c/measurement_report.h"
+#include "ovda_ethernetip/session.h"
+#include "ovda_ethernetip/socket/test_socket.h"
+#include "ovda_ethernetip/rr_data_response.h"
+#include "ovda_ethernetip/sequenced_address_item.h"
+#include "ovda_ethernetip/sequenced_data_item.h"
+#include "ovda_ethernetip/serialization/serializable_buffer.h"
+#include "ovda_ethernetip/serialization/serializable_primitive.h"
+//#include "os32c/measurement_report.h"
 
 using boost::make_shared;
 using namespace boost::asio;
@@ -27,7 +27,7 @@ using namespace boost::asio;
 using namespace eip::socket;
 using namespace eip::serialization;
 
-using os32c::MeasurementReport;
+//using os32c::MeasurementReport;
 
 namespace eip {
 
@@ -841,12 +841,12 @@ TEST_F(SessionTest, test_create_connection)
   // TODO: verify path ?
 
   char close_resp_packet[] = {
-    0x6F, 0x00, 0x1E, 0x00, 0xEF, 0xBE, 0xAD, 0xDE, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0xB2, 0x00, 0x0E, 0x00, 
-    0xCE, 0x00, 0x00, 0x00, 0x89, 0x67, 0x95, 0x01, 
+    0x6F, 0x00, 0x1E, 0x00, 0xEF, 0xBE, 0xAD, 0xDE,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0xB2, 0x00, 0x0E, 0x00,
+    0xCE, 0x00, 0x00, 0x00, 0x89, 0x67, 0x95, 0x01,
     0x21, 0x43, 0x00, 0x00, 0x00, 0x00,
   };
 
@@ -970,7 +970,7 @@ TEST_F(SessionTest, test_receive_io_packet)
   EXPECT_EQ(0x00020004, address.connection_id);
   EXPECT_EQ(0x00000015, address.sequence_num);
 
-  SequencedDataItem<MeasurementReport> data;
+  /*SequencedDataItem<MeasurementReport> data;
   pkt.getItems()[1].getDataAs(data);
   EXPECT_EQ(0x0062, data.getLength());
   EXPECT_EQ(0x00A1, data.sequence_num);
@@ -1011,7 +1011,7 @@ TEST_F(SessionTest, test_receive_io_packet)
   EXPECT_EQ(0x0867, data.measurement_data[16]);
   EXPECT_EQ(0x085E, data.measurement_data[17]);
   EXPECT_EQ(0x085E, data.measurement_data[18]);
-  EXPECT_EQ(0x086F, data.measurement_data[19]);
+  EXPECT_EQ(0x086F, data.measurement_data[19]);*/
 }
 
 } // namespace eip

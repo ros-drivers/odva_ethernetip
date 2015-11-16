@@ -14,8 +14,8 @@ express permission of Clearpath Robotics.
 #include <boost/make_shared.hpp>
 #include <boost/asio.hpp>
 
-#include "eip/socket/test_socket.h"
-#include "eip/serialization/buffer_reader.h"
+#include "ovda_ethernetip/socket/test_socket.h"
+#include "ovda_ethernetip/serialization/buffer_reader.h"
 
 using boost::shared_ptr;
 using boost::make_shared;

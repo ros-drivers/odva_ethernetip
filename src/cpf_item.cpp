@@ -11,9 +11,9 @@ express permission of Clearpath Robotics.
 
 #include <boost/make_shared.hpp>
 
-#include "eip/cpf_item.h"
-#include "eip/serialization/serializable_buffer.h"
-#include "eip/serialization/copy_serializable.h"
+#include "ovda_ethernetip/cpf_item.h"
+#include "ovda_ethernetip/serialization/serializable_buffer.h"
+#include "ovda_ethernetip/serialization/copy_serializable.h"
 
 using boost::make_shared;
 

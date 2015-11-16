@@ -16,7 +16,7 @@ express permission of Clearpath Robotics.
 #include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
 
-#include "eip/serialization/reader.h"
+#include "ovda_ethernetip/serialization/reader.h"
 
 using boost::shared_ptr;
 using boost::asio::mutable_buffer;

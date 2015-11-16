@@ -9,7 +9,7 @@ Redistribution and use in source and binary forms, with or without modification,
 express permission of Clearpath Robotics.
 */
 
-#include "eip/path.h"
+#include "ovda_ethernetip/path.h"
 
 #include <boost/asio.hpp>
 

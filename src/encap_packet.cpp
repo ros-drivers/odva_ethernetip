@@ -12,11 +12,11 @@ express permission of Clearpath Robotics.
 #include <vector>
 #include <boost/make_shared.hpp>
 
-#include "eip/encap_packet.h"
-#include "eip/serialization/serializable_buffer.h"
-#include "eip/serialization/buffer_reader.h"
-#include "eip/serialization/buffer_writer.h"
-#include "eip/serialization/copy_serializable.h"
+#include "ovda_ethernetip/encap_packet.h"
+#include "ovda_ethernetip/serialization/serializable_buffer.h"
+#include "ovda_ethernetip/serialization/buffer_reader.h"
+#include "ovda_ethernetip/serialization/buffer_writer.h"
+#include "ovda_ethernetip/serialization/copy_serializable.h"
 
 using std::vector;
 using boost::make_shared;

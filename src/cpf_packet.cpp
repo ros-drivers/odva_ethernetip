@@ -12,7 +12,7 @@ express permission of Clearpath Robotics.
 #include <boost/make_shared.hpp>
 #include <boost/foreach.hpp>
 
-#include "eip/cpf_packet.h"
+#include "ovda_ethernetip/cpf_packet.h"
 
 using boost::make_shared;
 

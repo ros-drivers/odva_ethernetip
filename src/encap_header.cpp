@@ -9,7 +9,7 @@ Redistribution and use in source and binary forms, with or without modification,
 express permission of Clearpath Robotics.
 */
 
-#include "eip/encap_header.h"
+#include "ovda_ethernetip/encap_header.h"
 
 
 namespace eip {

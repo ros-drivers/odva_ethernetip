@@ -12,9 +12,9 @@ express permission of Clearpath Robotics.
 #ifndef EIP_SERIALIZABLE_PRIMITIVE_H
 #define EIP_SERIALIZABLE_PRIMITIVE_H
 
-#include "eip/serialization/serializable.h"
-#include "eip/serialization/writer.h"
-#include "eip/serialization/reader.h"
+#include "ovda_ethernetip/serialization/serializable.h"
+#include "ovda_ethernetip/serialization/writer.h"
+#include "ovda_ethernetip/serialization/reader.h"
 
 namespace eip {
 namespace serialization {

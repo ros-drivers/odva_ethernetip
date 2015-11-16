@@ -12,10 +12,10 @@ express permission of Clearpath Robotics.
 #include <gtest/gtest.h>
 #include <boost/make_shared.hpp>
 
-#include "eip/encap_packet.h"
-#include "eip/serialization/serializable_buffer.h"
-#include "eip/serialization/buffer_writer.h"
-#include "eip/serialization/buffer_reader.h"
+#include "ovda_ethernetip/encap_packet.h"
+#include "ovda_ethernetip/serialization/serializable_buffer.h"
+#include "ovda_ethernetip/serialization/buffer_writer.h"
+#include "ovda_ethernetip/serialization/buffer_reader.h"
 
 using boost::make_shared;
 using namespace boost::asio;

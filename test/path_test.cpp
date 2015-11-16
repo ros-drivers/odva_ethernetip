@@ -12,8 +12,8 @@ express permission of Clearpath Robotics.
 #include <gtest/gtest.h>
 #include <boost/asio.hpp>
 
-#include "eip/path.h"
-#include "eip/serialization/buffer_writer.h"
+#include "ovda_ethernetip/path.h"
+#include "ovda_ethernetip/serialization/buffer_writer.h"
 
 using namespace boost::asio;
 using eip::Path;

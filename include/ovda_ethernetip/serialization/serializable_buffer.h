@@ -14,10 +14,10 @@ express permission of Clearpath Robotics.
 
 #include <boost/asio.hpp>
 
-#include "eip/serialization/serializable.h"
-#include "eip/serialization/writer.h"
-#include "eip/serialization/reader.h"
-#include "eip/serialization/buffer_reader.h"
+#include "ovda_ethernetip/serialization/serializable.h"
+#include "ovda_ethernetip/serialization/writer.h"
+#include "ovda_ethernetip/serialization/reader.h"
+#include "ovda_ethernetip/serialization/buffer_reader.h"
 
 using boost::asio::mutable_buffer;
 using boost::asio::buffer_size;

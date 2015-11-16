@@ -15,12 +15,12 @@ express permission of Clearpath Robotics.
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "eip/eip_types.h"
-#include "eip/path.h"
-#include "eip/forward_open_request.h"
-#include "eip/forward_open_success.h"
-#include "eip/forward_close_request.h"
-#include "eip/forward_close_success.h"
+#include "ovda_ethernetip/eip_types.h"
+#include "ovda_ethernetip/path.h"
+#include "ovda_ethernetip/forward_open_request.h"
+#include "ovda_ethernetip/forward_open_success.h"
+#include "ovda_ethernetip/forward_close_request.h"
+#include "ovda_ethernetip/forward_close_success.h"
 
 using boost::shared_ptr;
 

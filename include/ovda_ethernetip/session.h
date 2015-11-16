@@ -18,15 +18,15 @@ express permission of Clearpath Robotics.
 #include <boost/make_shared.hpp>
 #include <boost/asio.hpp>
 
-#include "eip/eip_types.h"
-#include "eip/socket/socket.h"
-#include "eip/serialization/serializable.h"
-#include "eip/serialization/serializable_primitive.h"
-#include "eip/encap_packet.h"
-#include "eip/cpf_packet.h"
-#include "eip/rr_data_response.h"
-#include "eip/path.h"
-#include "eip/connection.h"
+#include "ovda_ethernetip/eip_types.h"
+#include "ovda_ethernetip/socket/socket.h"
+#include "ovda_ethernetip/serialization/serializable.h"
+#include "ovda_ethernetip/serialization/serializable_primitive.h"
+#include "ovda_ethernetip/encap_packet.h"
+#include "ovda_ethernetip/cpf_packet.h"
+#include "ovda_ethernetip/rr_data_response.h"
+#include "ovda_ethernetip/path.h"
+#include "ovda_ethernetip/connection.h"
 
 using std::string;
 using boost::shared_ptr;

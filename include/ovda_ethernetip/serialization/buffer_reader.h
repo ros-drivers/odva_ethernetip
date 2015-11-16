@@ -15,8 +15,8 @@ express permission of Clearpath Robotics.
 #include <stdexcept>
 #include <boost/asio.hpp>
 
-#include "eip/eip_types.h"
-#include "eip/serialization/reader.h"
+#include "ovda_ethernetip/eip_types.h"
+#include "ovda_ethernetip/serialization/reader.h"
 
 using boost::asio::buffer;
 using boost::asio::mutable_buffer;

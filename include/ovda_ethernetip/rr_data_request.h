@@ -17,13 +17,13 @@ express permission of Clearpath Robotics.
 #include <boost/make_shared.hpp>
 #include <boost/asio.hpp>
 
-#include "eip/eip_types.h"
-#include "eip/cpf_item.h"
-#include "eip/serialization/serializable.h"
-#include "eip/serialization/reader.h"
-#include "eip/serialization/writer.h"
-#include "eip/rr_data.h"
-#include "eip/message_router_request.h"
+#include "ovda_ethernetip/eip_types.h"
+#include "ovda_ethernetip/cpf_item.h"
+#include "ovda_ethernetip/serialization/serializable.h"
+#include "ovda_ethernetip/serialization/reader.h"
+#include "ovda_ethernetip/serialization/writer.h"
+#include "ovda_ethernetip/rr_data.h"
+#include "ovda_ethernetip/message_router_request.h"
 
 using boost::shared_ptr;
 using boost::make_shared;

@@ -15,7 +15,7 @@ express permission of Clearpath Robotics.
 #include <string>
 #include <boost/asio.hpp>
 
-#include "eip/socket/socket.h"
+#include "ovda_ethernetip/socket/socket.h"
 
 using std::size_t;
 using std::string;

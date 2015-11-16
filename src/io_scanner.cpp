@@ -12,14 +12,14 @@ express permission of Clearpath Robotics.
 #include <iostream>
 #include <boost/bind.hpp>
 
-#include "eip/io_scanner.h"
-#include "eip/eip_types.h"
-#include "eip/serialization/buffer_reader.h"
-#include "eip/serialization/buffer_writer.h"
-#include "eip/encap_packet.h"
-#include "eip/cpf_packet.h"
-#include "eip/cpf_item.h"
-#include "eip/identity_item_data.h"
+#include "ovda_ethernetip/io_scanner.h"
+#include "ovda_ethernetip/eip_types.h"
+#include "ovda_ethernetip/serialization/buffer_reader.h"
+#include "ovda_ethernetip/serialization/buffer_writer.h"
+#include "ovda_ethernetip/encap_packet.h"
+#include "ovda_ethernetip/cpf_packet.h"
+#include "ovda_ethernetip/cpf_item.h"
+#include "ovda_ethernetip/identity_item_data.h"
 
 using namespace boost::asio;
 using boost::asio::ip::udp;

@@ -15,8 +15,8 @@ express permission of Clearpath Robotics.
 #include <string>
 #include <boost/asio.hpp>
 
-#include "eip/serialization/serializable.h"
-#include "eip/serialization/buffer_writer.h"
+#include "ovda_ethernetip/serialization/serializable.h"
+#include "ovda_ethernetip/serialization/buffer_writer.h"
 
 using std::string;
 using std::size_t;
