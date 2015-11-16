@@ -5,12 +5,26 @@ Software License Agreement (BSD)
 \authors   Kareem Shehata <kareem@shehata.ca>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, is not permitted without the
-express permission of Clearpath Robotics.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+   following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+   following disclaimer in the documentation and/or other materials provided with the distribution.
+ * Neither the name of Clearpath Robotics nor the names of its contributors may be used to endorse or promote
+   products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WAR-
+RANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, IN-
+DIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef EIP_BUFFER_WRITER_H
-#define EIP_BUFFER_WRITER_H
+#ifndef OVDA_ETHERNETIP_SERIALIZATION_BUFFER_WRITER_H
+#define OVDA_ETHERNETIP_SERIALIZATION_BUFFER_WRITER_H
 
 #include <stdexcept>
 #include <boost/asio.hpp>
@@ -38,7 +52,7 @@ public:
   BufferWriter(mutable_buffer buf) : buf_(buf), byte_count_(0) { }
 
   /**
-   * Write a set of bytes to the buffer. Automatically increases the number of 
+   * Write a set of bytes to the buffer. Automatically increases the number of
    * bytes writen and advances the pointer in the buffer
    * @param p pointer to data to write
    * @param n number of bytes to write
@@ -54,7 +68,7 @@ public:
    * Automatically increases the bytes written and advances the pointer
    * into the current output buffer.
    * @param b buffer of data to add to the current buffer at the current location
-   * @throw std::length_error if the output buffer is too small to contain the 
+   * @throw std::length_error if the output buffer is too small to contain the
    * contents of b
    */
   void writeBuffer(const_buffer b)
@@ -85,4 +99,4 @@ private:
 
 } // namespace serialization
 } // namespace eip
-#endif  // EIP_BUFFER_WRITER_H
+#endif  // OVDA_ETHERNETIP_SERIALIZATION_BUFFER_WRITER_H

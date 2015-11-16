@@ -5,8 +5,22 @@ Software License Agreement (BSD)
 \authors   Kareem Shehata <kareem@shehata.ca>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, is not permitted without the
-express permission of Clearpath Robotics.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+   following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+   following disclaimer in the documentation and/or other materials provided with the distribution.
+ * Neither the name of Clearpath Robotics nor the names of its contributors may be used to endorse or promote
+   products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WAR-
+RANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, IN-
+DIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <boost/bind.hpp>
@@ -37,7 +51,7 @@ using serialization::BufferWriter;
 
 Session::Session(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket,
     EIP_UINT vendor_id, EIP_UDINT serial_num)
-    : socket_(socket), io_socket_(io_socket), session_id_(0), 
+    : socket_(socket), io_socket_(io_socket), session_id_(0),
       my_vendor_id_(vendor_id), my_serial_num_(serial_num)
 {
   // generate pseudo-random connection ID and connection SN starting points
@@ -142,7 +156,7 @@ void Session::close()
 {
   // TODO: should close all connections and the IO port
   cout << "Closing session" << endl;
-  
+
   // create the unregister session message
   EncapPacket reg_msg(EIP_CMD_UNREGISTER_SESSION, session_id_);
   socket_->send(reg_msg);
@@ -160,7 +174,7 @@ EncapPacket Session::sendCommand(EncapPacket& req)
   socket_->send(req);
 
   cout << "Waiting for response" << endl;
-  size_t n = socket_->receive(buffer(recv_buffer_));  
+  size_t n = socket_->receive(buffer(recv_buffer_));
   cout << "Received response of " << n << " bytes" << endl;
 
   BufferReader reader(buffer(recv_buffer_, n));
@@ -169,7 +183,7 @@ EncapPacket Session::sendCommand(EncapPacket& req)
 
   if (reader.getByteCount() != n)
   {
-    cerr << "Warning: packet received with " << n << 
+    cerr << "Warning: packet received with " << n <<
       " bytes, but only " << reader.getByteCount() << " bytes used" << endl;
   }
 
@@ -182,13 +196,13 @@ void Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
   // verify that all fields are correct
   if (pkt.getHeader().command != exp_cmd)
   {
-    cerr << "Reply received with wrong command. Expected " 
+    cerr << "Reply received with wrong command. Expected "
       << exp_cmd << ", received " << pkt.getHeader().command << endl;
     throw std::logic_error("Reply received with wrong command");
   }
   if (session_id_ == 0 && pkt.getHeader().session_handle == 0)
   {
-    cerr << "Warning: Zero session handle received on registration: " 
+    cerr << "Warning: Zero session handle received on registration: "
       << pkt.getHeader().session_handle << endl;
     throw std::logic_error("Zero session handle received on registration");
   }
@@ -204,7 +218,7 @@ void Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
   }
   if (pkt.getHeader().context[0] != 0 || pkt.getHeader().context[1] != 0)
   {
-    cerr << "Warning: Non-zero sender context received: " 
+    cerr << "Warning: Non-zero sender context received: "
     << pkt.getHeader().context[0] << " / " << pkt.getHeader().context[1] << endl;
   }
   if (pkt.getHeader().options != 0)
@@ -213,7 +227,7 @@ void Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
   }
 }
 
-void Session::getSingleAttributeSerializable(EIP_USINT class_id, EIP_USINT instance_id, 
+void Session::getSingleAttributeSerializable(EIP_USINT class_id, EIP_USINT instance_id,
   EIP_USINT attribute_id, Serializable& result)
 {
   shared_ptr<Serializable> no_data;
@@ -252,7 +266,7 @@ RRDataResponse Session::sendRRDataCommand(EIP_USINT service, const Path& path,
   catch (std::logic_error ex)
   {
     cerr << "Invalid response to RR command: " << ex.what() << endl;
-    throw std::runtime_error("Invalid packet response to RR Data Command");   
+    throw std::runtime_error("Invalid packet response to RR Data Command");
   }
 
   RRDataResponse resp_data;
@@ -286,7 +300,7 @@ RRDataResponse Session::sendRRDataCommand(EIP_USINT service, const Path& path,
   return resp_data;
 }
 
-int Session::createConnection(const EIP_CONNECTION_INFO_T& o_to_t, 
+int Session::createConnection(const EIP_CONNECTION_INFO_T& o_to_t,
   const EIP_CONNECTION_INFO_T& t_to_o)
 {
   Connection conn(o_to_t, t_to_o);

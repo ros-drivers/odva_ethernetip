@@ -5,8 +5,22 @@ Software License Agreement (BSD)
 \authors   Kareem Shehata <kareem@shehata.ca>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, is not permitted without the
-express permission of Clearpath Robotics.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+   following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+   following disclaimer in the documentation and/or other materials provided with the distribution.
+ * Neither the name of Clearpath Robotics nor the names of its contributors may be used to endorse or promote
+   products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WAR-
+RANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, IN-
+DIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <iostream>
@@ -38,8 +52,8 @@ IOScanner::IOScanner(io_service& io_service, string hostname)
   cout << "Opening UDP socket... ";
   socket_.open(udp::v4());
   socket_.async_receive_from(buffer(recv_buf_), device_endpoint_,
-    boost::bind(&IOScanner::handleListIdentityResponse, this, 
-      boost::asio::placeholders::error, 
+    boost::bind(&IOScanner::handleListIdentityResponse, this,
+      boost::asio::placeholders::error,
       boost::asio::placeholders::bytes_transferred));
   cout << "done." << endl;
 }
@@ -75,13 +89,13 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
     pkt.deserialize(r);
     if (r.getByteCount() != num_bytes)
     {
-      cerr << "Warning: packet received with " << num_bytes << 
+      cerr << "Warning: packet received with " << num_bytes <<
         " bytes, but only " << r.getByteCount() << " bytes used" << endl;
     }
 
     if (pkt.getHeader().command != EIP_CMD_LIST_IDENTITY)
     {
-      cerr << "Reply received with wrong command. Expected " 
+      cerr << "Reply received with wrong command. Expected "
         << EIP_CMD_LIST_IDENTITY << ", received " << pkt.getHeader().command << endl;
       return;
     }
@@ -95,7 +109,7 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
     }
     if (pkt.getHeader().context[0] != 0 || pkt.getHeader().context[1] != 0)
     {
-      cerr << "Warning: Non-zero sender context received: " 
+      cerr << "Warning: Non-zero sender context received: "
            << pkt.getHeader().context[0] << ", " << pkt.getHeader().context[1] << endl;
     }
     if (pkt.getHeader().options != 0)
@@ -119,7 +133,7 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
     if (payload.getItems().at(0).getItemType() != EIP_ITEM_LIST_IDENTITY_RESPONSE)
     {
       cerr << "Error: Payload response received with the wrong item type. Expected: "
-        << EIP_ITEM_LIST_IDENTITY_RESPONSE << ", received: " << 
+        << EIP_ITEM_LIST_IDENTITY_RESPONSE << ", received: " <<
         payload.getItems().at(0).getItemType() << endl;
       return;
     }
