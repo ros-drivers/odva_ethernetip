@@ -5,8 +5,22 @@ Software License Agreement (BSD)
 \authors   Kareem Shehata <kareem@shehata.ca>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, is not permitted without the
-express permission of Clearpath Robotics.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+   following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+   following disclaimer in the documentation and/or other materials provided with the distribution.
+ * Neither the name of Clearpath Robotics nor the names of its contributors may be used to endorse or promote
+   products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WAR-
+RANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, IN-
+DIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <gtest/gtest.h>
@@ -209,7 +223,7 @@ TEST_F(EncapPacketTest, test_deserialization_simple)
   BufferReader reader(buffer(d));
   pkt.deserialize(reader);
   ASSERT_EQ(24, reader.getByteCount());
-  
+
   EXPECT_EQ(0x55AA, pkt.getHeader().command);
   EXPECT_EQ(0x87654321, pkt.getHeader().session_handle);
   EXPECT_EQ(0, pkt.getHeader().status);
@@ -224,7 +238,7 @@ TEST_F(EncapPacketTest, test_deserialization_simple_short_buffer)
   EncapPacket pkt;
   EIP_USINT d[] = {0xAA, 0x55, 0, 0x00, 0x21, 0x43, 0x65, 0x87,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  
+
   BufferReader reader(buffer(d));
   ASSERT_THROW(pkt.deserialize(reader), std::length_error);
 }
@@ -232,14 +246,14 @@ TEST_F(EncapPacketTest, test_deserialization_simple_short_buffer)
 TEST_F(EncapPacketTest, test_deserialization_complex)
 {
   EncapPacket pkt;
-  EIP_USINT d[] = {0xAA, 0x55, 0x08, 0x00, 0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 
-    0xDC, 0xFE, 0x89, 0x67, 0x45, 0x23, 0x01, 0xEF, 0xCD, 0xAB, 0xEF, 0xBE, 
+  EIP_USINT d[] = {0xAA, 0x55, 0x08, 0x00, 0x21, 0x43, 0x65, 0x87, 0x98, 0xBA,
+    0xDC, 0xFE, 0x89, 0x67, 0x45, 0x23, 0x01, 0xEF, 0xCD, 0xAB, 0xEF, 0xBE,
     0xAD, 0xDE, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 0, };
 
   BufferReader reader(buffer(d));
   pkt.deserialize(reader);
   ASSERT_EQ(32, reader.getByteCount());
-  
+
   EXPECT_EQ(0x55AA, pkt.getHeader().command);
   EXPECT_EQ(0x87654321, pkt.getHeader().session_handle);
   EXPECT_EQ(0xFEDCBA98, pkt.getHeader().status);
@@ -255,8 +269,8 @@ TEST_F(EncapPacketTest, test_deserialization_complex)
 TEST_F(EncapPacketTest, test_deserialization_complex_short_buffer)
 {
   EncapPacket pkt;
-  EIP_USINT d[] = {0xAA, 0x55, 0x08, 0x00, 0x21, 0x43, 0x65, 0x87, 0x98, 0xBA, 
-    0xDC, 0xFE, 0x89, 0x67, 0x45, 0x23, 0x01, 0xEF, 0xCD, 0xAB, 0xEF, 0xBE, 
+  EIP_USINT d[] = {0xAA, 0x55, 0x08, 0x00, 0x21, 0x43, 0x65, 0x87, 0x98, 0xBA,
+    0xDC, 0xFE, 0x89, 0x67, 0x45, 0x23, 0x01, 0xEF, 0xCD, 0xAB, 0xEF, 0xBE,
     0xAD, 0xDE, 'a', 'b', 'c', 'd', 'e', 'f', 'g', };
 
   BufferReader reader(buffer(d));
