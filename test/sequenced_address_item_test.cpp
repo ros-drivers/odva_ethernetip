@@ -26,10 +26,10 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <gtest/gtest.h>
 #include <boost/asio.hpp>
 
-#include "ovda_ethernetip/sequenced_address_item.h"
-#include "ovda_ethernetip/serialization/serializable_buffer.h"
-#include "ovda_ethernetip/serialization/buffer_writer.h"
-#include "ovda_ethernetip/serialization/buffer_reader.h"
+#include "odva_ethernetip/sequenced_address_item.h"
+#include "odva_ethernetip/serialization/serializable_buffer.h"
+#include "odva_ethernetip/serialization/buffer_writer.h"
+#include "odva_ethernetip/serialization/buffer_reader.h"
 
 using namespace boost::asio;
 using namespace eip;

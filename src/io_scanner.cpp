@@ -26,14 +26,14 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <iostream>
 #include <boost/bind.hpp>
 
-#include "ovda_ethernetip/io_scanner.h"
-#include "ovda_ethernetip/eip_types.h"
-#include "ovda_ethernetip/serialization/buffer_reader.h"
-#include "ovda_ethernetip/serialization/buffer_writer.h"
-#include "ovda_ethernetip/encap_packet.h"
-#include "ovda_ethernetip/cpf_packet.h"
-#include "ovda_ethernetip/cpf_item.h"
-#include "ovda_ethernetip/identity_item_data.h"
+#include "odva_ethernetip/io_scanner.h"
+#include "odva_ethernetip/eip_types.h"
+#include "odva_ethernetip/serialization/buffer_reader.h"
+#include "odva_ethernetip/serialization/buffer_writer.h"
+#include "odva_ethernetip/encap_packet.h"
+#include "odva_ethernetip/cpf_packet.h"
+#include "odva_ethernetip/cpf_item.h"
+#include "odva_ethernetip/identity_item_data.h"
 
 using namespace boost::asio;
 using boost::asio::ip::udp;

@@ -29,14 +29,14 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 
-#include "ovda_ethernetip/serialization/buffer_reader.h"
-#include "ovda_ethernetip/serialization/buffer_writer.h"
-#include "ovda_ethernetip/session.h"
-#include "ovda_ethernetip/eip_types.h"
-#include "ovda_ethernetip/encap_packet.h"
-#include "ovda_ethernetip/register_session_data.h"
-#include "ovda_ethernetip/rr_data_request.h"
-#include "ovda_ethernetip/rr_data_response.h"
+#include "odva_ethernetip/serialization/buffer_reader.h"
+#include "odva_ethernetip/serialization/buffer_writer.h"
+#include "odva_ethernetip/session.h"
+#include "odva_ethernetip/eip_types.h"
+#include "odva_ethernetip/encap_packet.h"
+#include "odva_ethernetip/register_session_data.h"
+#include "odva_ethernetip/rr_data_request.h"
+#include "odva_ethernetip/rr_data_response.h"
 
 using boost::shared_ptr;
 using boost::make_shared;

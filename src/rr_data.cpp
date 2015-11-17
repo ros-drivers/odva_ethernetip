@@ -26,9 +26,9 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
-#include "ovda_ethernetip/rr_data.h"
-#include "ovda_ethernetip/cpf_packet.h"
-#include "ovda_ethernetip/cpf_item.h"
+#include "odva_ethernetip/rr_data.h"
+#include "odva_ethernetip/cpf_packet.h"
+#include "odva_ethernetip/cpf_item.h"
 
 using boost::shared_ptr;
 using boost::make_shared;

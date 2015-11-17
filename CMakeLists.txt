@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ovda_ethernetip)
+project(odva_ethernetip)
 
 find_package(catkin REQUIRED)
 

@@ -30,7 +30,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/device/array.hpp>
 
-#include "ovda_ethernetip/serialization/stream_writer.h"
+#include "odva_ethernetip/serialization/stream_writer.h"
 
 using namespace boost::asio;
 using namespace boost::iostreams;

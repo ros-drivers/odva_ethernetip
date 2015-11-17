@@ -26,13 +26,13 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <gtest/gtest.h>
 #include <boost/make_shared.hpp>
 
-#include "ovda_ethernetip/session.h"
-#include "ovda_ethernetip/socket/test_socket.h"
-#include "ovda_ethernetip/rr_data_response.h"
-#include "ovda_ethernetip/sequenced_address_item.h"
-#include "ovda_ethernetip/sequenced_data_item.h"
-#include "ovda_ethernetip/serialization/serializable_buffer.h"
-#include "ovda_ethernetip/serialization/serializable_primitive.h"
+#include "odva_ethernetip/session.h"
+#include "odva_ethernetip/socket/test_socket.h"
+#include "odva_ethernetip/rr_data_response.h"
+#include "odva_ethernetip/sequenced_address_item.h"
+#include "odva_ethernetip/sequenced_data_item.h"
+#include "odva_ethernetip/serialization/serializable_buffer.h"
+#include "odva_ethernetip/serialization/serializable_primitive.h"
 //#include "os32c/measurement_report.h"
 
 using boost::make_shared;

@@ -26,11 +26,11 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <vector>
 #include <boost/make_shared.hpp>
 
-#include "ovda_ethernetip/encap_packet.h"
-#include "ovda_ethernetip/serialization/serializable_buffer.h"
-#include "ovda_ethernetip/serialization/buffer_reader.h"
-#include "ovda_ethernetip/serialization/buffer_writer.h"
-#include "ovda_ethernetip/serialization/copy_serializable.h"
+#include "odva_ethernetip/encap_packet.h"
+#include "odva_ethernetip/serialization/serializable_buffer.h"
+#include "odva_ethernetip/serialization/buffer_reader.h"
+#include "odva_ethernetip/serialization/buffer_writer.h"
+#include "odva_ethernetip/serialization/copy_serializable.h"
 
 using std::vector;
 using boost::make_shared;

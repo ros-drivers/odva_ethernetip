@@ -26,7 +26,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <boost/make_shared.hpp>
 #include <boost/foreach.hpp>
 
-#include "ovda_ethernetip/cpf_packet.h"
+#include "odva_ethernetip/cpf_packet.h"
 
 using boost::make_shared;
 
