@@ -24,9 +24,9 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 
 #include <boost/make_shared.hpp>
 
-#include "ovda_ethernetip/cpf_item.h"
-#include "ovda_ethernetip/serialization/serializable_buffer.h"
-#include "ovda_ethernetip/serialization/copy_serializable.h"
+#include "odva_ethernetip/cpf_item.h"
+#include "odva_ethernetip/serialization/serializable_buffer.h"
+#include "odva_ethernetip/serialization/copy_serializable.h"
 
 using boost::make_shared;
 

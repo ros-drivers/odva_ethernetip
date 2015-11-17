@@ -23,10 +23,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCL
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "ovda_ethernetip/serialization/copy_serializable.h"
-#include "ovda_ethernetip/serialization/serializable_buffer.h"
-#include "ovda_ethernetip/serialization/buffer_reader.h"
-#include "ovda_ethernetip/serialization/buffer_writer.h"
+#include "odva_ethernetip/serialization/copy_serializable.h"
+#include "odva_ethernetip/serialization/serializable_buffer.h"
+#include "odva_ethernetip/serialization/buffer_reader.h"
+#include "odva_ethernetip/serialization/buffer_writer.h"
 
 namespace eip {
 namespace serialization {

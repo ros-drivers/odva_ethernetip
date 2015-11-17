@@ -30,7 +30,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/device/array.hpp>
 
-#include "ovda_ethernetip/serialization/stream_reader.h"
+#include "odva_ethernetip/serialization/stream_reader.h"
 
 using boost::shared_ptr;
 using boost::make_shared;

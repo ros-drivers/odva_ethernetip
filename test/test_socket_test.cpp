@@ -28,8 +28,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <boost/make_shared.hpp>
 #include <boost/asio.hpp>
 
-#include "ovda_ethernetip/socket/test_socket.h"
-#include "ovda_ethernetip/serialization/buffer_reader.h"
+#include "odva_ethernetip/socket/test_socket.h"
+#include "odva_ethernetip/serialization/buffer_reader.h"
 
 using boost::shared_ptr;
 using boost::make_shared;

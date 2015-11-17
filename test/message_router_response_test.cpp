@@ -28,10 +28,10 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <boost/make_shared.hpp>
 #include <boost/asio.hpp>
 
-#include "ovda_ethernetip/message_router_response.h"
-#include "ovda_ethernetip/serialization/serializable_buffer.h"
-#include "ovda_ethernetip/serialization/buffer_reader.h"
-#include "ovda_ethernetip/serialization/buffer_writer.h"
+#include "odva_ethernetip/message_router_response.h"
+#include "odva_ethernetip/serialization/serializable_buffer.h"
+#include "odva_ethernetip/serialization/buffer_reader.h"
+#include "odva_ethernetip/serialization/buffer_writer.h"
 
 using boost::shared_ptr;
 using boost::make_shared;
