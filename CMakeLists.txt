@@ -8,7 +8,7 @@ find_package(Boost 1.47 REQUIRED COMPONENTS system)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
-  DEPENDS boost
+  DEPENDS Boost
 )
 
 include_directories(
@@ -18,18 +18,18 @@ include_directories(
 
 ## Declare a cpp library for just Ethernet/IP generic stuff
 add_library(${PROJECT_NAME}
+  src/connection.cpp
   src/copy_serializable.cpp
-  src/encap_header.cpp
-  src/encap_packet.cpp
   src/cpf_item.cpp
   src/cpf_packet.cpp
+  src/encap_header.cpp
+  src/encap_packet.cpp
   src/identity_item_data.cpp
   src/io_scanner.cpp
-  src/session.cpp
+  src/message_router_response.cpp
   src/path.cpp
   src/rr_data.cpp
-  src/message_router_response.cpp
-  src/connection.cpp
+  src/session.cpp
 )
 target_link_libraries(${PROJECT_NAME}
   ${Boost_LIBRARIES}
