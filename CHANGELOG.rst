@@ -2,8 +2,8 @@
 Changelog for package odva_ethernetip
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.2 (2018-04-12)
+------------------
 * Optional local_ip (`#8 <https://github.com/ros-drivers/odva_ethernetip/issues/8>`_)
 * Exclude tests from rosdoc.
 * Minor manifest and build script updates.
