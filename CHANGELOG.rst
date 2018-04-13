@@ -2,8 +2,8 @@
 Changelog for package odva_ethernetip
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.3 (2018-04-13)
+------------------
 * Make sure to #include <boost/array.hpp> in the header file.
 * Switch to unsigned char arrays in the tests.
   This gets rid of a narrowing error thrown by the compiler.
