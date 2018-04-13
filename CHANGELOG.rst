@@ -2,6 +2,13 @@
 Changelog for package odva_ethernetip
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Make sure to #include <boost/array.hpp> in the header file.
+* Switch to unsigned char arrays in the tests.
+  This gets rid of a narrowing error thrown by the compiler.
+* Contributors: Chris Lalancette
+
 0.1.2 (2018-04-12)
 ------------------
 * Optional local_ip (`#8 <https://github.com/ros-drivers/odva_ethernetip/issues/8>`_)
