@@ -48,18 +48,18 @@ using serialization::BufferWriter;
 IOScanner::IOScanner(io_service& io_service, string hostname)
     : socket_(io_service), hostname_(hostname)
 {
-  logInform("Opening UDP socket... ");
+  CONSOLE_BRIDGE_logInform("Opening UDP socket... ");
   socket_.open(udp::v4());
   socket_.async_receive_from(buffer(recv_buf_), device_endpoint_,
     boost::bind(&IOScanner::handleListIdentityResponse, this,
       boost::asio::placeholders::error,
       boost::asio::placeholders::bytes_transferred));
-  logInform("done.");
+  CONSOLE_BRIDGE_logInform("done.");
 }
 
 void IOScanner::sendListIdentityRequest()
 {
-  logInform("Sending List Identity Request... ");
+  CONSOLE_BRIDGE_logInform("Sending List Identity Request... ");
   udp::resolver r(socket_.get_io_service());
   udp::resolver::query q(udp::v4(), hostname_, "44818");
   udp::endpoint receiver_endpoint = *r.resolve(q);
@@ -69,7 +69,7 @@ void IOScanner::sendListIdentityRequest()
   BufferWriter w(buffer(d));
   pkt.serialize(w);
   socket_.send_to(buffer(d, w.getByteCount()), receiver_endpoint);
-  logInform("done.");
+  CONSOLE_BRIDGE_logInform("done.");
 }
 
 void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
@@ -77,7 +77,7 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
 {
   if (ec)
   {
-    logError("Error receiving list identity response message");
+    CONSOLE_BRIDGE_logError("Error receiving list identity response message");
     return;
   }
 
@@ -88,30 +88,31 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
     pkt.deserialize(r);
     if (r.getByteCount() != num_bytes)
     {
-      logWarn("Packet received with %d bytes, but only %d bytes used", num_bytes, r.getByteCount());
+      CONSOLE_BRIDGE_logWarn("Packet received with %d bytes, but only %d bytes used", num_bytes, r.getByteCount());
     }
 
     if (pkt.getHeader().command != EIP_CMD_LIST_IDENTITY)
     {
-      logError("Reply received with wrong command. Expected %d, received %d", EIP_CMD_LIST_IDENTITY,
-               pkt.getHeader().command);
+      CONSOLE_BRIDGE_logError("Reply received with wrong command. Expected %d, received %d", EIP_CMD_LIST_IDENTITY,
+                              pkt.getHeader().command);
       return;
     }
     if (pkt.getHeader().session_handle != 0)
     {
-      logWarn("Non-zero session handle received: %d", pkt.getHeader().session_handle);
+      CONSOLE_BRIDGE_logWarn("Non-zero session handle received: %d", pkt.getHeader().session_handle);
     }
     if (pkt.getHeader().status != 0)
     {
-      logWarn("Non-zero status received: %d", pkt.getHeader().status);
+      CONSOLE_BRIDGE_logWarn("Non-zero status received: %d", pkt.getHeader().status);
     }
     if (pkt.getHeader().context[0] != 0 || pkt.getHeader().context[1] != 0)
     {
-      logWarn("Non-zero sender context received: %d, %d", pkt.getHeader().context[0], pkt.getHeader().context[1]);
+      CONSOLE_BRIDGE_logWarn("Non-zero sender context received: %d, %d", pkt.getHeader().context[0],
+                             pkt.getHeader().context[1]);
     }
     if (pkt.getHeader().options != 0)
     {
-      logWarn("Non-zero options received: %d", pkt.getHeader().options);
+      CONSOLE_BRIDGE_logWarn("Non-zero options received: %d", pkt.getHeader().options);
     }
 
     CPFPacket payload;
@@ -119,17 +120,17 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
 
     if (payload.getItemCount() < 1)
     {
-      logError("No items in list identity payload!");
+      CONSOLE_BRIDGE_logError("No items in list identity payload!");
       return;
     }
     if (payload.getItemCount() > 1)
     {
-      logWarn("More than one item in list identity payload %d", payload.getItemCount());
+      CONSOLE_BRIDGE_logWarn("More than one item in list identity payload %d", payload.getItemCount());
     }
 
     if (payload.getItems().at(0).getItemType() != EIP_ITEM_LIST_IDENTITY_RESPONSE)
     {
-      logError("Error: Payload response received with the wrong item type. Expected: %d, received %d",
+      CONSOLE_BRIDGE_logError("Error: Payload response received with the wrong item type. Expected: %d, received %d",
                EIP_ITEM_LIST_IDENTITY_RESPONSE, payload.getItems().at(0).getItemType());
       return;
     }
@@ -137,17 +138,17 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
     IdentityItemData id;
     payload.getItems().at(0).getDataAs(id);
 
-    logInform("=== Received ID Message ===");
-    logInform("Encapsulation Protocol Version: %d", (int)id.encap_protocol_version);
-    logInform("Address: %d : %d", inet_ntoa(id.sockaddr.sin_addr), ntohs(id.sockaddr.sin_port));
-    logInform("Vendor ID: %d", (int)id.vendor_id);
-    logInform("Device Type: %d", (int)id.device_type);
-    logInform("Product Code: %d", (int)id.product_code);
-    logInform("Revision: %d.%d", (int)id.revision[0], (int)id.revision[1]);
-    logInform("Status: %d", (int)id.status);
-    logInform("Serial Number: %d", (int)id.serial_number);
-    logInform("Product Name: %s", id.product_name.c_str());
-    logInform("State: %d", (int)id.state);
+    CONSOLE_BRIDGE_logInform("=== Received ID Message ===");
+    CONSOLE_BRIDGE_logInform("Encapsulation Protocol Version: %d", (int)id.encap_protocol_version);
+    CONSOLE_BRIDGE_logInform("Address: %d : %d", inet_ntoa(id.sockaddr.sin_addr), ntohs(id.sockaddr.sin_port));
+    CONSOLE_BRIDGE_logInform("Vendor ID: %d", (int)id.vendor_id);
+    CONSOLE_BRIDGE_logInform("Device Type: %d", (int)id.device_type);
+    CONSOLE_BRIDGE_logInform("Product Code: %d", (int)id.product_code);
+    CONSOLE_BRIDGE_logInform("Revision: %d.%d", (int)id.revision[0], (int)id.revision[1]);
+    CONSOLE_BRIDGE_logInform("Status: %d", (int)id.status);
+    CONSOLE_BRIDGE_logInform("Serial Number: %d", (int)id.serial_number);
+    CONSOLE_BRIDGE_logInform("Product Name: %s", id.product_name.c_str());
+    CONSOLE_BRIDGE_logInform("State: %d", (int)id.state);
   }
   catch (std::length_error e)
   {
@@ -158,7 +159,7 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
 void IOScanner::run()
 {
   sendListIdentityRequest();
-  logInform("Waiting for responses.");
+  CONSOLE_BRIDGE_logInform("Waiting for responses.");
   socket_.get_io_service().run();
 }
 

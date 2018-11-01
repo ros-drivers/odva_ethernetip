@@ -61,7 +61,7 @@ Reader& RRData::deserialize(Reader& reader)
   }
   if (pkt.getItemCount() > 2)
   {
-    logWarn("More than 2 items in RR data response");
+    CONSOLE_BRIDGE_logWarn("More than 2 items in RR data response");
   }
   if (pkt.getItems().at(0).getItemType() != EIP_ITEM_NULL)
   {

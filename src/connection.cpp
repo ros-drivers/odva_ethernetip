@@ -110,14 +110,14 @@ bool Connection::verifyForwardOpenResult(const ForwardOpenSuccess& result)
   }
   if (result.o_to_t_connection_id != o_to_t_connection_id)
   {
-    logInform("Replacing our o_to_t connection ID (%d) with connection ID provided by target (%d)",
-              o_to_t_connection_id, result.o_to_t_connection_id);
+    CONSOLE_BRIDGE_logInform("Replacing our o_to_t connection ID (%d) with connection ID provided by target (%d)",
+                             o_to_t_connection_id, result.o_to_t_connection_id);
     o_to_t_connection_id = result.o_to_t_connection_id;
   }
   if (result.t_to_o_connection_id != t_to_o_connection_id)
   {
-    logInform("Replacing our t_to_o connection ID (%d) with connection ID provided by target (%d)",
-              t_to_o_connection_id, result.t_to_o_connection_id);
+    CONSOLE_BRIDGE_logInform("Replacing our t_to_o connection ID (%d) with connection ID provided by target (%d)",
+                             t_to_o_connection_id, result.t_to_o_connection_id);
     t_to_o_connection_id = result.t_to_o_connection_id;
   }
   o_to_t_api = result.o_to_t_api;

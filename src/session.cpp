@@ -59,7 +59,7 @@ Session::Session(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket,
   boost::random::uniform_int_distribution<> dist(0, 0xFFFF);
   next_connection_id_ = gen();
   next_connection_sn_ = dist(gen);
-  logInform("Generated starting connection ID %d and SN %d", next_connection_id_, next_connection_sn_);
+  CONSOLE_BRIDGE_logInform("Generated starting connection ID %d and SN %d", next_connection_id_, next_connection_sn_);
 }
 
 Session::~Session()
@@ -79,12 +79,12 @@ Session::~Session()
 
 void Session::open(string hostname, string port, string io_port)
 {
-  logInform("Resolving hostname and connecting socket");
+  CONSOLE_BRIDGE_logInform("Resolving hostname and connecting socket");
   socket_->open(hostname, port);
   io_socket_->open(hostname, io_port);
 
   // create the registration message
-  logInform("Creating and sending the registration message");
+  CONSOLE_BRIDGE_logInform("Creating and sending the registration message");
   shared_ptr<RegisterSessionData> reg_data = make_shared<RegisterSessionData>();
   EncapPacket reg_msg(EIP_CMD_REGISTER_SESSION, 0, reg_data);
 
@@ -98,21 +98,21 @@ void Session::open(string hostname, string port, string io_port)
   {
     socket_->close();
     io_socket_->close();
-    logError("Could not parse response when registering session: %s", ex.what());
+    CONSOLE_BRIDGE_logError("Could not parse response when registering session: %s", ex.what());
     throw std::runtime_error("Invalid response received registering session");
   }
   catch (std::logic_error ex)
   {
     socket_->close();
     io_socket_->close();
-    logError("Error in registration response: %s", ex.what());
+    CONSOLE_BRIDGE_logError("Error in registration response: %s", ex.what());
     throw std::runtime_error("Error in registration response");
   }
 
   if (response.getHeader().length != reg_data->getLength())
   {
-    logWarn("Registration message received with wrong size. Expected %d bytes, received %d", reg_data->getLength(),
-            response.getHeader().length);
+    CONSOLE_BRIDGE_logWarn("Registration message received with wrong size. Expected %d bytes, received %d",
+                           reg_data->getLength(), response.getHeader().length);
   }
 
   bool response_valid = false;
@@ -123,40 +123,40 @@ void Session::open(string hostname, string port, string io_port)
   }
   catch (std::length_error ex)
   {
-    logWarn("Registration message too short, ignoring");
+    CONSOLE_BRIDGE_logWarn("Registration message too short, ignoring");
   }
   catch (std::logic_error ex)
   {
-    logWarn("Could not parse registration response: %s", ex.what());
+    CONSOLE_BRIDGE_logWarn("Could not parse registration response: %s", ex.what());
   }
 
   if (response_valid && reg_data->protocol_version != EIP_PROTOCOL_VERSION)
   {
-    logError("Error: Wrong Ethernet Industrial Protocol Version. Expected %d got %d", EIP_PROTOCOL_VERSION,
-             reg_data->protocol_version);
+    CONSOLE_BRIDGE_logError("Error: Wrong Ethernet Industrial Protocol Version. Expected %d got %d",
+                            EIP_PROTOCOL_VERSION, reg_data->protocol_version);
     socket_->close();
     io_socket_->close();
     throw std::runtime_error("Received wrong Ethernet IP Protocol Version on registration");
   }
   if (response_valid && reg_data->options != 0)
   {
-    logWarn("Registration message included non-zero options flags: %d", reg_data->options);
+    CONSOLE_BRIDGE_logWarn("Registration message included non-zero options flags: %d", reg_data->options);
   }
 
   session_id_ = response.getHeader().session_handle;
-  logInform("Successfully opened session ID %d", session_id_);
+  CONSOLE_BRIDGE_logInform("Successfully opened session ID %d", session_id_);
 }
 
 void Session::close()
 {
   // TODO: should close all connections and the IO port
-  logInform("Closing session");
+  CONSOLE_BRIDGE_logInform("Closing session");
 
   // create the unregister session message
   EncapPacket reg_msg(EIP_CMD_UNREGISTER_SESSION, session_id_);
   socket_->send(reg_msg);
 
-  logInform("Session closed");
+  CONSOLE_BRIDGE_logInform("Session closed");
 
   socket_->close();
   io_socket_->close();
@@ -165,12 +165,12 @@ void Session::close()
 
 EncapPacket Session::sendCommand(EncapPacket& req)
 {
-  logDebug("Sending Command");
+  CONSOLE_BRIDGE_logDebug("Sending Command");
   socket_->send(req);
 
-  logDebug("Waiting for response");
+  CONSOLE_BRIDGE_logDebug("Waiting for response");
   size_t n = socket_->receive(buffer(recv_buffer_));
-  logDebug("Received response of %d bytes", n);
+  CONSOLE_BRIDGE_logDebug("Received response of %d bytes", n);
 
   BufferReader reader(buffer(recv_buffer_, n));
   EncapPacket result;
@@ -178,7 +178,7 @@ EncapPacket Session::sendCommand(EncapPacket& req)
 
   if (reader.getByteCount() != n)
   {
-    logWarn("Packet received with %d bytes, but only %d bytes used", n, reader.getByteCount());
+    CONSOLE_BRIDGE_logWarn("Packet received with %d bytes, but only %d bytes used", n, reader.getByteCount());
   }
 
   check_packet(result, req.getHeader().command);
@@ -190,31 +190,32 @@ void Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
   // verify that all fields are correct
   if (pkt.getHeader().command != exp_cmd)
   {
-    logError("Reply received with wrong command. Expected %d received %d", exp_cmd, pkt.getHeader().command);
+    CONSOLE_BRIDGE_logError("Reply received with wrong command. Expected %d received %d", exp_cmd,
+                            pkt.getHeader().command);
     throw std::logic_error("Reply received with wrong command");
   }
   if (session_id_ == 0 && pkt.getHeader().session_handle == 0)
   {
-    logError("Zero session handle received on registration: %d", pkt.getHeader().session_handle);
+    CONSOLE_BRIDGE_logError("Zero session handle received on registration: %d", pkt.getHeader().session_handle);
     throw std::logic_error("Zero session handle received on registration");
   }
   if (session_id_ != 0 && pkt.getHeader().session_handle != session_id_)
   {
-    logError("Reply received with wrong session ID. Expected %d, received %d", session_id_,
-             pkt.getHeader().session_handle);
+    CONSOLE_BRIDGE_logError("Reply received with wrong session ID. Expected %d, received %d", session_id_,
+                            pkt.getHeader().session_handle);
     throw std::logic_error("Wrong session ID received for command");
   }
   if (pkt.getHeader().status != 0)
   {
-    logWarn("Non-zero status received: %d", pkt.getHeader().status);
+    CONSOLE_BRIDGE_logWarn("Non-zero status received: %d", pkt.getHeader().status);
   }
   if (pkt.getHeader().context[0] != 0 || pkt.getHeader().context[1] != 0)
   {
-    logWarn("Non-zero sender context received: %d/%d", pkt.getHeader().context[0], pkt.getHeader().context[1]);
+    CONSOLE_BRIDGE_logWarn("Non-zero sender context received: %d/%d", pkt.getHeader().context[0], pkt.getHeader().context[1]);
   }
   if (pkt.getHeader().options != 0)
   {
-    logWarn("Non-zero options received: %d", pkt.getHeader().options);
+    CONSOLE_BRIDGE_logWarn("Non-zero options received: %d", pkt.getHeader().options);
   }
 }
 
@@ -238,7 +239,7 @@ void Session::setSingleAttributeSerializable(EIP_USINT class_id,
 RRDataResponse Session::sendRRDataCommand(EIP_USINT service, const Path& path,
   shared_ptr<Serializable> data)
 {
-  logDebug("Creating RR Data Request");
+  CONSOLE_BRIDGE_logDebug("Creating RR Data Request");
   shared_ptr<RRDataRequest> req_data =
     make_shared<RRDataRequest> (service, path, data);
   EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
@@ -251,12 +252,12 @@ RRDataResponse Session::sendRRDataCommand(EIP_USINT service, const Path& path,
   }
   catch (std::length_error ex)
   {
-    logError("Response packet to RR command too short: %s", ex.what());
+    CONSOLE_BRIDGE_logError("Response packet to RR command too short: %s", ex.what());
     throw std::runtime_error("Packet response to RR Data Command too short");
   }
   catch (std::logic_error ex)
   {
-    logError("Invalid response to RR command: %s", ex.what());
+    CONSOLE_BRIDGE_logError("Invalid response to RR command: %s", ex.what());
     throw std::runtime_error("Invalid packet response to RR Data Command");
   }
 
@@ -267,25 +268,25 @@ RRDataResponse Session::sendRRDataCommand(EIP_USINT service, const Path& path,
   }
   catch (std::length_error ex)
   {
-    logError("Response data to RR command too short: %s", ex.what());
+    CONSOLE_BRIDGE_logError("Response data to RR command too short: %s", ex.what());
     throw std::runtime_error("Response data to RR Command too short");
   }
   catch (std::logic_error ex)
   {
-    logError("Invalid data to RR command: %s", ex.what());
+    CONSOLE_BRIDGE_logError("Invalid data to RR command: %s", ex.what());
     throw std::runtime_error("Invalid data in response to RR command");
   }
 
   // check that responses are valid
   if (resp_data.getServiceCode() != (service | 0x80))
   {
-    logWarn("Wrong service code returned for RR Data command. Expected: %d but received %d", (int)service,
-            (int)resp_data.getServiceCode());
+    CONSOLE_BRIDGE_logWarn("Wrong service code returned for RR Data command. Expected: %d but received %d",
+                           (int)service, (int)resp_data.getServiceCode());
     // throw std::runtime_error("Wrong service code returned for RR Data command");
   }
   if (resp_data.getGeneralStatus())
   {
-    logError("RR Data Command failed with status %d", (int)resp_data.getGeneralStatus());
+    CONSOLE_BRIDGE_logError("RR Data Command failed with status %d", (int)resp_data.getGeneralStatus());
     throw std::runtime_error("RR Data Command Failed");
   }
   return resp_data;
@@ -307,7 +308,7 @@ int Session::createConnection(const EIP_CONNECTION_INFO_T& o_to_t,
   resp_data.getResponseDataAs(result);
   if (!conn.verifyForwardOpenResult(result))
   {
-    logError("Received invalid response to forward open request");
+    CONSOLE_BRIDGE_logError("Received invalid response to forward open request");
     throw std::logic_error("Forward Open Response Invalid");
   }
 
@@ -323,7 +324,7 @@ void Session::closeConnection(size_t n)
   resp_data.getResponseDataAs(result);
   if (!connections_[n].verifyForwardCloseResult(result))
   {
-    logError("Received invalid response to forward close request");
+    CONSOLE_BRIDGE_logError("Received invalid response to forward close request");
     throw std::logic_error("Forward Close Response Invalid");
   }
   // remove the connection from the list
@@ -332,9 +333,9 @@ void Session::closeConnection(size_t n)
 
 CPFPacket Session::receiveIOPacket()
 {
-  // logInform("Receiving IO packet");
+  // CONSOLE_BRIDGE_logInform("Receiving IO packet");
   size_t n = io_socket_->receive(buffer(recv_buffer_));
-  // logInform("Received IO of %d bytes", n);
+  // CONSOLE_BRIDGE_logInform("Received IO of %d bytes", n);
 
   BufferReader reader(buffer(recv_buffer_, n));
   CPFPacket result;
@@ -342,7 +343,7 @@ CPFPacket Session::receiveIOPacket()
 
   if (reader.getByteCount() != n)
   {
-    logWarn("IO packet received with %d bytes, but only %d bytes used", n, reader.getByteCount());
+    CONSOLE_BRIDGE_logWarn("IO packet received with %d bytes, but only %d bytes used", n, reader.getByteCount());
   }
 
   return result;
@@ -350,7 +351,7 @@ CPFPacket Session::receiveIOPacket()
 
 void Session::sendIOPacket(CPFPacket& pkt)
 {
-  // logInform("Sending CPF Packet on IO Socket");
+  // CONSOLE_BRIDGE_logInform("Sending CPF Packet on IO Socket");
   io_socket_->send(pkt);
 }
 
