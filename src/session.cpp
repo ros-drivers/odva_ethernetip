@@ -127,7 +127,7 @@ void Session::open(string hostname, string port, string io_port)
   }
   catch (std::logic_error ex)
   {
-    logWarn("Warning: could not parse registration response: %s", ex.what());
+    logWarn("Could not parse registration response: %s", ex.what());
   }
 
   if (response_valid && reg_data->protocol_version != EIP_PROTOCOL_VERSION)
@@ -140,7 +140,7 @@ void Session::open(string hostname, string port, string io_port)
   }
   if (response_valid && reg_data->options != 0)
   {
-    logWarn("Warning: Registration message included non-zero options flags: %d", reg_data->options);
+    logWarn("Registration message included non-zero options flags: %d", reg_data->options);
   }
 
   session_id_ = response.getHeader().session_handle;
@@ -178,7 +178,7 @@ EncapPacket Session::sendCommand(EncapPacket& req)
 
   if (reader.getByteCount() != n)
   {
-    logWarn("Warning: packet received with %d bytes, but only %d bytes used", n, reader.getByteCount());
+    logWarn("Packet received with %d bytes, but only %d bytes used", n, reader.getByteCount());
   }
 
   check_packet(result, req.getHeader().command);
@@ -210,11 +210,11 @@ void Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
   }
   if (pkt.getHeader().context[0] != 0 || pkt.getHeader().context[1] != 0)
   {
-    logWarn("Warning: Non-zero sender context received: %d/%d", pkt.getHeader().context[0], pkt.getHeader().context[1]);
+    logWarn("Non-zero sender context received: %d/%d", pkt.getHeader().context[0], pkt.getHeader().context[1]);
   }
   if (pkt.getHeader().options != 0)
   {
-    logWarn("Warning: Non-zero options received: %d", pkt.getHeader().options);
+    logWarn("Non-zero options received: %d", pkt.getHeader().options);
   }
 }
 
