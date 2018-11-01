@@ -8,7 +8,7 @@ env:
   - CC=gcc CXX=g++
   - CC=clang CXX=clang++
 install:
-  - export CI_ROS_DISTRO=indigo
+  - export CI_ROS_DISTRO=kinetic
   - sudo sh -c 'echo "deb http://packages.ros.org/ros-shadow-fixed/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list'
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   - sudo apt-get update
