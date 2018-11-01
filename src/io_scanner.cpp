@@ -146,7 +146,7 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
     logInform("Revision: %d.%d", (int)id.revision[0], (int)id.revision[1]);
     logInform("Status: %d", (int)id.status);
     logInform("Serial Number: %d", (int)id.serial_number);
-    logInform("Product Name: %s", id.product_name);
+    logInform("Product Name: %s", id.product_name.c_str());
     logInform("State: %d", (int)id.state);
   }
   catch (std::length_error e)
