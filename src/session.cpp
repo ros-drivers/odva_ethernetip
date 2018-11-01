@@ -165,12 +165,12 @@ void Session::close()
 
 EncapPacket Session::sendCommand(EncapPacket& req)
 {
-  logInform("Sending Command");
+  logDebug("Sending Command");
   socket_->send(req);
 
-  logInform("Waiting for response");
+  logDebug("Waiting for response");
   size_t n = socket_->receive(buffer(recv_buffer_));
-  logInform("Received response of %d bytes", n);
+  logDebug("Received response of %d bytes", n);
 
   BufferReader reader(buffer(recv_buffer_, n));
   EncapPacket result;
@@ -238,7 +238,7 @@ void Session::setSingleAttributeSerializable(EIP_USINT class_id,
 RRDataResponse Session::sendRRDataCommand(EIP_USINT service, const Path& path,
   shared_ptr<Serializable> data)
 {
-  logInform("Creating RR Data Request");
+  logDebug("Creating RR Data Request");
   shared_ptr<RRDataRequest> req_data =
     make_shared<RRDataRequest> (service, path, data);
   EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
