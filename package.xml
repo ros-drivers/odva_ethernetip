@@ -11,5 +11,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>boost</depend>
+  <depend>libconsole-bridge-dev</depend>
+
   <test_depend>rosunit</test_depend>
 </package>

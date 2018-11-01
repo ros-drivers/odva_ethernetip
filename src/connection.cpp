@@ -26,10 +26,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include "odva_ethernetip/connection.h"
 
 #include <boost/make_shared.hpp>
-#include <iostream>
+#include <console_bridge/console.h>
 
-using std::cout;
-using std::endl;
 using boost::shared_ptr;
 using boost::make_shared;
 
@@ -112,16 +110,14 @@ bool Connection::verifyForwardOpenResult(const ForwardOpenSuccess& result)
   }
   if (result.o_to_t_connection_id != o_to_t_connection_id)
   {
-    cout << "Replacing our o_to_t connection ID (" << o_to_t_connection_id
-      << ") with connection ID provided by target ("
-      << result.o_to_t_connection_id << ")" << endl;
+    logInform("Replacing our o_to_t connection ID (%d) with connection ID provided by target (%d)",
+              o_to_t_connection_id, result.o_to_t_connection_id);
     o_to_t_connection_id = result.o_to_t_connection_id;
   }
   if (result.t_to_o_connection_id != t_to_o_connection_id)
   {
-    cout << "Replacing our t_to_o connection ID (" << t_to_o_connection_id
-      << ") with connection ID provided by target ("
-      << result.t_to_o_connection_id << ")" << endl;
+    logInform("Replacing our t_to_o connection ID (%d) with connection ID provided by target (%d)",
+              t_to_o_connection_id, result.t_to_o_connection_id);
     t_to_o_connection_id = result.t_to_o_connection_id;
   }
   o_to_t_api = result.o_to_t_api;

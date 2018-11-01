@@ -28,6 +28,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <boost/make_shared.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
+#include <console_bridge/console.h>
 
 #include "odva_ethernetip/serialization/buffer_reader.h"
 #include "odva_ethernetip/serialization/buffer_writer.h"
@@ -40,8 +41,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 
 using boost::shared_ptr;
 using boost::make_shared;
-using std::cerr;
-using std::cout;
 using std::endl;
 
 namespace eip {
@@ -60,8 +59,7 @@ Session::Session(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket,
   boost::random::uniform_int_distribution<> dist(0, 0xFFFF);
   next_connection_id_ = gen();
   next_connection_sn_ = dist(gen);
-  cout << "Generated starting connection ID " << next_connection_id_
-    << " and SN " << next_connection_sn_ << endl;;
+  logInform("Generated starting connection ID %d and SN %d", next_connection_id_, next_connection_sn_);
 }
 
 Session::~Session()
@@ -81,12 +79,12 @@ Session::~Session()
 
 void Session::open(string hostname, string port, string io_port)
 {
-  cout << "Resolving hostname and connecting socket" << endl;
+  logInform("Resolving hostname and connecting socket");
   socket_->open(hostname, port);
   io_socket_->open(hostname, io_port);
 
   // create the registration message
-  cout << "Creating and sending the registration message" << endl;
+  logInform("Creating and sending the registration message");
   shared_ptr<RegisterSessionData> reg_data = make_shared<RegisterSessionData>();
   EncapPacket reg_msg(EIP_CMD_REGISTER_SESSION, 0, reg_data);
 
@@ -100,22 +98,21 @@ void Session::open(string hostname, string port, string io_port)
   {
     socket_->close();
     io_socket_->close();
-    cerr << "Could not parse response when registering session: " << ex.what() << endl;
+    logError("Could not parse response when registering session: %s", ex.what());
     throw std::runtime_error("Invalid response received registering session");
   }
   catch (std::logic_error ex)
   {
     socket_->close();
     io_socket_->close();
-    cerr << "Error in registration response: " << ex.what() << endl;
+    logError("Error in registration response: %s", ex.what());
     throw std::runtime_error("Error in registration response");
   }
 
   if (response.getHeader().length != reg_data->getLength())
   {
-    cerr << "Warning: Registration message received with wrong size. Expected "
-       << reg_data->getLength() << " bytes, received "
-       << response.getHeader().length << endl;
+    logWarn("Registration message received with wrong size. Expected %d bytes, received %d", reg_data->getLength(),
+            response.getHeader().length);
   }
 
   bool response_valid = false;
@@ -126,42 +123,40 @@ void Session::open(string hostname, string port, string io_port)
   }
   catch (std::length_error ex)
   {
-    cerr << "Warning: Registration message too short, ignoring" << endl;
+    logWarn("Registration message too short, ignoring");
   }
   catch (std::logic_error ex)
   {
-    cerr << "Warning: could not parse registration response: " << ex.what() << endl;
+    logWarn("Warning: could not parse registration response: %s", ex.what());
   }
 
   if (response_valid && reg_data->protocol_version != EIP_PROTOCOL_VERSION)
   {
-    cerr << "Error: Wrong Ethernet Industrial Protocol Version. "
-      "Expected " << EIP_PROTOCOL_VERSION << " got "
-      << reg_data->protocol_version << endl;
+    logError("Error: Wrong Ethernet Industrial Protocol Version. Expected %d got %d", EIP_PROTOCOL_VERSION,
+             reg_data->protocol_version);
     socket_->close();
     io_socket_->close();
     throw std::runtime_error("Received wrong Ethernet IP Protocol Version on registration");
   }
   if (response_valid && reg_data->options != 0)
   {
-    cerr << "Warning: Registration message included non-zero options flags: "
-      << reg_data->options << endl;
+    logWarn("Warning: Registration message included non-zero options flags: %d", reg_data->options);
   }
 
   session_id_ = response.getHeader().session_handle;
-  cout << "Successfully opened session ID " << session_id_ << endl;
+  logInform("Successfully opened session ID %d", session_id_);
 }
 
 void Session::close()
 {
   // TODO: should close all connections and the IO port
-  cout << "Closing session" << endl;
+  logInform("Closing session");
 
   // create the unregister session message
   EncapPacket reg_msg(EIP_CMD_UNREGISTER_SESSION, session_id_);
   socket_->send(reg_msg);
 
-  cout << "Session closed" << endl;
+  logInform("Session closed");
 
   socket_->close();
   io_socket_->close();
@@ -170,12 +165,12 @@ void Session::close()
 
 EncapPacket Session::sendCommand(EncapPacket& req)
 {
-  cout << "Sending Command" << endl;
+  logInform("Sending Command");
   socket_->send(req);
 
-  cout << "Waiting for response" << endl;
+  logInform("Waiting for response");
   size_t n = socket_->receive(buffer(recv_buffer_));
-  cout << "Received response of " << n << " bytes" << endl;
+  logInform("Received response of %d bytes", n);
 
   BufferReader reader(buffer(recv_buffer_, n));
   EncapPacket result;
@@ -183,8 +178,7 @@ EncapPacket Session::sendCommand(EncapPacket& req)
 
   if (reader.getByteCount() != n)
   {
-    cerr << "Warning: packet received with " << n <<
-      " bytes, but only " << reader.getByteCount() << " bytes used" << endl;
+    logWarn("Warning: packet received with %d bytes, but only %d bytes used", n, reader.getByteCount());
   }
 
   check_packet(result, req.getHeader().command);
@@ -196,34 +190,31 @@ void Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
   // verify that all fields are correct
   if (pkt.getHeader().command != exp_cmd)
   {
-    cerr << "Reply received with wrong command. Expected "
-      << exp_cmd << ", received " << pkt.getHeader().command << endl;
+    logError("Reply received with wrong command. Expected %d received %d", exp_cmd, pkt.getHeader().command);
     throw std::logic_error("Reply received with wrong command");
   }
   if (session_id_ == 0 && pkt.getHeader().session_handle == 0)
   {
-    cerr << "Warning: Zero session handle received on registration: "
-      << pkt.getHeader().session_handle << endl;
+    logError("Zero session handle received on registration: %d", pkt.getHeader().session_handle);
     throw std::logic_error("Zero session handle received on registration");
   }
   if (session_id_ != 0 && pkt.getHeader().session_handle != session_id_)
   {
-    cerr << "Warning: reply received with wrong session ID. Expected "
-      << session_id_ << ", recieved " << pkt.getHeader().session_handle << endl;
+    logError("Reply received with wrong session ID. Expected %d, received %d", session_id_,
+             pkt.getHeader().session_handle);
     throw std::logic_error("Wrong session ID received for command");
   }
   if (pkt.getHeader().status != 0)
   {
-    cerr << "Warning: Non-zero status received: " << pkt.getHeader().status << endl;
+    logWarn("Non-zero status received: %d", pkt.getHeader().status);
   }
   if (pkt.getHeader().context[0] != 0 || pkt.getHeader().context[1] != 0)
   {
-    cerr << "Warning: Non-zero sender context received: "
-    << pkt.getHeader().context[0] << " / " << pkt.getHeader().context[1] << endl;
+    logWarn("Warning: Non-zero sender context received: %d/%d", pkt.getHeader().context[0], pkt.getHeader().context[1]);
   }
   if (pkt.getHeader().options != 0)
   {
-    cerr << "Warning: Non-zero options received: " << pkt.getHeader().options << endl;
+    logWarn("Warning: Non-zero options received: %d", pkt.getHeader().options);
   }
 }
 
@@ -247,7 +238,7 @@ void Session::setSingleAttributeSerializable(EIP_USINT class_id,
 RRDataResponse Session::sendRRDataCommand(EIP_USINT service, const Path& path,
   shared_ptr<Serializable> data)
 {
-  cout << "Creating RR Data Request" << endl;
+  logInform("Creating RR Data Request");
   shared_ptr<RRDataRequest> req_data =
     make_shared<RRDataRequest> (service, path, data);
   EncapPacket encap_pkt(EIP_CMD_SEND_RR_DATA, session_id_, req_data);
@@ -260,12 +251,12 @@ RRDataResponse Session::sendRRDataCommand(EIP_USINT service, const Path& path,
   }
   catch (std::length_error ex)
   {
-    cerr << "Response packet to RR command too short: " << ex.what() << endl;
+    logError("Response packet to RR command too short: %s", ex.what());
     throw std::runtime_error("Packet response to RR Data Command too short");
   }
   catch (std::logic_error ex)
   {
-    cerr << "Invalid response to RR command: " << ex.what() << endl;
+    logError("Invalid response to RR command: %s", ex.what());
     throw std::runtime_error("Invalid packet response to RR Data Command");
   }
 
@@ -276,25 +267,25 @@ RRDataResponse Session::sendRRDataCommand(EIP_USINT service, const Path& path,
   }
   catch (std::length_error ex)
   {
-    cerr << "Response data to RR command too short: " << ex.what() << endl;
+    logError("Response data to RR command too short: %s", ex.what());
     throw std::runtime_error("Response data to RR Command too short");
   }
   catch (std::logic_error ex)
   {
-    cerr << "Invalid data to RR command: " << ex.what() << endl;
+    logError("Invalid data to RR command: %s", ex.what());
     throw std::runtime_error("Invalid data in response to RR command");
   }
 
   // check that responses are valid
   if (resp_data.getServiceCode() != (service | 0x80))
   {
-    cerr << "Warning: Wrong service code returned for RR Data command. Expected: "
-      << (int)service << " but received " << (int)resp_data.getServiceCode() << endl;
+    logWarn("Wrong service code returned for RR Data command. Expected: %d but received %d", (int)service,
+            (int)resp_data.getServiceCode());
     // throw std::runtime_error("Wrong service code returned for RR Data command");
   }
   if (resp_data.getGeneralStatus())
   {
-    cerr << "RR Data Command failed with status " << (int)resp_data.getGeneralStatus() << endl;
+    logError("RR Data Command failed with status %d", (int)resp_data.getGeneralStatus());
     throw std::runtime_error("RR Data Command Failed");
   }
   return resp_data;
@@ -316,7 +307,7 @@ int Session::createConnection(const EIP_CONNECTION_INFO_T& o_to_t,
   resp_data.getResponseDataAs(result);
   if (!conn.verifyForwardOpenResult(result))
   {
-    cerr << "Received invalid response to forward open request" << endl;
+    logError("Received invalid response to forward open request");
     throw std::logic_error("Forward Open Response Invalid");
   }
 
@@ -332,7 +323,7 @@ void Session::closeConnection(size_t n)
   resp_data.getResponseDataAs(result);
   if (!connections_[n].verifyForwardCloseResult(result))
   {
-    cerr << "Received invalid response to forward close request" << endl;
+    logError("Received invalid response to forward close request");
     throw std::logic_error("Forward Close Response Invalid");
   }
   // remove the connection from the list
@@ -341,9 +332,9 @@ void Session::closeConnection(size_t n)
 
 CPFPacket Session::receiveIOPacket()
 {
-  // cout << "Receiving IO packet" << endl;
+  // logInform("Receiving IO packet");
   size_t n = io_socket_->receive(buffer(recv_buffer_));
-  // cout << "Received IO of " << n << " bytes" << endl;
+  // logInform("Received IO of %d bytes", n);
 
   BufferReader reader(buffer(recv_buffer_, n));
   CPFPacket result;
@@ -351,8 +342,7 @@ CPFPacket Session::receiveIOPacket()
 
   if (reader.getByteCount() != n)
   {
-    cerr << "Warning: IO packet received with " << n <<
-      " bytes, but only " << reader.getByteCount() << " bytes used" << endl;
+    logWarn("IO packet received with %d bytes, but only %d bytes used", n, reader.getByteCount());
   }
 
   return result;
@@ -360,7 +350,7 @@ CPFPacket Session::receiveIOPacket()
 
 void Session::sendIOPacket(CPFPacket& pkt)
 {
-  // cout << "Sending CPF Packet on IO Socket" << endl;
+  // logInform("Sending CPF Packet on IO Socket");
   io_socket_->send(pkt);
 }
 

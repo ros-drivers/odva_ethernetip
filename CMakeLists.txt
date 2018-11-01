@@ -3,17 +3,19 @@ project(odva_ethernetip)
 
 find_package(catkin REQUIRED)
 
+find_package(console_bridge REQUIRED)
 find_package(Boost 1.47 REQUIRED COMPONENTS system)
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
-  DEPENDS Boost
+  DEPENDS Boost console_bridge
 )
 
 include_directories(
   include
   ${Boost_INCLUDE_DIRS}
+  ${console_bridge_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library for just Ethernet/IP generic stuff
@@ -33,6 +35,7 @@ add_library(${PROJECT_NAME}
 )
 target_link_libraries(${PROJECT_NAME}
   ${Boost_LIBRARIES}
+  ${console_bridge_LIBRARIES}
 )
 
 ## Mark executables and libraries for installation

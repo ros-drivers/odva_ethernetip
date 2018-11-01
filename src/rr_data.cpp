@@ -25,6 +25,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <console_bridge/console.h>
 
 #include "odva_ethernetip/rr_data.h"
 #include "odva_ethernetip/cpf_packet.h"
@@ -60,7 +61,7 @@ Reader& RRData::deserialize(Reader& reader)
   }
   if (pkt.getItemCount() > 2)
   {
-    std::cout << "Warning: more than 2 items in RR data response" << std::endl;
+    logWarn("More than 2 items in RR data response");
   }
   if (pkt.getItems().at(0).getItemType() != EIP_ITEM_NULL)
   {
