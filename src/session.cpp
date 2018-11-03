@@ -333,9 +333,9 @@ void Session::closeConnection(size_t n)
 
 CPFPacket Session::receiveIOPacket()
 {
-  // CONSOLE_BRIDGE_logInform("Receiving IO packet");
+  CONSOLE_BRIDGE_logDebug("Receiving IO packet");
   size_t n = io_socket_->receive(buffer(recv_buffer_));
-  // CONSOLE_BRIDGE_logInform("Received IO of %d bytes", n);
+  CONSOLE_BRIDGE_logDebug("Received IO of %d bytes", n);
 
   BufferReader reader(buffer(recv_buffer_, n));
   CPFPacket result;
@@ -351,7 +351,7 @@ CPFPacket Session::receiveIOPacket()
 
 void Session::sendIOPacket(CPFPacket& pkt)
 {
-  // CONSOLE_BRIDGE_logInform("Sending CPF Packet on IO Socket");
+  CONSOLE_BRIDGE_logDebug("Sending CPF Packet on IO Socket");
   io_socket_->send(pkt);
 }
 
