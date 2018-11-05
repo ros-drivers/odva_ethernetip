@@ -59,7 +59,7 @@ Session::Session(shared_ptr<Socket> socket, shared_ptr<Socket> io_socket,
   boost::random::uniform_int_distribution<> dist(0, 0xFFFF);
   next_connection_id_ = gen();
   next_connection_sn_ = dist(gen);
-  CONSOLE_BRIDGE_logInform("Generated starting connection ID %d and SN %d", next_connection_id_, next_connection_sn_);
+  CONSOLE_BRIDGE_logInform("Generated starting connection ID %zu and SN %zu", next_connection_id_, next_connection_sn_);
 }
 
 Session::~Session()
@@ -111,7 +111,7 @@ void Session::open(string hostname, string port, string io_port)
 
   if (response.getHeader().length != reg_data->getLength())
   {
-    CONSOLE_BRIDGE_logWarn("Registration message received with wrong size. Expected %d bytes, received %d",
+    CONSOLE_BRIDGE_logWarn("Registration message received with wrong size. Expected %zu bytes, received %u",
                            reg_data->getLength(), response.getHeader().length);
   }
 
@@ -132,7 +132,7 @@ void Session::open(string hostname, string port, string io_port)
 
   if (response_valid && reg_data->protocol_version != EIP_PROTOCOL_VERSION)
   {
-    CONSOLE_BRIDGE_logError("Error: Wrong Ethernet Industrial Protocol Version. Expected %d got %d",
+    CONSOLE_BRIDGE_logError("Error: Wrong Ethernet Industrial Protocol Version. Expected %u got %u",
                             EIP_PROTOCOL_VERSION, reg_data->protocol_version);
     socket_->close();
     io_socket_->close();
@@ -140,11 +140,11 @@ void Session::open(string hostname, string port, string io_port)
   }
   if (response_valid && reg_data->options != 0)
   {
-    CONSOLE_BRIDGE_logWarn("Registration message included non-zero options flags: %d", reg_data->options);
+    CONSOLE_BRIDGE_logWarn("Registration message included non-zero options flags: %u", reg_data->options);
   }
 
   session_id_ = response.getHeader().session_handle;
-  CONSOLE_BRIDGE_logInform("Successfully opened session ID %d", session_id_);
+  CONSOLE_BRIDGE_logInform("Successfully opened session ID %zu", session_id_);
 }
 
 void Session::close()
@@ -170,7 +170,7 @@ EncapPacket Session::sendCommand(EncapPacket& req)
 
   CONSOLE_BRIDGE_logDebug("Waiting for response");
   size_t n = socket_->receive(buffer(recv_buffer_));
-  CONSOLE_BRIDGE_logDebug("Received response of %d bytes", n);
+  CONSOLE_BRIDGE_logDebug("Received response of %zu bytes", n);
 
   BufferReader reader(buffer(recv_buffer_, n));
   EncapPacket result;
@@ -178,7 +178,7 @@ EncapPacket Session::sendCommand(EncapPacket& req)
 
   if (reader.getByteCount() != n)
   {
-    CONSOLE_BRIDGE_logWarn("Packet received with %d bytes, but only %d bytes used", n, reader.getByteCount());
+    CONSOLE_BRIDGE_logWarn("Packet received with %zu bytes, but only %zu bytes used", n, reader.getByteCount());
   }
 
   check_packet(result, req.getHeader().command);
@@ -190,32 +190,33 @@ void Session::check_packet(EncapPacket& pkt, EIP_UINT exp_cmd)
   // verify that all fields are correct
   if (pkt.getHeader().command != exp_cmd)
   {
-    CONSOLE_BRIDGE_logError("Reply received with wrong command. Expected %d received %d", exp_cmd,
+    CONSOLE_BRIDGE_logError("Reply received with wrong command. Expected %u received %u", exp_cmd,
                             pkt.getHeader().command);
     throw std::logic_error("Reply received with wrong command");
   }
   if (session_id_ == 0 && pkt.getHeader().session_handle == 0)
   {
-    CONSOLE_BRIDGE_logError("Zero session handle received on registration: %d", pkt.getHeader().session_handle);
+    CONSOLE_BRIDGE_logError("Zero session handle received on registration: %zu", pkt.getHeader().session_handle);
     throw std::logic_error("Zero session handle received on registration");
   }
   if (session_id_ != 0 && pkt.getHeader().session_handle != session_id_)
   {
-    CONSOLE_BRIDGE_logError("Reply received with wrong session ID. Expected %d, received %d", session_id_,
+    CONSOLE_BRIDGE_logError("Reply received with wrong session ID. Expected %zu, received %zu", session_id_,
                             pkt.getHeader().session_handle);
     throw std::logic_error("Wrong session ID received for command");
   }
   if (pkt.getHeader().status != 0)
   {
-    CONSOLE_BRIDGE_logWarn("Non-zero status received: %d", pkt.getHeader().status);
+    CONSOLE_BRIDGE_logWarn("Non-zero status received: %zu", pkt.getHeader().status);
   }
   if (pkt.getHeader().context[0] != 0 || pkt.getHeader().context[1] != 0)
   {
-    CONSOLE_BRIDGE_logWarn("Non-zero sender context received: %d/%d", pkt.getHeader().context[0], pkt.getHeader().context[1]);
+    CONSOLE_BRIDGE_logWarn("Non-zero sender context received: %zu/%zu", pkt.getHeader().context[0],
+                           pkt.getHeader().context[1]);
   }
   if (pkt.getHeader().options != 0)
   {
-    CONSOLE_BRIDGE_logWarn("Non-zero options received: %d", pkt.getHeader().options);
+    CONSOLE_BRIDGE_logWarn("Non-zero options received: %zu", pkt.getHeader().options);
   }
 }
 
@@ -335,7 +336,7 @@ CPFPacket Session::receiveIOPacket()
 {
   CONSOLE_BRIDGE_logDebug("Receiving IO packet");
   size_t n = io_socket_->receive(buffer(recv_buffer_));
-  CONSOLE_BRIDGE_logDebug("Received IO of %d bytes", n);
+  CONSOLE_BRIDGE_logDebug("Received IO of %zu bytes", n);
 
   BufferReader reader(buffer(recv_buffer_, n));
   CPFPacket result;
@@ -343,7 +344,7 @@ CPFPacket Session::receiveIOPacket()
 
   if (reader.getByteCount() != n)
   {
-    CONSOLE_BRIDGE_logWarn("IO packet received with %d bytes, but only %d bytes used", n, reader.getByteCount());
+    CONSOLE_BRIDGE_logWarn("IO packet received with %zu bytes, but only %zu bytes used", n, reader.getByteCount());
   }
 
   return result;

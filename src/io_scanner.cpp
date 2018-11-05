@@ -88,31 +88,31 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
     pkt.deserialize(r);
     if (r.getByteCount() != num_bytes)
     {
-      CONSOLE_BRIDGE_logWarn("Packet received with %d bytes, but only %d bytes used", num_bytes, r.getByteCount());
+      CONSOLE_BRIDGE_logWarn("Packet received with %zu bytes, but only %zu bytes used", num_bytes, r.getByteCount());
     }
 
     if (pkt.getHeader().command != EIP_CMD_LIST_IDENTITY)
     {
-      CONSOLE_BRIDGE_logError("Reply received with wrong command. Expected %d, received %d", EIP_CMD_LIST_IDENTITY,
+      CONSOLE_BRIDGE_logError("Reply received with wrong command. Expected %u, received %u", EIP_CMD_LIST_IDENTITY,
                               pkt.getHeader().command);
       return;
     }
     if (pkt.getHeader().session_handle != 0)
     {
-      CONSOLE_BRIDGE_logWarn("Non-zero session handle received: %d", pkt.getHeader().session_handle);
+      CONSOLE_BRIDGE_logWarn("Non-zero session handle received: %zu", pkt.getHeader().session_handle);
     }
     if (pkt.getHeader().status != 0)
     {
-      CONSOLE_BRIDGE_logWarn("Non-zero status received: %d", pkt.getHeader().status);
+      CONSOLE_BRIDGE_logWarn("Non-zero status received: %zu", pkt.getHeader().status);
     }
     if (pkt.getHeader().context[0] != 0 || pkt.getHeader().context[1] != 0)
     {
-      CONSOLE_BRIDGE_logWarn("Non-zero sender context received: %d, %d", pkt.getHeader().context[0],
+      CONSOLE_BRIDGE_logWarn("Non-zero sender context received: %zu, %zu", pkt.getHeader().context[0],
                              pkt.getHeader().context[1]);
     }
     if (pkt.getHeader().options != 0)
     {
-      CONSOLE_BRIDGE_logWarn("Non-zero options received: %d", pkt.getHeader().options);
+      CONSOLE_BRIDGE_logWarn("Non-zero options received: %zu", pkt.getHeader().options);
     }
 
     CPFPacket payload;
@@ -125,12 +125,12 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
     }
     if (payload.getItemCount() > 1)
     {
-      CONSOLE_BRIDGE_logWarn("More than one item in list identity payload %d", payload.getItemCount());
+      CONSOLE_BRIDGE_logWarn("More than one item in list identity payload %u", payload.getItemCount());
     }
 
     if (payload.getItems().at(0).getItemType() != EIP_ITEM_LIST_IDENTITY_RESPONSE)
     {
-      CONSOLE_BRIDGE_logError("Error: Payload response received with the wrong item type. Expected: %d, received %d",
+      CONSOLE_BRIDGE_logError("Error: Payload response received with the wrong item type. Expected: %zu, received %zu",
                EIP_ITEM_LIST_IDENTITY_RESPONSE, payload.getItems().at(0).getItemType());
       return;
     }
