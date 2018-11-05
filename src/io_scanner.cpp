@@ -25,6 +25,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 
 #include <iostream>
 #include <boost/bind.hpp>
+#include <console_bridge/console.h>
 
 #include "odva_ethernetip/io_scanner.h"
 #include "odva_ethernetip/eip_types.h"
@@ -37,8 +38,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 
 using namespace boost::asio;
 using boost::asio::ip::udp;
-using std::cerr;
-using std::cout;
 using std::endl;
 
 namespace eip {
@@ -49,18 +48,18 @@ using serialization::BufferWriter;
 IOScanner::IOScanner(io_service& io_service, string hostname)
     : socket_(io_service), hostname_(hostname)
 {
-  cout << "Opening UDP socket... ";
+  CONSOLE_BRIDGE_logInform("Opening UDP socket... ");
   socket_.open(udp::v4());
   socket_.async_receive_from(buffer(recv_buf_), device_endpoint_,
     boost::bind(&IOScanner::handleListIdentityResponse, this,
       boost::asio::placeholders::error,
       boost::asio::placeholders::bytes_transferred));
-  cout << "done." << endl;
+  CONSOLE_BRIDGE_logInform("done.");
 }
 
 void IOScanner::sendListIdentityRequest()
 {
-  cout << "Sending List Identity Request... ";
+  CONSOLE_BRIDGE_logInform("Sending List Identity Request... ");
   udp::resolver r(socket_.get_io_service());
   udp::resolver::query q(udp::v4(), hostname_, "44818");
   udp::endpoint receiver_endpoint = *r.resolve(q);
@@ -70,7 +69,7 @@ void IOScanner::sendListIdentityRequest()
   BufferWriter w(buffer(d));
   pkt.serialize(w);
   socket_.send_to(buffer(d, w.getByteCount()), receiver_endpoint);
-  cout << "done." << endl;
+  CONSOLE_BRIDGE_logInform("done.");
 }
 
 void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
@@ -78,7 +77,7 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
 {
   if (ec)
   {
-    cerr << "Error receiving list identity response message" << endl;
+    CONSOLE_BRIDGE_logError("Error receiving list identity response message");
     return;
   }
 
@@ -89,32 +88,31 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
     pkt.deserialize(r);
     if (r.getByteCount() != num_bytes)
     {
-      cerr << "Warning: packet received with " << num_bytes <<
-        " bytes, but only " << r.getByteCount() << " bytes used" << endl;
+      CONSOLE_BRIDGE_logWarn("Packet received with %zu bytes, but only %zu bytes used", num_bytes, r.getByteCount());
     }
 
     if (pkt.getHeader().command != EIP_CMD_LIST_IDENTITY)
     {
-      cerr << "Reply received with wrong command. Expected "
-        << EIP_CMD_LIST_IDENTITY << ", received " << pkt.getHeader().command << endl;
+      CONSOLE_BRIDGE_logError("Reply received with wrong command. Expected %u, received %u", EIP_CMD_LIST_IDENTITY,
+                              pkt.getHeader().command);
       return;
     }
     if (pkt.getHeader().session_handle != 0)
     {
-      cerr << "Warning: Non-zero session handle received: " << pkt.getHeader().session_handle << endl;
+      CONSOLE_BRIDGE_logWarn("Non-zero session handle received: %zu", pkt.getHeader().session_handle);
     }
     if (pkt.getHeader().status != 0)
     {
-      cerr << "Warning: Non-zero status received: " << pkt.getHeader().status << endl;
+      CONSOLE_BRIDGE_logWarn("Non-zero status received: %zu", pkt.getHeader().status);
     }
     if (pkt.getHeader().context[0] != 0 || pkt.getHeader().context[1] != 0)
     {
-      cerr << "Warning: Non-zero sender context received: "
-           << pkt.getHeader().context[0] << ", " << pkt.getHeader().context[1] << endl;
+      CONSOLE_BRIDGE_logWarn("Non-zero sender context received: %zu, %zu", pkt.getHeader().context[0],
+                             pkt.getHeader().context[1]);
     }
     if (pkt.getHeader().options != 0)
     {
-      cerr << "Warning: Non-zero options received: " << pkt.getHeader().options << endl;
+      CONSOLE_BRIDGE_logWarn("Non-zero options received: %zu", pkt.getHeader().options);
     }
 
     CPFPacket payload;
@@ -122,36 +120,35 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
 
     if (payload.getItemCount() < 1)
     {
-      cerr << "No items in list identity payload!" << endl;
+      CONSOLE_BRIDGE_logError("No items in list identity payload!");
       return;
     }
     if (payload.getItemCount() > 1)
     {
-      cerr << "Warning: more than one item in list identity payload " << payload.getItemCount() << endl;
+      CONSOLE_BRIDGE_logWarn("More than one item in list identity payload %u", payload.getItemCount());
     }
 
     if (payload.getItems().at(0).getItemType() != EIP_ITEM_LIST_IDENTITY_RESPONSE)
     {
-      cerr << "Error: Payload response received with the wrong item type. Expected: "
-        << EIP_ITEM_LIST_IDENTITY_RESPONSE << ", received: " <<
-        payload.getItems().at(0).getItemType() << endl;
+      CONSOLE_BRIDGE_logError("Error: Payload response received with the wrong item type. Expected: %zu, received %zu",
+               EIP_ITEM_LIST_IDENTITY_RESPONSE, payload.getItems().at(0).getItemType());
       return;
     }
 
     IdentityItemData id;
     payload.getItems().at(0).getDataAs(id);
 
-    cout << "=== Received ID Message ===" << endl;
-    cout << "Encapsulation Protocol Version: " << (int)id.encap_protocol_version << endl;
-    cout << "Address: " << inet_ntoa(id.sockaddr.sin_addr) << " : " << ntohs(id.sockaddr.sin_port) << endl;
-    cout << "Vendor ID: " << (int)id.vendor_id << endl;
-    cout << "Device Type: " << (int)id.device_type << endl;
-    cout << "Product Code: " << (int)id.product_code << endl;
-    cout << "Revision: " << (int)id.revision[0] << "." << (int)id.revision[1] << endl;
-    cout << "Status: " << (int)id.status << endl;
-    cout << "Serial Number: " << (int)id.serial_number << endl;
-    cout << "Product Name: " << id.product_name << endl;
-    cout << "State: " << (int)id.state << endl;
+    CONSOLE_BRIDGE_logInform("=== Received ID Message ===");
+    CONSOLE_BRIDGE_logInform("Encapsulation Protocol Version: %d", (int)id.encap_protocol_version);
+    CONSOLE_BRIDGE_logInform("Address: %d : %d", inet_ntoa(id.sockaddr.sin_addr), ntohs(id.sockaddr.sin_port));
+    CONSOLE_BRIDGE_logInform("Vendor ID: %d", (int)id.vendor_id);
+    CONSOLE_BRIDGE_logInform("Device Type: %d", (int)id.device_type);
+    CONSOLE_BRIDGE_logInform("Product Code: %d", (int)id.product_code);
+    CONSOLE_BRIDGE_logInform("Revision: %d.%d", (int)id.revision[0], (int)id.revision[1]);
+    CONSOLE_BRIDGE_logInform("Status: %d", (int)id.status);
+    CONSOLE_BRIDGE_logInform("Serial Number: %d", (int)id.serial_number);
+    CONSOLE_BRIDGE_logInform("Product Name: %s", id.product_name.c_str());
+    CONSOLE_BRIDGE_logInform("State: %d", (int)id.state);
   }
   catch (std::length_error e)
   {
@@ -162,7 +159,7 @@ void IOScanner::handleListIdentityResponse(const boost::system::error_code& ec,
 void IOScanner::run()
 {
   sendListIdentityRequest();
-  cout << "Waiting for responses." << endl;
+  CONSOLE_BRIDGE_logInform("Waiting for responses.");
   socket_.get_io_service().run();
 }
 
