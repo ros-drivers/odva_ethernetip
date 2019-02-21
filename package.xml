@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>odva_ethernetip</name>
-  <version>0.1.3</version>
+  <version>0.1.4</version>
   <description>Library implementing ODVA EtherNet/IP (Industrial Protocol).</description>
 
   <license>BSD</license>

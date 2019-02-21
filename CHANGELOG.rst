@@ -2,8 +2,8 @@
 Changelog for package odva_ethernetip
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.4 (2019-02-21)
+------------------
 
 * Update .travis.yml to use industrial CI to test against Xenial
 * Logging using console_bridge (`#15 <https://github.com/ros-drivers/odva_ethernetip/issues/15>`_)
