@@ -2,6 +2,16 @@
 Changelog for package odva_ethernetip
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
+* Update .travis.yml to use industrial CI to test against Xenial
+* Logging using console_bridge (`#15 <https://github.com/ros-drivers/odva_ethernetip/issues/15>`_)
+  - cout replaced by logInform
+  - cerr with 'Warning: ' string replaced by logWarn
+  - cerr without 'Warning: ' string replaced by logErr
+* Contributors: Rein Appeldoorn
+
 0.1.3 (2018-04-13)
 ------------------
 * Make sure to #include <boost/array.hpp> in the header file.
