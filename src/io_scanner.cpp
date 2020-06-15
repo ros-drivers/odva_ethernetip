@@ -40,6 +40,12 @@ using namespace boost::asio;
 using boost::asio::ip::udp;
 using std::endl;
 
+#if BOOST_VERSION >= 107000
+#define GET_IO_SERVICE(s) ((boost::asio::io_context&)(s)->get_executor().context())
+#else
+#define GET_IO_SERVICE(s) ((s)->get_io_service())
+#endif
+
 namespace eip {
 
 using serialization::BufferReader;
@@ -60,7 +66,7 @@ IOScanner::IOScanner(io_service& io_service, string hostname)
 void IOScanner::sendListIdentityRequest()
 {
   CONSOLE_BRIDGE_logInform("Sending List Identity Request... ");
-  udp::resolver r(socket_.get_io_service());
+  udp::resolver r(GET_IO_SERVICE(&socket_));
   udp::resolver::query q(udp::v4(), hostname_, "44818");
   udp::endpoint receiver_endpoint = *r.resolve(q);
 
@@ -160,7 +166,7 @@ void IOScanner::run()
 {
   sendListIdentityRequest();
   CONSOLE_BRIDGE_logInform("Waiting for responses.");
-  socket_.get_io_service().run();
+  GET_IO_SERVICE(&socket_).run();
 }
 
 } // namespace eip
