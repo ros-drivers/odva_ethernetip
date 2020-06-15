@@ -35,16 +35,11 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include "odva_ethernetip/cpf_packet.h"
 #include "odva_ethernetip/cpf_item.h"
 #include "odva_ethernetip/identity_item_data.h"
+#include "odva_ethernetip/socket/socket.h"
 
 using namespace boost::asio;
 using boost::asio::ip::udp;
 using std::endl;
-
-#if BOOST_VERSION >= 107000
-#define GET_IO_SERVICE(s) ((boost::asio::io_context&)(s)->get_executor().context())
-#else
-#define GET_IO_SERVICE(s) ((s)->get_io_service())
-#endif
 
 namespace eip {
 
