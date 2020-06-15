@@ -55,7 +55,7 @@ public:
    */
   virtual void open(string hostname, string port)
   {
-    tcp::resolver resolver(GET_IO_SERVICE(&socket_);
+    tcp::resolver resolver(GET_IO_SERVICE(&socket_));
     tcp::resolver::query query(hostname, port);
     tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
     connect(socket_, endpoint_iterator);
