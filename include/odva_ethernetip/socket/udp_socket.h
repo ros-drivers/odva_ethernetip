@@ -56,7 +56,7 @@ public:
    */
   virtual void open(string hostname, string port)
   {
-    udp::resolver resolver(socket_.get_io_service());
+    udp::resolver resolver(GET_IO_SERVICE(&socket_));
     udp::resolver::query query(udp::v4(), hostname, port);
     remote_endpoint_ = *resolver.resolve(query);
     socket_.open(udp::v4());

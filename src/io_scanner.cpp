@@ -35,6 +35,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include "odva_ethernetip/cpf_packet.h"
 #include "odva_ethernetip/cpf_item.h"
 #include "odva_ethernetip/identity_item_data.h"
+#include "odva_ethernetip/socket/socket.h"
 
 using namespace boost::asio;
 using boost::asio::ip::udp;
@@ -60,7 +61,7 @@ IOScanner::IOScanner(io_service& io_service, string hostname)
 void IOScanner::sendListIdentityRequest()
 {
   CONSOLE_BRIDGE_logInform("Sending List Identity Request... ");
-  udp::resolver r(socket_.get_io_service());
+  udp::resolver r(GET_IO_SERVICE(&socket_));
   udp::resolver::query q(udp::v4(), hostname_, "44818");
   udp::endpoint receiver_endpoint = *r.resolve(q);
 
@@ -160,7 +161,7 @@ void IOScanner::run()
 {
   sendListIdentityRequest();
   CONSOLE_BRIDGE_logInform("Waiting for responses.");
-  socket_.get_io_service().run();
+  GET_IO_SERVICE(&socket_).run();
 }
 
 } // namespace eip
