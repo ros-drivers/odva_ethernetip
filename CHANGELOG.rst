@@ -2,8 +2,8 @@
 Changelog for package odva_ethernetip
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.5 (2020-11-26)
+------------------
 * Update maintainer
 * Merge pull request `#19 <https://github.com/ros-drivers/odva_ethernetip/issues/19>`_ from ros-drivers/fix/get-io-service-boost-noetic
   Fix/get io service boost noetic
